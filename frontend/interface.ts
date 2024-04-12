@@ -22,14 +22,8 @@ export interface Restaurant{
     menu: string[],
     openingHours: string,
     closingHours: string,
-    availableReservationPeriod:Period[],
     tags: string[],
     id: string
-}
-
-export interface Period{
-    startTime:string,
-    endTime:string
 }
 
 interface BaseRestaurantResponse{
@@ -59,10 +53,6 @@ export interface Reservation{
     reservorId: string,
     restaurantId: string,
     reservationDate: string,
-    reservationPeriod: {
-        startTime: string,
-        endTime: string
-    },
     _id: string,
     restaurant?: Restaurant
 }
@@ -74,6 +64,6 @@ export interface ReservationsResponse{
 
 export interface ResizableMultiInputEvent{
     currentTarget:{
-        value:string|Period
+        value:string
     }
 }

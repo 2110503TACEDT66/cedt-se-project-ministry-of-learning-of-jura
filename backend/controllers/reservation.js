@@ -47,7 +47,7 @@ exports.getReservation = async function(req,res,next){
 }
 exports.addReservation = async function(req,res,next){
     try{
-        let {restaurantId,reservationPeriod,reservationDate,restaurantName} = req.body;
+        let {restaurantId,reservationDate,restaurantName} = req.body;
         const reservorId = req.user.id
         let existingReservations = Reservation.find({reservorId});
         const existingReservationsCount = await Reservation.countDocuments(existingReservations);
@@ -65,7 +65,6 @@ exports.addReservation = async function(req,res,next){
         const reservation = await Reservation.create({
             restaurantId,
             reservorId,
-            reservationPeriod,
             reservationDate
         })
         res.status(201).json({

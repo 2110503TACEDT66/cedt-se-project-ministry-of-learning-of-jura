@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import removeFromArrayByIndex from "@/utils/removeFromArrayByIndex";
-import { Period, ResizableMultiInputEvent } from "../../interface";
+import { ResizableMultiInputEvent } from "../../interface";
 
 export default function({
     label,
@@ -13,7 +13,7 @@ export default function({
     helperTexts
 }:{
     label:string,
-    onChange: (newValue: (string|Period)[])=>void,
+    onChange: (newValue: (string)[])=>void,
     InnerProps?: React.ComponentType<{
         className?:string,
         onChange: (event:ResizableMultiInputEvent)=>void,
@@ -22,10 +22,7 @@ export default function({
     }>,
     helperTexts?: string[]
 }){
-    const initialValue: string|Period = (InnerProps==undefined)?"":{
-        startTime:"",
-        endTime:""
-    };
+    const initialValue: string = ""
 
     InnerProps=InnerProps||TextField;
     const [textValuesList,setTextValuesList] = useState([initialValue]);
@@ -39,7 +36,7 @@ export default function({
     }
 
     function onTextChange(event: ResizableMultiInputEvent,index:number){
-        textValuesList[index]=event.currentTarget.value as string|Period
+        textValuesList[index]=event.currentTarget.value as string
         console.log(event.currentTarget.value)
         onChange(textValuesList);
     }

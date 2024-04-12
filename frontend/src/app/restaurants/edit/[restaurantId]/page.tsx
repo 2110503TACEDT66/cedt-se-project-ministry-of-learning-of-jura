@@ -1,9 +1,8 @@
 "use client"
 import { useFormik } from "formik"
-import { Period, Restaurant } from "@/../interface"
+import { Restaurant } from "@/../interface"
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
 import ResizableMultiInput from "@/components/ResizableMultiInput"
-import TimePeriodTextField from "@/components/TimePeriodTextField"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
@@ -43,14 +42,6 @@ export default function({
         closingHours: yup.string().matches(hourRegex,invalidHourMessage),
         tags:yup.array().of(
             yup.string().required(invalidTagsMessage)
-        ),
-        availableReservationPeriod: yup.array()
-        .of(
-            // yup.string().matches(periodRegex,invalidHourMessage)
-            yup.object().shape({
-                startTime: yup.string().matches(hourRegex,invalidHourMessage),
-                endTime: yup.string().matches(hourRegex,invalidHourMessage),
-            })
         )
     })
 
@@ -61,14 +52,10 @@ export default function({
             menu: [] as string[],
             openingHours: "",
             closingHours: "",
-            tags: [] as string[],
-            availableReservationPeriod: [] as Period[]
+            tags: [] as string[]
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
-            // values.availableReservationPeriod=values.availableReservationPeriod.map((period)=>{
-            //     return 
-            // })
             const response = await fetch(`/api/restaurants/${params.restaurantId}`,{
                 method:"PUT",
                 headers:{
@@ -173,12 +160,6 @@ export default function({
                     helperTexts={formik.errors.tags as string[]|undefined}
                 />
 
-                <ResizableMultiInput
-                    label="availableReservationPeriod"
-                    InnerProps={TimePeriodTextField}
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("availableReservationPeriod",newValue)}}
-                    helperTexts={formik.errors.availableReservationPeriod as string[]|undefined}
-                />
                 <Button 
                     type="submit"
                     disabled={isSubmitting}

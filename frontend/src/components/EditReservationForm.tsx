@@ -2,7 +2,7 @@
 import { Dayjs } from "dayjs"
 import { useFormik } from "formik"
 import { SyntheticEvent, useState } from "react";
-import { Period, Restaurant, RestaurantsResponse } from "../../interface";
+import { Restaurant, RestaurantsResponse } from "../../interface";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Autocomplete, TextField } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,7 +16,6 @@ export default function ({
 }){
     
     const [restaurantsList,setRestaurantsList] = useState<string[]>([]);
-    const [reservationPeriodsList,setReservationPeriodsList] = useState<string[]>([]);
     const [isAlerting,setIsAlerting] = useState<boolean>(false);
     const [alertMessages,setAlertMessage] = useState<{
         title:string|null,
@@ -28,12 +27,10 @@ export default function ({
     const formik = useFormik({
         initialValues:{
             restaurantName: "",
-            reservationDate: null as (Dayjs|null),
-            reservationPeriod: ""
+            reservationDate: null as (Dayjs|null)
         },
         async onSubmit(values,{setSubmitting, setErrors}){
-            const {reservationPeriod,restaurantName,reservationDate} = formik.values
-            const [startTime,endTime]=reservationPeriod.split("-")
+            const {restaurantName,reservationDate} = formik.values
             
             const restaurantResponse: RestaurantsResponse = await fetch(`/api/restaurants/?name=${restaurantName}`,{
                 method:"GET",
@@ -45,11 +42,7 @@ export default function ({
             const restaurantId = restaurantResponse.data[0].id;
             let data = {
                 restaurantId,
-                reservationDate,
-                reservationPeriod:{
-                    startTime,
-                    endTime
-                }
+                reservationDate
             }
             // console.log(restaurantResponse,data)
             const result = await fetch(`/api/reservations/${reservationId}`,{
@@ -64,7 +57,7 @@ export default function ({
             if(!result.ok||!responseJson.success){
                 setAlertMessage({
                     title:"Error!",
-                    description:responseJson.message||"Wrong restaurant name or unavailable period"
+                    description:responseJson.message||"Wrong restaurant name"
                 })
                 setIsAlerting(true);
                 return
@@ -89,20 +82,6 @@ export default function ({
             return restaurant.name
         })
         setRestaurantsList(newRestaurantsList)
-    }
-    async function onReservationPeriodChange(_e:SyntheticEvent<Element, Event>|null, value: string|null,restaurantName?:string|null){
-        console.log(formik.values.restaurantName)
-        const restaurantsResponse = await fetch(`/api/restaurants?name=${formik.values.restaurantName||restaurantName}&select=availableReservationPeriod`)
-        .then((res)=>{
-            return res.json()
-        })
-        let newReservationPeriodsList = []
-        if(restaurantsResponse.data!=undefined&&restaurantsResponse.data.length>=1){
-            newReservationPeriodsList = restaurantsResponse.data[0].availableReservationPeriod.map((period: Period)=>{
-                return period.startTime+"-"+period.endTime
-            })
-        }
-        setReservationPeriodsList(newReservationPeriodsList)
     }
     return (
         <div className="h-full flex items-center justify-center m-2">
@@ -146,7 +125,6 @@ export default function ({
                     onInputChange={onRestaurantNameChange}
                     onChange={async (e,value)=>{
                         formik.setFieldValue("restaurantName",value)
-                        await onReservationPeriodChange(null,"",value);
                     }}
                     freeSolo
                     autoSelect
@@ -160,31 +138,6 @@ export default function ({
                         }}
                     ></DatePicker>
                 </LocalizationProvider>
-                <Autocomplete
-                    disablePortal
-                    sx={{
-                        width:"100%",
-                        alignSelf:"center"
-                    }}
-                    options={reservationPeriodsList}
-                    filterOptions={(options, state) => options}
-                    // sx={{ width: 300 }}
-                    renderInput={(params) => <TextField 
-                        {...params} 
-                        label="Reservation Period" 
-                        InputProps={{
-                            ...params.InputProps,
-                            // type: 'search',
-                        }}
-                    />}
-                    value={formik.values.reservationPeriod}
-                    onInputChange={onReservationPeriodChange}
-                    onChange={(e,value)=>{
-                        formik.setFieldValue("reservationPeriod",value)
-                    }}
-                    freeSolo
-                    autoSelect
-                />
                 <Button 
                     type="submit"
                     disabled={formik.isSubmitting}

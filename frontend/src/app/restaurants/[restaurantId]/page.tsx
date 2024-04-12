@@ -60,27 +60,6 @@ export default async function({
                     }
                     </List>
 
-                    <Typography variant="h5">Available Reservation Periods</Typography>
-                    <List>
-                    {
-                        restaurant.availableReservationPeriod.map(({startTime,endTime},index)=>{
-                            const periodString = `${startTime}-${endTime}`;
-                            const searchParams = new URLSearchParams({
-                                restaurantName:restaurant.name,
-                                reservationPeriod: periodString
-                            })
-                            return (
-                                <ListItemButton 
-                                    key={index}
-                                    component="a" 
-                                    href={`/reservations/create?${searchParams.toString()}`}
-                                >
-                                    <ListItemText key={index} primary={periodString} />
-                                </ListItemButton>
-                            )
-                        })
-                    }
-                    </List>
                 </div>
             </div>
         </main>
