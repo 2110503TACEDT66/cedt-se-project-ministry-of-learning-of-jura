@@ -9,11 +9,20 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
   },
-  "scripts":{
-    "dev":"concurrently --kill-others 'bun run dev:backend' 'bun run dev:frontend'",
-    "dev:backend": "cd ./backend && bun run dev",
-    "dev:frontend": "cd ./frontend && bun run dev"
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm:dev:*\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+
+    "setup": "bun install && bun run setup:backend && bun run setup:frontend",
+    "setup:backend": "cd backend && bun install",
+    "setup:frontend": "cd frontend && bun install",
+    
+    "npm:setup": "npm install && npm run npm:setup:backend && npm run npm:setup:frontend",
+    "npm:setup:backend": "cd backend && npm install",
+    "npm:setup:frontend": "cd frontend && npm install"
   }
 }
