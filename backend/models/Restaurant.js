@@ -14,18 +14,27 @@ const Restaurant = new mongoose.Schema({
         required:true
     },
     menu:{
-        type: [String]
+        type: [String],
+        required:true
     },
     openingHours:{
         type: String,
-        match: [timeRegex,invalidTimeMsg]
+        match: [timeRegex,invalidTimeMsg],
+        required:true
     },
     closingHours:{
         type: String,
-        match: [timeRegex,invalidTimeMsg]
+        match: [timeRegex,invalidTimeMsg],
+        required:true
+    },
+    restaurantOwner:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required:true
     },
     tags:{
         type: [String],
+        required:true
     }
 },{
     toJSON: {virtuals:true},
@@ -34,9 +43,6 @@ const Restaurant = new mongoose.Schema({
 Restaurant.pre("deleteOne",{document:true, query:false},async function(next){
     await Reservation.deleteMany({
         restaurantId: this._id
-    });
-    await Files.deleteOne({
-        filename: this._id
     });
     next()
 })

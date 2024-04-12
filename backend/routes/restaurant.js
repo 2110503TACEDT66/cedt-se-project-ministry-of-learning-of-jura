@@ -1,14 +1,16 @@
 const express = require("express");
-const Restaurant = require("../models/Restaurant");
-const {getRestaurants,getRestaurant,createRestaurant,updateRestaurant,deleteRestaurant} = require("../controllers/restaurants");
+const {uploadRestaurantImage,getRestaurants,getRestaurant,createRestaurant,updateRestaurant,deleteRestaurant} = require("../controllers/restaurants");
 const { checkToken,checkRole,checkTokenIfExists } = require("../middleware/auth");
 const router = express.Router();
+const upload = require("../middleware/upload")
 
 router.route("/")
     .get(checkTokenIfExists,getRestaurants)
-    .post(checkToken, checkRole("admin"), createRestaurant);
+    .post(checkToken, checkRole("restaurantOwner"), createRestaurant);
 router.route("/:id")
     .get(checkTokenIfExists,getRestaurant)
-    .put(checkToken, checkRole("admin"), updateRestaurant)
-    .delete(checkToken, checkRole("admin"), deleteRestaurant)
+    .put(checkToken, checkRole("restaurantOwner"), updateRestaurant)
+    .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurant)
+router.route("/:id/image")
+    .post(checkToken, checkRole("restaurantOwner"),upload(process.env.MAX_IMAGE_MB_SIZE,["image/jpeg","image/png"]), uploadRestaurantImage);
 module.exports=router
