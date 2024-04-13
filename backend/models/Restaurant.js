@@ -26,6 +26,19 @@ const Restaurant = new mongoose.Schema({
     },
     tags:{
         type: [String],
+    },
+    menus:{
+        type: [{
+            name:{
+                type: String,
+                required:true
+            },
+            price:{
+                type: Number,
+                required:true
+            }
+        }],
+        default: []
     }
 },{
     toJSON: {virtuals:true},
