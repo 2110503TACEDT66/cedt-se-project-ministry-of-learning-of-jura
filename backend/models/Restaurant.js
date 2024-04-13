@@ -13,9 +13,6 @@ const Restaurant = new mongoose.Schema({
         unique: true,
         required:true
     },
-    menu:{
-        type: [String]
-    },
     openingHours:{
         type: String,
         match: [timeRegex,invalidTimeMsg]
