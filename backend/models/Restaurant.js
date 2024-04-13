@@ -30,14 +30,21 @@ const Restaurant = new mongoose.Schema(
     tags: {
       type: [String],
     },
-    reservationOpen: {
-      type: String,
-      match: [timeRegex, invalidTimeMsg],
-      required: true,
-    },
-    reservationClose: {
-      type: String,
-      match: [timeRegex, invalidTimeMsg],
+    reservationPeriods: {
+      type: [
+        {
+          start: {
+            type: String,
+            match: [timeRegex, invalidTimeMsg],
+            required: true,
+          },
+          end: {
+            type: String,
+            match: [timeRegex, invalidTimeMsg],
+            required: true,
+          },
+        },
+      ],
       required: true,
     },
   },
