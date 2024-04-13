@@ -9,12 +9,14 @@ const restaurantRoute = require("./routes/restaurant");
 const authRoute = require("./routes/auth");
 const { connectDB } = require("./config/connectDB");
 const reservationRouter = require("./routes/reservation");
-// const cors = require('cors')
+const cors = require('cors')
 const app = express();
 
 connectDB();
 
-// app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:3000' // Replace with your frontend's origin
+}));
 // app.options('*', cors());
 app.use(express.json())
 app.use(cookieParser());
