@@ -8,11 +8,7 @@ module.exports=function(maxSize,allowedMimeTypes){
         }
         cb(null,false)
     }
-    function onError(err, next){
-        if(err instanceof multer.MulterError){
-
-        }
-    }
+    
     let upload = multer({
         fileFilter:fileFilter,
         limits:{
@@ -20,7 +16,7 @@ module.exports=function(maxSize,allowedMimeTypes){
         }
     }).single("image")
     return function(req,res,next){
-        upload(req,res,function(err){
+        upload(req,res,function onError(err){
             if(err==undefined){
                 next();
                 return;
