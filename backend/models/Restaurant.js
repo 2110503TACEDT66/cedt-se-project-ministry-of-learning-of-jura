@@ -30,6 +30,11 @@ const Restaurant = new mongoose.Schema(
     tags: {
       type: [String],
     },
+    reserverCapacity:{
+        type: Number,
+        min: 0,
+        required: true
+    },
     reservationPeriods: {
       type: [
         {
