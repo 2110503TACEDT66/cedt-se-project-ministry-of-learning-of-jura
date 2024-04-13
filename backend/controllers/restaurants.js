@@ -1,6 +1,6 @@
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
-const { getBucket } = require('../config/connectDB');
+const { getGridFsBucket } = require('../config/connectDB');
 
 //@desc   : Get all restaurants
 //@route  : GET /api/v1/restaurant
@@ -154,5 +154,38 @@ exports.deleteRestaurant = async (req,res,next) => {
     } catch(err) {
         console.log(err)
         res.status(400).json({success: false, message: 'Not valid ID'});
+    }
+}
+
+//@desc   : Get image of a restaurant
+//@route  : GET /api/v1/restaurants/:id/image
+//@access : Public
+exports.getRestaurantImage = async function (req, res, next) {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: "Cannot find restaurant with id " + req.params.id });
+        }
+        
+        const bucket = getGridFsBucket()
+        const downloadStream = await bucket.openDownloadStreamByName(req.params.id);
+        downloadStream.on('error', (err) => {
+            console.log(err);
+            res.status(404).json({
+                success: false,
+                message: "This restaurant has no images"
+            });
+        });
+        
+        res.setHeader('Content-Type', 'image/jpeg');
+        downloadStream.pipe(res);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error" 
+        });
     }
 }
