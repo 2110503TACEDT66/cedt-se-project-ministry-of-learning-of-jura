@@ -24,6 +24,11 @@ const Restaurant = new mongoose.Schema({
         type: String,
         match: [timeRegex,invalidTimeMsg]
     },
+    reserverCapacity:{
+        type: Number,
+        min: 0,
+        required: true
+    },
     tags:{
         type: [String],
     }
