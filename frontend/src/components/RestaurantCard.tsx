@@ -2,7 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Restaurant } from "../../interface"
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import useSession from "@/hooks/useSession"
@@ -10,6 +10,7 @@ import { Delete, Edit } from "@mui/icons-material"
 import { IconButton } from "@mui/material"
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useRouter } from "next/navigation"
+import getRestaurantImageData from "@/utils/getRestaurantImageData"
 // import { useRouter } from "next/navigation"
 
 export default function({
@@ -22,6 +23,7 @@ export default function({
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
     const isAdmin = session?.user.role=="admin";
+    const [image, setImage] = useState<string>(`/img/pure_logo.jpg`);
 
     const router = useRouter();
 
@@ -43,6 +45,19 @@ export default function({
         strokeWidth: 1
     };
 
+    useEffect(() => {
+        const fetchImage = async () => {
+            try {
+                const imageData = await getRestaurantImageData(restaurant.id);
+                setImage(imageData);
+            } catch (error) {
+                console.error("Error fetching image:", error);
+            }
+        };
+        fetchImage();
+    }, []);
+
+
     return (
         <div className={`${className||''} relative md:w-[250px] sm:w-1/3 rounded-2xl p-2 border-solid border-2 border-grey text-black bg-white`}>
             <Link href={`/restaurants/${restaurant.id}`}>
@@ -61,7 +76,7 @@ export default function({
                 }
                 <Image
                     alt={restaurant.name}
-                    src={`/img/pure_logo.jpg`}
+                    src={image}
                     width={250}
                     height={250}
                     sizes={"100vw"}
