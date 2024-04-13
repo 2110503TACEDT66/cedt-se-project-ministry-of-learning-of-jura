@@ -1,8 +1,11 @@
+
+
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
 const { getGridFsBucket } = require('../config/connectDB');
 const mongoose = require("mongoose")
 const { Readable } = require('stream');
+const File = require("../models/File")
 
 //@desc   : Get all restaurants
 //@route  : GET /api/v1/restaurant
@@ -165,17 +168,25 @@ exports.deleteRestaurant = async (req,res,next) => {
 }
 
 exports.uploadRestaurantImage = async(req,res,next)=>{
-    let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
-    if(!req.user._id.equals(restaurant.restaurantOwner)){
-        return res.status(401).json({success:false,message:"Not Authorized"})
+    try{
+        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+        if(restaurant==undefined){
+            return res.status(404).json({success:false,message:"cannot find restaurant with id "+req.params.id})
+        }
+        if(!req.user._id.equals(restaurant.restaurantOwner)){
+            return res.status(401).json({success:false,message:"Not Authorized"})
+        }
+        let bucket = getGridFsBucket()
+        let uploadStream = bucket.openUploadStream(restaurant.id,{
+            metadata:{
+                contentType: req.file.mimetype
+            },
+        });
+        let fileStream = Readable.from(req.file.buffer);
+        fileStream.pipe(uploadStream)
+        res.status(200).json({success:true});
     }
-    let bucket = getGridFsBucket()
-    let uploadStream = bucket.openUploadStream(restaurant.id,{
-        metadata:{
-            contentType: req.file.mimetype
-        },
-    });
-    let fileStream = Readable.from(req.file.buffer);
-    fileStream.pipe(uploadStream)
-    res.status(200).json({success:true});
+    catch(err){
+        res.status(400).json({success:false,message:"restaurant already has image"})
+    }
 }
