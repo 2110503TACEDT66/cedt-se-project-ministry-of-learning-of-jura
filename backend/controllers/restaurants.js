@@ -77,15 +77,15 @@ exports.getRestaurants = async (req,res,next) => {
 //@access : Public
 exports.getRestaurant = async (req,res,next) => {
     try {
-        let restaurant = await Restaurant.findById(req.params.id);
-        let query = Restaurant.findById(req.params.id).select("_id");
+        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+        let query = Restaurant.findById(req.params.id);
         if(req.user){
             let populateQuery = {
                 path:'reservations'
             }
-            if(req.user.role!="restaurantOwner" && !restaurant.restaurantOwner.equals(req.user._id)){
+            if(req.user.role!="restaurantOwner" || !restaurant.restaurantOwner.equals(req.user._id)){
                 populateQuery.match={
-                    reservorId: req.user._id
+                    reservorId: req.user._id.toString()
                 }
             }
             // console.log(populateQuery);
@@ -93,13 +93,14 @@ exports.getRestaurant = async (req,res,next) => {
         }
 
         const reservationsJson = await query;
-        restaurant.reservations=reservationsJson.reservations;
+        // console.log(restaurant.restaurantOwner)
+        // restaurant.reservations=reservationsJson.reservations;
         if(!restaurant){
             return res.status(404).json({success: false, message: 'Not found'});
         }
         res.status(200).json({
             success: true,
-            data: restaurant
+            data: reservationsJson
         })
     } catch(err) {
         console.log(err)
