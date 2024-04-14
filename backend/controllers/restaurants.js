@@ -80,16 +80,13 @@ exports.getRestaurants = async (req, res, next) => {
 //@access : Public
 exports.getRestaurant = async (req, res, next) => {
   try {
-    let restaurant = await Restaurant.findById(req.params.id);
-    let query = Restaurant.findById(req.params.id).select("_id");
+    let query = Restaurant.findById(req.params.id);
+
     if (req.user) {
       let populateQuery = {
         path: "reservations",
       };
-      if (
-        req.user.role != "restaurantOwner" &&
-        !restaurant.restaurantOwner.equals(req.user._id)
-      ) {
+      if (req.user.role != "admin") {
         populateQuery.match = {
           reservorId: req.user._id,
         };
@@ -98,8 +95,7 @@ exports.getRestaurant = async (req, res, next) => {
       query = query.populate(populateQuery);
     }
 
-    const reservationsJson = await query;
-    restaurant.reservations = reservationsJson.reservations;
+    const restaurant = await query;
     if (!restaurant) {
       return res.status(404).json({ success: false, message: "Not found" });
     }
@@ -118,7 +114,6 @@ exports.getRestaurant = async (req, res, next) => {
 //@access : Private
 exports.createRestaurant = async (req, res, next) => {
   try {
-    req.body.restaurantOwner = req.user._id;
     const restaurant = await Restaurant.create(req.body);
     res.status(201).json({ success: true, data: restaurant });
   } catch (err) {
@@ -139,17 +134,14 @@ exports.updateRestaurant = async (req, res, next) => {
       req.params.id,
       req.body
     );
+
     if (!restaurant) {
       return res.status(404).json({
         success: false,
         message: `Not found restaurant with id ${req.params.id}`,
       });
     }
-    if (!restaurant.restaurantOwner.equals(req.user._id)) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Not Authorized" });
-    }
+
     res.status(200).json({ success: true, data: restaurant });
   } catch (err) {
     res.status(400).json({ success: false, message: "Not valid ID" });
@@ -172,11 +164,7 @@ exports.deleteRestaurant = async (req, res, next) => {
         message: `Not found restaurant with id ${req.params.id}`,
       });
     }
-    if (!restaurant.restaurantOwner.equals(req.user._id)) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Not Authorized" });
-    }
+
     await restaurant.deleteOne();
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
@@ -198,6 +186,8 @@ exports.updateRestaurantImage = async (req, res, next) => {
       });
     }
     if (!req.user._id.equals(restaurant.restaurantOwner)) {
+      // console.log(restaurant.restaurantOwner);
+      // console.log(req.user._id);
       return res
         .status(401)
         .json({ success: false, message: "Not Authorized" });
@@ -208,6 +198,9 @@ exports.updateRestaurantImage = async (req, res, next) => {
         message: "cannot find image file with id " + req.params.id,
       });
     }
+    // console.log(req.user._id);
+    // let deleter = await File.findOneAndDelete({ filename: req.params.id });
+    await file.deleteOne();
     let bucket = getGridFsBucket();
     let uploadStream = bucket.openUploadStream(restaurant.id, {
       metadata: {
@@ -218,6 +211,7 @@ exports.updateRestaurantImage = async (req, res, next) => {
     fileStream.pipe(uploadStream);
     res.status(200).json({ success: true });
   } catch (err) {
+    console.log(err);
     res
       .status(400)
       .json({ success: false, message: "restaurant already has image" });
