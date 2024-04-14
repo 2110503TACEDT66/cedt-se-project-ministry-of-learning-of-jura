@@ -177,6 +177,10 @@ exports.uploadRestaurantImage = async(req,res,next)=>{
         if(!req.user._id.equals(restaurant.restaurantOwner)){
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
+        let file = File.findOne({filename:restaurant.id});
+        if(file!=undefined){
+            return res.status(404).json({success:false,message:"restaurant already has image"})
+        }
         let bucket = getGridFsBucket()
         let uploadStream = bucket.openUploadStream(restaurant.id,{
             metadata:{
