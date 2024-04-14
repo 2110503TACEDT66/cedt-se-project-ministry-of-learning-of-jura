@@ -1,15 +1,6 @@
-export default async function getRestaurantImageData(restaurantId: string) {
-    try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/restaurants/${restaurantId}/image`
-        );
+import relativeToAbsolute from "./relativeToAbsolute";
 
-        if (!response.ok) {
-            return "/img/pure_logo.jpg";
-        }
-        return response.url;
-    } catch (error) {
-        return "/img/pure_logo.jpg";
-    }
+export default function getRestaurantImageData(restaurantId: string) {
+    return relativeToAbsolute(`/api/v1/restaurants/${restaurantId}/image`);
 }
 

@@ -25,7 +25,6 @@ export default async function({
     console.log(restaurantResponse)
 
     const restaurant: Restaurant = restaurantResponse.data;
-    const ImageData = await getRestaurantImageData(params.restaurantId);
 
     return (
         <main className="w-full h-full flex items-center justify-center">
@@ -33,7 +32,7 @@ export default async function({
                 <div>
                     <RestaurantImage
                         alt={restaurant.name}
-                        src={ImageData}
+                        src={getRestaurantImageData(params.restaurantId)}
                         width={400}
                         height={400}
                         sizes={"100vw"}
