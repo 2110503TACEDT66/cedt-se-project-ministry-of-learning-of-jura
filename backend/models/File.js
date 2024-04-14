@@ -22,7 +22,6 @@ FilesSchema.pre(
     query: false
   },
   async function (next) {
-    console.log(this._id)
     await getGridFsBucket().delete(this._id);
     next();
   }
@@ -32,7 +31,7 @@ FilesSchema.pre(
   "deleteOne",
   { 
     document: false,
-    query: true
+    query: false
   },
   async function (next) {
     let file = await this.model.findOne(this._condition)
