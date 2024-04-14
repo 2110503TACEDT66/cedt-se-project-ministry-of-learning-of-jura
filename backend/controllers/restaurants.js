@@ -178,7 +178,6 @@ exports.getRestaurantImage = async function (req, res, next) {
             });
         });
         
-        res.setHeader('Content-Type', 'image/jpeg');
         downloadStream.pipe(res);
     }
     catch (err) {

@@ -23,7 +23,7 @@ export default function({
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
     const isAdmin = session?.user.role=="admin";
-    const [image, setImage] = useState<string>(`/img/pure_logo.jpg`);
+    const [image, setImage] = useState<string>("");
 
     const router = useRouter();
 
@@ -48,8 +48,10 @@ export default function({
     useEffect(() => {
         const fetchImage = async () => {
             try {
+                setImageLoaded(false);
                 const imageData = await getRestaurantImageData(restaurant.id);
                 setImage(imageData);
+                setImageLoaded(true);
             } catch (error) {
                 console.error("Error fetching image:", error);
             }
@@ -81,9 +83,6 @@ export default function({
                     height={250}
                     sizes={"100vw"}
                     className={`rounded-2xl aspect-square object-cover ${imageLoaded? '':'w-0 h-0'} `}
-                    onLoad={()=>{
-                        setImageLoaded(true);
-                    }}
                 ></Image>
                 <p className={`text-center ${imageLoaded? '':'hidden'}`}>{restaurant.name}</p>
                 <p className={`bg-gray-300 rounded-2xl relative bottom-0 w-fit p-1 px-2 ${imageLoaded? '':'hidden'}`}>{restaurant.openingHours}-{restaurant.closingHours}</p>
