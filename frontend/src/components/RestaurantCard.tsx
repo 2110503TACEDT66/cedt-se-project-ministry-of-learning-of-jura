@@ -23,7 +23,7 @@ export default function({
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
     const isAdmin = session?.user.role=="admin";
-    const [image, setImage] = useState<string>("");
+    const [image, setImage] = useState<string>("/img/pure_logo.jpg");
 
     const router = useRouter();
 

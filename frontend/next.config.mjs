@@ -3,6 +3,9 @@
 // dotenv.config({path:"./.env.local"})
 
 const nextConfig = {
+    images: {
+        domains: ["localhost",`${process.env.NEXT_PUBLIC_BACKEND_URL}`],
+    },
     async rewrites(){
         return {
             beforeFiles:[{

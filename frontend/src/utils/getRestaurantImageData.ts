@@ -7,14 +7,9 @@ export default async function getRestaurantImageData(restaurantId: string) {
         if (!response.ok) {
             return "/img/pure_logo.jpg";
         }
-
-        const imageData = await response.arrayBuffer();
-        const base64ImageData = Buffer.from(imageData).toString("base64");
-
-        return `data:image;base64,${base64ImageData}`;
+        return response.url;
     } catch (error) {
         return "/img/pure_logo.jpg";
     }
 }
-
 
