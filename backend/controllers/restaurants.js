@@ -131,15 +131,19 @@ exports.createRestaurant = async (req,res,next) => {
 //@access : Private
 exports.updateRestaurant = async (req,res,next) => {
     try {
-        const restaurant = await Restaurant.findByIdAndUpdate(req.params.id,req.body);
+        const restaurant = await Restaurant.findOne({
+            _id:req.params.id,
+        }).select("restaurantOwner");;
         if(!restaurant){
             return res.status(404).json({success: false, message: `Not found restaurant with id ${req.params.id}`});
         }
         if(!restaurant.restaurantOwner.equals(req.user._id)){
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
-        res.status(200).json({success: true, data: restaurant});
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id,req.body,{new:true});
+        res.status(200).json({success: true, data: updatedRestaurant});
     } catch(err) {
+        console.log(err)
         res.status(400).json({success: false, message: 'Not valid ID'});
     }
 }
@@ -151,7 +155,7 @@ exports.deleteRestaurant = async (req,res,next) => {
     try {
         let restaurant
         if(req.params.id){
-            restaurant = await Restaurant.findById(req.params.id);
+            restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
         }
         
         if(!restaurant){
@@ -177,7 +181,7 @@ exports.uploadRestaurantImage = async(req,res,next)=>{
         if(!req.user._id.equals(restaurant.restaurantOwner)){
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
-        let file = File.findOne({filename:restaurant.id});
+        let file = await File.findOne({filename:restaurant.id});
         if(file!=undefined){
             return res.status(404).json({success:false,message:"restaurant already has image"})
         }
