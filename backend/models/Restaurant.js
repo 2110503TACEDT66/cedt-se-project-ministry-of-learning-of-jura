@@ -38,6 +38,7 @@ const Restaurant = new mongoose.Schema(
     reservationPeriods: {
       type: [
         {
+          _id: false,
           start: {
             type: String,
             match: [timeRegex, invalidTimeMsg],
@@ -51,6 +52,7 @@ const Restaurant = new mongoose.Schema(
         },
       ],
       required: true,
+      validate: (array) => array.length >= 1,
     },
   },
   {
