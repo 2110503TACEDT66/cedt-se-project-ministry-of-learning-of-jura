@@ -1,8 +1,11 @@
+
+
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
 const { getGridFsBucket } = require('../config/connectDB');
 const mongoose = require("mongoose")
 const { Readable } = require('stream');
+const File = require("../models/File")
 
 //@desc   : Get all restaurants
 //@route  : GET /api/v1/restaurant
@@ -74,15 +77,15 @@ exports.getRestaurants = async (req,res,next) => {
 //@access : Public
 exports.getRestaurant = async (req,res,next) => {
     try {
-        let restaurant = await Restaurant.findById(req.params.id);
-        let query = Restaurant.findById(req.params.id).select("_id");
+        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+        let query = Restaurant.findById(req.params.id);
         if(req.user){
             let populateQuery = {
                 path:'reservations'
             }
-            if(req.user.role!="restaurantOwner" && !restaurant.restaurantOwner.equals(req.user._id)){
+            if(req.user.role!="restaurantOwner" || !restaurant.restaurantOwner.equals(req.user._id)){
                 populateQuery.match={
-                    reservorId: req.user._id
+                    reservorId: req.user._id.toString()
                 }
             }
             // console.log(populateQuery);
@@ -90,13 +93,14 @@ exports.getRestaurant = async (req,res,next) => {
         }
 
         const reservationsJson = await query;
-        restaurant.reservations=reservationsJson.reservations;
+        // console.log(restaurant.restaurantOwner)
+        // restaurant.reservations=reservationsJson.reservations;
         if(!restaurant){
             return res.status(404).json({success: false, message: 'Not found'});
         }
         res.status(200).json({
             success: true,
-            data: restaurant
+            data: reservationsJson
         })
     } catch(err) {
         console.log(err)
@@ -127,15 +131,19 @@ exports.createRestaurant = async (req,res,next) => {
 //@access : Private
 exports.updateRestaurant = async (req,res,next) => {
     try {
-        const restaurant = await Restaurant.findByIdAndUpdate(req.params.id,req.body);
+        const restaurant = await Restaurant.findOne({
+            _id:req.params.id,
+        }).select("restaurantOwner");;
         if(!restaurant){
             return res.status(404).json({success: false, message: `Not found restaurant with id ${req.params.id}`});
         }
         if(!restaurant.restaurantOwner.equals(req.user._id)){
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
-        res.status(200).json({success: true, data: restaurant});
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id,req.body,{new:true});
+        res.status(200).json({success: true, data: updatedRestaurant});
     } catch(err) {
+        console.log(err)
         res.status(400).json({success: false, message: 'Not valid ID'});
     }
 }
@@ -147,7 +155,7 @@ exports.deleteRestaurant = async (req,res,next) => {
     try {
         let restaurant
         if(req.params.id){
-            restaurant = await Restaurant.findById(req.params.id);
+            restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
         }
         
         if(!restaurant){
@@ -165,17 +173,29 @@ exports.deleteRestaurant = async (req,res,next) => {
 }
 
 exports.uploadRestaurantImage = async(req,res,next)=>{
-    let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
-    if(!req.user._id.equals(restaurant.restaurantOwner)){
-        return res.status(401).json({success:false,message:"Not Authorized"})
+    try{
+        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+        if(restaurant==undefined){
+            return res.status(404).json({success:false,message:"cannot find restaurant with id "+req.params.id})
+        }
+        if(!req.user._id.equals(restaurant.restaurantOwner)){
+            return res.status(401).json({success:false,message:"Not Authorized"})
+        }
+        let file = await File.findOne({filename:restaurant.id});
+        if(file!=undefined){
+            return res.status(404).json({success:false,message:"restaurant already has image"})
+        }
+        let bucket = getGridFsBucket()
+        let uploadStream = bucket.openUploadStream(restaurant.id,{
+            metadata:{
+                contentType: req.file.mimetype
+            },
+        });
+        let fileStream = Readable.from(req.file.buffer);
+        fileStream.pipe(uploadStream)
+        res.status(200).json({success:true});
     }
-    let bucket = getGridFsBucket()
-    let uploadStream = bucket.openUploadStream(restaurant.id,{
-        metadata:{
-            contentType: req.file.mimetype
-        },
-    });
-    let fileStream = Readable.from(req.file.buffer);
-    fileStream.pipe(uploadStream)
-    res.status(200).json({success:true});
+    catch(err){
+        res.status(400).json({success:false,message:"restaurant already has image"})
+    }
 }
