@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import { List, ListItem, ListItemButton,ListItemText, Typography  } from "@mui/material"
 import getRestaurant from "@/utils/getRestaurant"
 import RestaurantImage from "@/components/RestaurantImage"
-
+import Link from "next/link"
 export default async function({
     params
 }:{
@@ -59,7 +59,28 @@ export default async function({
                         })
                     }
                     </List>
-
+                    <Typography variant="h5">Available Reservation Periods</Typography>
+                    {restaurant.reservationPeriods? 
+                    <List>
+                    {
+                        restaurant.reservationPeriods.map(({start,end},index)=>{
+                            const periodString = `${start}-${end}`;
+                            const searchParams = new URLSearchParams({
+                                restaurantName:restaurant.name,
+                                reservationPeriod: periodString
+                            })
+                            return (
+                                <ListItemButton 
+                                    key={index}
+                                    component="a" 
+                                    href={`/reservations/create?${searchParams.toString()}`}
+                                >
+                                    <ListItemText key={index} primary={periodString} />
+                                </ListItemButton>
+                            )
+                        })
+                    }
+                    </List> : null}
                 </div>
             </div>
         </main>

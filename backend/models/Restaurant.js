@@ -30,10 +30,15 @@ const Restaurant = new mongoose.Schema(
     tags: {
       type: [String],
     },
+    reserverCapacity: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
     reservationPeriods: {
       type: [
         {
-          _id:false,
+          _id: false,
           start: {
             type: String,
             match: [timeRegex, invalidTimeMsg],
@@ -47,7 +52,7 @@ const Restaurant = new mongoose.Schema(
         },
       ],
       required: true,
-      validate: (array)=>array.length>=1
+      validate: (array) => array.length >= 1,
     },
   },
   {
