@@ -6,6 +6,7 @@ import { List, ListItem, ListItemButton,ListItemText, Typography  } from "@mui/m
 import getRestaurant from "@/utils/getRestaurant"
 import RestaurantImage from "@/components/RestaurantImage"
 import getRestaurantImageData from "@/utils/getRestaurantImageData"
+import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl"
 
 export default async function({
     params
@@ -32,7 +33,7 @@ export default async function({
                 <div>
                     <RestaurantImage
                         alt={restaurant.name}
-                        src={getRestaurantImageData(params.restaurantId)}
+                        src={getRestaurantImageUrl(params.restaurantId)}
                         width={400}
                         height={400}
                         sizes={"100vw"}
