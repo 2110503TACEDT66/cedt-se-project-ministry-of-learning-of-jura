@@ -1,23 +1,8 @@
 const mongoose = require("mongoose")
 const {timeRegex,invalidTimeMsg} = require("../config/constants")
 const Reservation = require("./Reservation")
-const discount = {
-    _id:false,
-    name:{
-        type: String,
-        required:true
-    },
-    description:{
-        type: String,
-        required:true
-    },
-    points: {
-        type:Number,
-        min: 1,
-        max: 500,
-        required:true
-    }
-}
+const Discount = require("./Discount")
+
 const Restaurant = new mongoose.Schema({
     name:{
         type: String,
@@ -42,7 +27,7 @@ const Restaurant = new mongoose.Schema({
         match: [timeRegex,invalidTimeMsg]
     },
     discounts:{
-        type:[discount],
+        type:[Discount],
         default: []
     },
     tags:{
