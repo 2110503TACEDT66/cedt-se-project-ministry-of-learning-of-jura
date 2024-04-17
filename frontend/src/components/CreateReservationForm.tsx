@@ -1,5 +1,5 @@
 "use client"
-import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel } from "@mui/material";
 import { useFormik } from "formik";
 import { SyntheticEvent, useState } from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -8,6 +8,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import { Restaurant } from "../../interface";
 import { useSearchParams } from "next/navigation";
+import { Checkbox } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 export default function({
     token
@@ -24,14 +26,17 @@ export default function({
         title:null,
         description:null
     });
+    const [welcomedrink, setWelcomeDrink] = useState<boolean>(false);
+    const router = useRouter() ;
     
     const formik = useFormik({
         initialValues:{
             restaurantName: searchParams.get("restaurantName")||"",
             reservationDate: null as (Dayjs|null),
+            welcomedrink: false
         },
         async onSubmit(values,{setSubmitting, setErrors}){
-            let data = formik.values
+            let data = { ...formik.values, welcomedrink };
             const result = await fetch("/api/reservations",{
                 method:"POST",
                 headers:{
@@ -47,13 +52,18 @@ export default function({
                     description:responseJson.message||"Wrong restaurant name"
                 })
                 setIsAlerting(true);
-                return
+                return;
             }
             setAlertMessage({
                 title:"Success!",
                 description:"Successfully create reservation"
             })
+            
             setIsAlerting(true);
+            router.push("/reservations");
+            router.refresh() ;
+            
+            
         }
     })
 
@@ -128,6 +138,22 @@ export default function({
                         }}
                     ></DatePicker>
                 </LocalizationProvider>
+                    
+
+                <FormControlLabel
+                    control={<>
+                        <input 
+                            checked={welcomedrink} 
+                            id="checked-checkbox" 
+                            type="checkbox" 
+                            value="" 
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            onChange={(e) => setWelcomeDrink(e.target.checked)} 
+                        />
+                        
+                    </>}
+                    label={<label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900">Welcome Drink</label>}
+                />
                 <Button 
                     type="submit"
                     disabled={formik.isSubmitting}

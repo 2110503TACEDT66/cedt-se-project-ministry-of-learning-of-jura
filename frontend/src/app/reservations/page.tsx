@@ -3,7 +3,7 @@ import RestaurantImage from "@/components/RestaurantImage";
 import useServerSession from "@/hooks/useServerSession";
 import getReservations from "@/utils/getReservations";
 import getRestaurant from "@/utils/getRestaurant";
-import getRestaurantImageSrc from "@/utils/getRestaurantImageSrc";
+// import getRestaurantImageSrc from "@/utils/getRestaurantImageSrc";
 import getRestaurantUrl from "@/utils/getRestaurantUrl";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { Typography } from "@mui/material";
