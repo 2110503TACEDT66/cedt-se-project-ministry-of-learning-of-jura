@@ -1,12 +1,12 @@
 "use client"
-import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle , Select , MenuItem} from "@mui/material";
 import { useFormik } from "formik";
 import { SyntheticEvent, useState } from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
-import { Restaurant } from "../../interface";
+import { Discount, Restaurant } from "../../interface";
 import { useSearchParams } from "next/navigation";
 
 export default function({
@@ -24,7 +24,7 @@ export default function({
         title:null,
         description:null
     });
-    
+    const [discountsList , setDiscountsList] = useState<Discount[][]>([]) ;
     const formik = useFormik({
         initialValues:{
             restaurantName: searchParams.get("restaurantName")||"",
@@ -56,13 +56,13 @@ export default function({
             setIsAlerting(true);
         }
     })
-
+    
     async function onRestaurantNameChange(_e:SyntheticEvent<Element, Event>, value: string|null){
         if(!value || value.trim()==""){
             return
         }
         value = value.trim();
-        const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name`)
+        const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts`)
         .then((res)=>{
             return res.json()
         })
@@ -70,8 +70,13 @@ export default function({
             return restaurant.name
         })
         setRestaurantsList(newRestaurantsList)
+        const newDiscountsList = restaurantsResponse.data.map((restaurant : Restaurant) => {
+            return restaurant.discounts
+        })
+        console.log(restaurantsResponse) ;
+        setDiscountsList(newDiscountsList) ;
     }
-
+    
     return (
         <div className="h-full flex items-center justify-center m-2">
             <Dialog
@@ -128,6 +133,23 @@ export default function({
                         }}
                     ></DatePicker>
                 </LocalizationProvider>
+                <Select>
+                    {
+                        restaurantsList.length === 1 &&
+                        discountsList[0] !== undefined &&
+                        discountsList[0].map((discount, index) => (
+                            <MenuItem key={index} value = {discount.name}>
+                                <p>{discount.name}</p>
+                                <br></br>
+                                <p>{discount.description}</p>
+                                <br></br>
+                                <p>{discount.points}</p>
+                                <br></br>
+                                <p>{discount.isValid}</p>
+                            </MenuItem>
+                        ))
+                    }
+                </Select>
                 <Button 
                     type="submit"
                     disabled={formik.isSubmitting}

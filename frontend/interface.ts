@@ -22,8 +22,18 @@ export interface Restaurant{
     menu: string[],
     openingHours: string,
     closingHours: string,
+    discounts : Discount[],
     tags: string[],
     id: string
+}
+export interface Discount  {
+    name: string,
+
+    description : string,
+        
+    points: number,
+
+    isValid: boolean
 }
 
 interface BaseRestaurantResponse{
