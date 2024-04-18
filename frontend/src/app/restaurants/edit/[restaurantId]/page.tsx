@@ -9,6 +9,8 @@ import useSession from "@/hooks/useSession"
 import { ChangeEvent, useState } from "react"
 import { IconButton } from "@mui/material"
 import FileUploadIcon from "@mui/icons-material/FileUpload"
+import { Delete } from "@mui/icons-material"
+import { useRouter } from "next/navigation"
 
 export default function({
     params
@@ -28,6 +30,7 @@ export default function({
         title:null,
         description:null
     });
+    const router = useRouter();
     
     const invalidHourMessage = "invalid hour time"
     const invalidMenuMessage = "menu name can't be empty!"
@@ -68,6 +71,19 @@ export default function({
         const responseJson = await response.json();
         if(responseJson.success){
             window.location.reload();
+        }
+    }
+
+    async function deleteImage(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+        const response = await fetch(`/api/restaurants/${params.restaurantId}/image`,{
+            method:"DELETE",
+            headers:{
+                "Authorization":`Bearer ${session?.token}`
+            }
+        })
+        const responseJson = await response.json();
+        if(responseJson.success){
+            router.refresh()
         }
     }
 
@@ -137,7 +153,7 @@ export default function({
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.name}
+                    helperText={String(formik.errors.name)}
                     error={Boolean(formik.errors.name)}
                 >
                 </TextField>
@@ -149,9 +165,21 @@ export default function({
                     value={formik.values.address}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.address}
+                    helperText={String(formik.errors.address)}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
+ 
+                <div className="right-0 top-0">
+                    Delete Image Picture:
+                    <IconButton
+                        className="text-black right-0 bottom-0"
+                        onClick={deleteImage}
+                    >
+                        <Delete 
+                        sx={iconSx}
+                        ></Delete>
+                    </IconButton>
+                </div>
  
                 <div className="right-0 top-0">
                     Upload Image Picture:
@@ -187,7 +215,7 @@ export default function({
                     value={formik.values.openingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.openingHours}
+                    helperText={String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
                 
@@ -198,7 +226,7 @@ export default function({
                     value={formik.values.closingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.closingHours}
+                    helperText={String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
 

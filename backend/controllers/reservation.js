@@ -5,7 +5,7 @@ exports.getReservations = async function(req,res,next){
     try{
         const restaurantId = req.body.restaurantId || req.params.restaurantId
         let filterQuery = {};
-        if(req.user.role!="admin"){
+        if(req.user.role!="restaurantOwner"){
             filterQuery.reservorId=req.user.id
         }
         if(restaurantId){
@@ -28,7 +28,7 @@ exports.getReservations = async function(req,res,next){
 exports.getReservation = async function(req,res,next){
     try{
         let filterQuery = {};
-        if(req.user.role!="admin"){
+        if(req.user.role!="restaurantOwner"){
             filterQuery.reservorId=req.user.id
         }
         filterQuery._id=req.params.id
@@ -51,7 +51,7 @@ exports.addReservation = async function(req,res,next){
         const reservorId = req.user.id
         let existingReservations = Reservation.find({reservorId});
         const existingReservationsCount = await Reservation.countDocuments(existingReservations);
-        if(existingReservationsCount>=3 && req.user.role!="admin"){
+        if(existingReservationsCount>=3){
             return res.status(400).json({
                 success:false,
                 message:"reservations exceeding limits"
@@ -85,7 +85,7 @@ exports.updateReservation = async function(req,res,next){
         let filterQuery = {
             _id:req.params.id
         };
-        if(req.user.role!="admin"){
+        if(req.user.role!="restaurantOwner"){
             filterQuery.reservorId=req.user.id;
         }
         const reservation = await Reservation.findOneAndUpdate(

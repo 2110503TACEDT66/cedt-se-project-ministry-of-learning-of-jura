@@ -43,6 +43,12 @@ const Restaurant = new mongoose.Schema(
         required:true,
         select:false
     },
+    restaurantOwner:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required:true,
+        select:false
+    },
     tags:{
         type: [String],
         required:true

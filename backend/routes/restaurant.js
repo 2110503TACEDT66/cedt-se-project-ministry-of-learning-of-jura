@@ -8,6 +8,7 @@ const {
   updateRestaurant,
   deleteRestaurant,
   updateRestaurantImage,
+  deleteRestaurantImage
 } = require("../controllers/restaurants");
 const {
   checkToken,
@@ -18,23 +19,28 @@ const router = express.Router();
 const upload = require("../middleware/upload")
 
 router.route("/")
-    .get(checkTokenIfExists,getRestaurants)
-    .post(checkToken, checkRole("restaurantOwner"), createRestaurant);
+  .get(checkTokenIfExists, getRestaurants)
+  .post(checkToken, checkRole("restaurantOwner"), createRestaurant);
 router.route("/:id")
-    .get(checkTokenIfExists,getRestaurant)
-    .put(checkToken, checkRole("restaurantOwner"), updateRestaurant)
-    .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurant)
+  .get(checkTokenIfExists, getRestaurant)
+  .put(checkToken, checkRole("restaurantOwner"), updateRestaurant)
+  .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurant)
 router.route("/:id/image")
-    .post(
-      checkToken, 
-      checkRole("restaurantOwner"),
-      upload(process.env.MAX_IMAGE_MB_SIZE,["image/jpeg","image/png"]), 
-      uploadRestaurantImage
-    )
-    .put(
-      checkToken,
-      checkRole("restaurantOwner"),
-      upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
-      updateRestaurantImage
-    );
+  .post(
+    checkToken,
+    checkRole("restaurantOwner"),
+    upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
+    uploadRestaurantImage
+  )
+  .put(
+    checkToken,
+    checkRole("restaurantOwner"),
+    upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
+    updateRestaurantImage
+  )
+  .delete(
+    checkToken,
+    checkRole("restaurantOwner"),
+    deleteRestaurantImage
+  );
 module.exports = router;

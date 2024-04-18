@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <main className="flex flex-col gap-2">
       {
-        session?.user.role=="admin" && 
+        session?.user.role=="restaurantOwner" && 
         <Link href={`/restaurants/create`} className="absolute right-0">
           <AddIcon fontSize="large"/>
         </Link>

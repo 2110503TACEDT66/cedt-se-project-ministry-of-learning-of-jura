@@ -3,7 +3,6 @@ import RestaurantImage from "@/components/RestaurantImage";
 import useServerSession from "@/hooks/useServerSession";
 import getReservations from "@/utils/getReservations";
 import getRestaurant from "@/utils/getRestaurant";
-import getRestaurantImageSrc from "@/utils/getRestaurantImageSrc";
 import getRestaurantUrl from "@/utils/getRestaurantUrl";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { Typography } from "@mui/material";
@@ -32,7 +31,7 @@ export default async function(){
         const restaurant = restaurantResponse.data
         reservation.restaurant=restaurant
     }
-    const isAdmin=session.user.role=="admin";
+    const isRestaurantOwner=session.user.role=="restaurantOwner";
     return (
         <div className="flex items-center justify-center text-black m-2">
             <div className="flex items-center justify-center gap-2 flex-col">
@@ -58,7 +57,7 @@ export default async function(){
                                 <Typography>Restaurant: {reservation.restaurant?.name}</Typography>
                                 <Typography>Reservation Date: {new Date(Date.parse(reservation.reservationDate)).toLocaleDateString("en-UK")}</Typography>
                                 {
-                                    isAdmin && 
+                                    isRestaurantOwner && 
                                     <Typography>By: {reservation.reservorId==session.user._id? "you":reservation.reservorId}</Typography>
                                 }
                             </div>

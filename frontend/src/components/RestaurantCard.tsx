@@ -21,7 +21,7 @@ export default function({
 }){
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
-    const isAdmin = session?.user.role=="admin";
+    const isRestaurantOwner = session?.user.role=="restaurantOwner";
 
     const router = useRouter();
 
@@ -74,7 +74,7 @@ export default function({
                 <p className={`bg-gray-300 rounded-2xl relative bottom-0 w-fit p-1 px-2 ${imageLoaded? '':'hidden'}`}>{restaurant.openingHours}-{restaurant.closingHours}</p>
             </Link>
             {
-                isAdmin &&
+                isRestaurantOwner &&
                 <div>
                     <Link href={`/restaurants/edit/${restaurant.id}`} className="absolute right-0 top-0">
                         <IconButton
