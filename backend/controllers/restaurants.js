@@ -156,3 +156,25 @@ exports.deleteRestaurant = async (req,res,next) => {
         res.status(400).json({success: false, message: 'Not valid ID'});
     }
 }
+
+exports.deleteRestaurantImage = async(req,res,next)=>{
+    try{
+        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+        if(restaurant==undefined){
+            return res.status(404).json({success:false,message:"cannot find restaurant with id "+req.params.id})
+        }
+        if(!req.user._id.equals(restaurant.restaurantOwner)){
+            return res.status(401).json({success:false,message:"Not Authorized"})
+        }
+        let file = await File.findOne({filename:restaurant.id});
+        if(file==undefined){
+            return res.status(404).json({success:false,message:"restaurant has no image"})
+        }
+        let bucket = getGridFsBucket();
+        bucket.delete(file._id);
+        res.status(200).json({success:true});
+    }
+    catch(err){
+        res.status(400).json({success:false,message:"An error occured"})
+    }
+}
