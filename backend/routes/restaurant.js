@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.route("/")
     .get(checkTokenIfExists,getRestaurants)
-    .post(checkToken, checkRole("admin"), createRestaurant);
+    .post(checkToken, checkRole("restaurantOwner"), createRestaurant);
 router.route("/:id")
     .get(checkTokenIfExists,getRestaurant)
-    .put(checkToken, checkRole("admin"), updateRestaurant)
-    .delete(checkToken, checkRole("admin"), deleteRestaurant)
+    .put(checkToken, checkRole("restaurantOwner"), updateRestaurant)
+    .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurant)
 module.exports=router
