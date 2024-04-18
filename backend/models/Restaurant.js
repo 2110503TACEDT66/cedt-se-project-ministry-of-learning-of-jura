@@ -24,6 +24,12 @@ const Restaurant = new mongoose.Schema({
         type: String,
         match: [timeRegex,invalidTimeMsg]
     },
+    restaurantOwner:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required:true,
+        select:false
+    },
     tags:{
         type: [String],
     }
