@@ -19,6 +19,10 @@ const Reservation = new mongoose.Schema({
     discount:{
         required: false,
         type: Discount
+    },
+    welcomedrink:{
+        required: true,
+        type:Boolean
     }
 })
 module.exports=mongoose.model("Reservation",Reservation)

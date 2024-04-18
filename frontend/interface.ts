@@ -72,7 +72,8 @@ export interface Reservation{
     restaurantId: string,
     reservationDate: string,
     _id: string,
-    restaurant?: Restaurant
+    restaurant?: Restaurant,
+    welcomedrink: boolean
 }
 
 export interface ReservationsResponse{
