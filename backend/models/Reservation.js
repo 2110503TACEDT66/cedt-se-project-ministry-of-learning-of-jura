@@ -2,15 +2,18 @@ const mongoose = require("mongoose")
 const Reservation = new mongoose.Schema({
     reservorId:{
         type: mongoose.Schema.ObjectId,
-        ref:"User"
+        ref:"User",
+        required:true
     },
     restaurantId:{
         type: mongoose.Schema.ObjectId,
-        ref:"Restaurant"
+        ref:"Restaurant",
+        required:true
     },
     reservationDate:{
         required: true,
-        type: Date
+        type: Date,
+        required:true
     }
 })
 module.exports=mongoose.model("Reservation",Reservation)
