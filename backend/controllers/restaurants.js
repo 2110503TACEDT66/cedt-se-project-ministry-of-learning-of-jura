@@ -168,7 +168,7 @@ exports.deleteRestaurantImage = async(req,res,next)=>{
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
         let file = await File.findOne({filename:restaurant.id});
-        if(file==undefined){
+        if(file==null){
             return res.status(404).json({success:false,message:"restaurant has no image"})
         }
         let bucket = getGridFsBucket();
