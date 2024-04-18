@@ -6,7 +6,11 @@ import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
+import { IconButton } from "@mui/material"
+import FileUploadIcon from "@mui/icons-material/FileUpload"
+import { Delete } from "@mui/icons-material"
+import { useRouter } from "next/navigation"
 
 export default function({
     params
@@ -26,6 +30,7 @@ export default function({
         title:null,
         description:null
     });
+    const router = useRouter();
     
     const invalidHourMessage = "invalid hour time"
     const invalidMenuMessage = "menu name can't be empty!"
@@ -44,6 +49,24 @@ export default function({
             yup.string().required(invalidTagsMessage)
         )
     })
+
+    const iconSx = {
+        stroke: "white",
+        strokeWidth: 1
+    };
+
+    async function deleteRestaurant(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+        const response = await fetch(`/api/restaurants/${params.restaurantId}/image`,{
+            method:"DELETE",
+            headers:{
+                "Authorization":`Bearer ${session?.token}`
+            }
+        })
+        const responseJson = await response.json();
+        if(responseJson.success){
+            router.refresh()
+        }
+    }
 
     const formik = useFormik<Omit<Restaurant,"id">>({
         initialValues:{
@@ -113,7 +136,8 @@ export default function({
                     onBlur={formik.handleBlur}
                     helperText={formik.errors.name}
                     error={Boolean(formik.errors.name)}
-                ></TextField>
+                >
+                </TextField>
                 
                 <TextField
                     id="address"
@@ -125,6 +149,18 @@ export default function({
                     helperText={formik.errors.address}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
+ 
+                <div className="right-0 top-0">
+                    Delete Image Picture:
+                    <IconButton
+                        className="text-black absolute right-0 bottom-0"
+                        onClick={deleteRestaurant}
+                    >
+                        <Delete 
+                        sx={iconSx}
+                        ></Delete>
+                    </IconButton>
+                </div>
 
                 <ResizableMultiInput
                     label="menu"
