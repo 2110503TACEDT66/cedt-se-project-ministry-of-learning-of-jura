@@ -1,6 +1,12 @@
-import relativeToAbsolute from "./relativeToAbsolute";
+export default async function getRestaurantImageData(imgSrc: string) {
+    try {
+        const response = await fetch(imgSrc);
 
-export default function getRestaurantImageData(restaurantId: string) {
-    return relativeToAbsolute(`/api/v1/restaurants/${restaurantId}/image`);
+        if (!response.ok) {
+            return "/img/pure_logo.jpg";
+        }
+        return response.url;
+    } catch (error) {
+        return "/img/pure_logo.jpg";
+    }
 }
-

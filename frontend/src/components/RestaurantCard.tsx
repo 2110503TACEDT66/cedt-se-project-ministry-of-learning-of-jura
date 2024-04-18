@@ -12,6 +12,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useRouter } from "next/navigation"
 import getRestaurantImageData from "@/utils/getRestaurantImageData"
 import RestaurantImage from "./RestaurantImage"
+import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl"
 // import { useRouter } from "next/navigation"
 
 export default function({
@@ -64,7 +65,7 @@ export default function({
                 )}
                 <RestaurantImage
                     alt={restaurant.name}
-                    src={getRestaurantImageData(restaurant.id)}
+                    src={getRestaurantImageUrl(restaurant.id)}
                     width={250}
                     height={250}
                     sizes={"100vw"}
