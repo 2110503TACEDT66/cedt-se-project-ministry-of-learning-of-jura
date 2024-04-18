@@ -9,7 +9,6 @@ const FilesSchema = new mongoose.Schema(
       unique: true,
       required: true
     },
-    
   },
   {
     collection: "fs.files",

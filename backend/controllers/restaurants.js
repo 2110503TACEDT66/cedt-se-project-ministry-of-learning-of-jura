@@ -1,5 +1,3 @@
-
-
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
 const { getGridFsBucket } = require('../config/connectDB');
@@ -10,67 +8,72 @@ const File = require("../models/File")
 //@desc   : Get all restaurants
 //@route  : GET /api/v1/restaurant
 //@access : Public
-exports.getRestaurants = async (req,res,next) => {
-    let query;
-    const reqQuery = {...req.query};
-    const removeFields = ['select','sort','page','limit'];
-    removeFields.forEach(params => delete reqQuery[params]);
+exports.getRestaurants = async (req, res, next) => {
+  let query;
+  const reqQuery = { ...req.query };
+  const removeFields = ["select", "sort", "page", "limit"];
+  removeFields.forEach((params) => delete reqQuery[params]);
 
-    let queryStr = JSON.stringify(reqQuery);
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in|regex)\b/g, match => `$${match}`);
-    query = Restaurant.find(JSON.parse(queryStr));
+  let queryStr = JSON.stringify(reqQuery);
+  queryStr = queryStr.replace(
+    /\b(gt|gte|lt|lte|in|regex)\b/g,
+    (match) => `$${match}`
+  );
+  query = Restaurant.find(JSON.parse(queryStr));
 
-    if(req.user){
-        let populateQuery = {
-            path:'reservations'
-        }
-        if(req.user.role!="admin"){
-            populateQuery.match={
-                reservorId: req.user._id
-            }
-        }
-        // console.log(populateQuery);
-        query = query.populate(populateQuery)
+  if (req.user) {
+    let populateQuery = {
+      path: "reservations",
+    };
+    if (req.user.role != "admin") {
+      populateQuery.match = {
+        reservorId: req.user._id,
+      };
+    }
+    // console.log(populateQuery);
+    query = query.populate(populateQuery);
+  }
+
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("name");
+  }
+
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 3;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  try {
+    const total = await Restaurant.countDocuments(query);
+    query = query.skip(startIndex).limit(limit);
+
+    const result = await query;
+
+    const pagination = { limit, total };
+
+    if (endIndex < total) {
+      pagination.next = { page: page + 1 };
     }
 
-    if (req.query.select){
-        const fields = req.query.select.split(',').join(' ');
-        query = query.select(fields);
-    }
-    if (req.query.sort){
-        const sortBy = req.query.sort.split(',').join(' ');
-        query = query.sort(sortBy);
-    } else {
-        query = query.sort('name');
+    if (startIndex > 0) {
+      pagination.prev = { page: page - 1 };
     }
 
-    const page = parseInt(req.query.page,10) || 1;
-    const limit = parseInt(req.query.limit,10) || 3;
-    const startIndex = (page-1) * limit;
-    const endIndex = page * limit;
-
-    try {
-        const total = await Restaurant.countDocuments(query);
-        query = query.skip(startIndex).limit(limit);
-        
-        const result = await query;
-
-        const pagination = {limit,total};
-
-        if (endIndex < total){
-            pagination.next = {page: page+1}
-        }
-
-        if (startIndex > 0){
-            pagination.prev = {page: page-1}
-        }
-
-        res.status(200).json({success: true, count: result.length, pagination, data: result});
-    } catch(err) {
-        console.log(err)
-        res.status(400).json({success: false});
-    }
-}
+    res
+      .status(200)
+      .json({ success: true, count: result.length, pagination, data: result });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false });
+  }
+};
 
 //@desc   : Get a restaurant
 //@route  : GET /api/v1/restaurant/:id
@@ -106,7 +109,15 @@ exports.getRestaurant = async (req,res,next) => {
         console.log(err)
         res.status(500).json({success: false, message: 'Not valid ID'});
     }
-}
+    res.status(200).json({
+      success: true,
+      data: restaurant,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Not valid ID" });
+  }
+};
 
 //@desc   : Create a restaurant
 //@route  : POST /api/v1/restaurants
@@ -146,7 +157,12 @@ exports.updateRestaurant = async (req,res,next) => {
         console.log(err)
         res.status(400).json({success: false, message: 'Not valid ID'});
     }
-}
+
+    res.status(200).json({ success: true, data: restaurant });
+  } catch (err) {
+    res.status(400).json({ success: false, message: "Not valid ID" });
+  }
+};
 
 //@desc   : Delete a restaurant
 //@route  : DELETE /api/v1/restaurants/:id

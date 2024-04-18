@@ -1,22 +1,32 @@
-const mongoose = require("mongoose")
-const {timeRegex,invalidTimeMsg} = require("../config/constants")
-const Reservation = require("./Reservation")
-const Restaurant = new mongoose.Schema({
-    name:{
-        type: String,
-        required:true,
-        unique: true,
-        minLength: 1
+const mongoose = require("mongoose");
+const { timeRegex, invalidTimeMsg } = require("../config/constants");
+const Reservation = require("./Reservation");
+const Restaurant = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      minLength: 1,
     },
-    address:{
-        type: String,
-        unique: true,
-        required:true
+    address: {
+      type: String,
+      unique: true,
+      required: true,
     },
-    menu:{
-        type: [String],
-        required:true
-    },
+    menus:{
+        type: [{
+            name:{
+                type: String,
+                required:true
+            },
+            price:{
+                type: Number,
+                required:true
+            }
+        }],
+        default: []
+    }
     openingHours:{
         type: String,
         match: [timeRegex,invalidTimeMsg],

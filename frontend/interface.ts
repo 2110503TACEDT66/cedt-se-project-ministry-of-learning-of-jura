@@ -17,9 +17,10 @@ export interface Session{
 }
 
 export interface Restaurant{
+    [x: string]: any
     name: string,
     address: string,
-    menu: string[],
+    menus: Menu[],
     openingHours: string,
     closingHours: string,
     tags: string[],
@@ -66,4 +67,9 @@ export interface ResizableMultiInputEvent{
     currentTarget:{
         value:string
     }
+}
+
+export interface Menu{
+    name:string,
+    price:number
 }
