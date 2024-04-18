@@ -103,7 +103,7 @@ export default function({
                 </DialogActions>
             </Dialog>
             <form onSubmit={formik.handleSubmit} className="bg-white p-2 flex flex-col gap-2 text-black">
-                <p className="self-center">Create Restaurant!</p>
+                <p className="self-center">Edit Restaurant</p>
                 <TextField
                     id="name"
                     name="name"
