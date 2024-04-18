@@ -8,5 +8,5 @@ router.post("/login",login)
 router.post("/superuser/login",express.text(),superUserLogin)
 router.get("/me",checkToken,getMe)
 router.get("/logout",logout)
-// router.delete("/deleteAccount/:username",checkToken,checkRole("admin"),deleteAccount)
+router.delete("/deleteAccount/:username",checkToken,checkRole("admin"),deleteAccount)
 module.exports=router;

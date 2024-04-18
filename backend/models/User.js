@@ -17,9 +17,8 @@ const UserSchema = new mongoose.Schema({
     },
     role:{
         type: String,
-        enum:['user','restaurantOwner'],
-        default:"user",
-        required:true
+        enum:['user','admin'],
+        default:"user"
     },
     password:{
         type: String,
@@ -29,8 +28,7 @@ const UserSchema = new mongoose.Schema({
     },
     joinedAt:{
         type: Date,
-        default: Date.now,
-        required:true
+        default: Date.now
     },
     phone:{
         type: [String]

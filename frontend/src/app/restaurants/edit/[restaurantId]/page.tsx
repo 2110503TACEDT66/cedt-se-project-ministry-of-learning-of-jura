@@ -6,9 +6,7 @@ import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
-import { ChangeEvent, useState } from "react"
-import { IconButton } from "@mui/material"
-import FileUploadIcon from "@mui/icons-material/FileUpload"
+import { useState } from "react"
 
 export default function({
     params
@@ -46,30 +44,6 @@ export default function({
             yup.string().required(invalidTagsMessage)
         )
     })
-
-    const iconSx = {
-        stroke: "white",
-        strokeWidth: 1
-    };
-
-    async function uploadImage(e: ChangeEvent<HTMLInputElement>){
-        if(e.currentTarget.files==undefined){
-            return;
-        }
-        let formData = new FormData();
-        formData.append("image",e.currentTarget.files[0])
-        const response = await fetch(`/api/restaurants/${params.restaurantId}/image`,{
-            method:"POST",
-            headers:{
-                "Authorization":`Bearer ${session?.token}`          
-            },
-            body: formData
-        })
-        const responseJson = await response.json();
-        if(responseJson.success){
-            window.location.reload();
-        }
-    }
 
     const formik = useFormik<Omit<Restaurant,"id">>({
         initialValues:{
@@ -129,7 +103,7 @@ export default function({
                 </DialogActions>
             </Dialog>
             <form onSubmit={formik.handleSubmit} className="bg-white p-2 flex flex-col gap-2 text-black">
-                <p className="self-center">Edit Restaurant</p>
+                <p className="self-center">Create Restaurant!</p>
                 <TextField
                     id="name"
                     name="name"
@@ -139,8 +113,7 @@ export default function({
                     onBlur={formik.handleBlur}
                     helperText={formik.errors.name}
                     error={Boolean(formik.errors.name)}
-                >
-                </TextField>
+                ></TextField>
                 
                 <TextField
                     id="address"
@@ -152,27 +125,6 @@ export default function({
                     helperText={formik.errors.address}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
- 
-                <div className="right-0 top-0">
-                    Upload Image Picture:
-                    <IconButton 
-                        className="text-black"
-                        sx={{
-                            text:"black"
-                        }}
-                        component="label"
-                    >
-                        <FileUploadIcon
-                            sx={iconSx}
-                        >
-                        </FileUploadIcon>
-                        <input
-                            type="file"
-                            onChange={uploadImage}
-                            hidden
-                        />
-                    </IconButton>
-                </div>
 
                 <ResizableMultiInput
                     label="menu"
