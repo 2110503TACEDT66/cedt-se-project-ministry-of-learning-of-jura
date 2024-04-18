@@ -27,6 +27,7 @@ export interface Restaurant{
     id: string
 }
 export interface Discount  {
+    _id: string,
     name: string,
 
     description : string,

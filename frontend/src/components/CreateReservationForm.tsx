@@ -1,5 +1,5 @@
 "use client"
-import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle , Select , MenuItem} from "@mui/material";
+import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle , Select , MenuItem, SelectChangeEvent} from "@mui/material";
 import { useFormik } from "formik";
 import { SyntheticEvent, useState } from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -29,6 +29,7 @@ export default function({
         initialValues:{
             restaurantName: searchParams.get("restaurantName")||"",
             reservationDate: null as (Dayjs|null),
+            discountId: null as (string|null)
         },
         async onSubmit(values,{setSubmitting, setErrors}){
             let data = formik.values
@@ -75,6 +76,11 @@ export default function({
         })
         console.log(restaurantsResponse) ;
         setDiscountsList(newDiscountsList) ;
+    }
+
+    async function onDiscountChange(e:SelectChangeEvent<unknown>){
+        formik.handleChange(e)
+        console.log(formik.values.discountId);
     }
     
     return (
@@ -133,12 +139,14 @@ export default function({
                         }}
                     ></DatePicker>
                 </LocalizationProvider>
-                <Select>
+                <Select
+                    onChange={onDiscountChange}
+                >
                     {
                         restaurantsList.length === 1 &&
                         discountsList[0] !== undefined &&
                         discountsList[0].map((discount, index) => (
-                            <MenuItem key={index} value = {discount.name}>
+                            <MenuItem key={index} value = {discount._id}>
                                 <p>{discount.name}</p>
                                 <br></br>
                                 <p>{discount.description}</p>

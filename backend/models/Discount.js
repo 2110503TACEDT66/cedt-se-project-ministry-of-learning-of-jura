@@ -1,5 +1,5 @@
 const discount = {
-    _id:false,
+    // _id:true,
     name:{
         type: String,
         required:true
