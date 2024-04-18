@@ -1,3 +1,4 @@
+const File = require("./File");
 const mongoose = require("mongoose");
 const { timeRegex, invalidTimeMsg } = require("../config/constants");
 const Reservation = require("./Reservation");
@@ -90,8 +91,25 @@ Restaurant.pre(
     await Reservation.deleteMany({
       restaurantId: this._id,
     });
-    await Files.deleteOne({
+    await File.deleteOne({
       filename: this._id,
+    });
+    next();
+  }
+);
+Restaurant.pre(
+  "deleteOne",
+  { document: false, query: false },
+  async function (next) {
+    let restaurant = await Restaurant.findOne(this._condition)
+    if(restaurant==undefined){
+      return;
+    }
+    await Reservation.deleteMany({
+      restaurantId: restaurant._id,
+    });
+    await File.deleteOne({
+      filename: restaurant._id,
     });
     next();
   }

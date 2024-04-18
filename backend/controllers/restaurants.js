@@ -78,18 +78,18 @@ exports.getRestaurants = async (req, res, next) => {
 //@desc   : Get a restaurant
 //@route  : GET /api/v1/restaurant/:id
 //@access : Public
-exports.getRestaurant = async (req,res,next) => {
+exports.getRestaurant = async (req, res, next) => {
   try {
     let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
     let query = Restaurant.findById(req.params.id);
-    if(req.user){
+    if (req.user) {
       let populateQuery = {
-          path:'reservations'
+        path: 'reservations'
       }
-      if(req.user.role!="restaurantOwner" || !restaurant.restaurantOwner.equals(req.user._id)){
-          populateQuery.match={
-              reservorId: req.user._id.toString()
-          }
+      if (req.user.role != "restaurantOwner" || !restaurant.restaurantOwner.equals(req.user._id)) {
+        populateQuery.match = {
+          reservorId: req.user._id.toString()
+        }
       }
       // console.log(populateQuery);
       query = query.populate(populateQuery)
@@ -98,208 +98,209 @@ exports.getRestaurant = async (req,res,next) => {
     const reservationsJson = await query;
     // console.log(restaurant.restaurantOwner)
     // restaurant.reservations=reservationsJson.reservations;
-    if(!restaurant){
-      return res.status(404).json({success: false, message: 'Not found'});
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: 'Not found' });
     }
     res.status(200).json({
       success: true,
       data: reservationsJson
     })
-  } catch(err) {
+  } catch (err) {
     console.log(err)
-    res.status(500).json({success: false, message: 'Not valid ID'});
+    res.status(500).json({ success: false, message: 'Not valid ID' });
   }
 };
 
 //@desc   : Create a restaurant
 //@route  : POST /api/v1/restaurants
 //@access : Private
-exports.createRestaurant = async (req,res,next) => {
-    try{
-        req.body.restaurantOwner=req.user._id;
-        const restaurant = await Restaurant.create(req.body);
-        res.status(201).json({success: true, data: restaurant});
-    }
-    catch(err){
-        console.log(err)
-        res.status(400).json({
-            success:false,
-            message:"restaurant with this name already exists"
-        })
-    }
+exports.createRestaurant = async (req, res, next) => {
+  try {
+    req.body.restaurantOwner = req.user._id;
+    const restaurant = await Restaurant.create(req.body);
+    res.status(201).json({ success: true, data: restaurant });
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).json({
+      success: false,
+      message: "restaurant with this name already exists"
+    })
+  }
 }
 
 //@desc   : Update a restaurant
 //@route  : PUT /api/v1/restaurants/:id
 //@access : Private
-exports.updateRestaurant = async (req,res,next) => {
+exports.updateRestaurant = async (req, res, next) => {
   try {
-      const restaurant = await Restaurant.findOne({
-          _id:req.params.id,
-      }).select("restaurantOwner");;
-      if(!restaurant){
-          return res.status(404).json({success: false, message: `Not found restaurant with id ${req.params.id}`});
-      }
-      if(!restaurant.restaurantOwner.equals(req.user._id)){
-          return res.status(401).json({success:false,message:"Not Authorized"})
-      }
-      const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id,req.body,{new:true});
-      res.status(200).json({success: true, data: updatedRestaurant});
-  } catch(err) {
-      console.log(err)
-      res.status(400).json({success: false, message: 'Not valid ID'});
+    const restaurant = await Restaurant.findOne({
+      _id: req.params.id,
+    }).select("restaurantOwner");;
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: `Not found restaurant with id ${req.params.id}` });
+    }
+    if (!restaurant.restaurantOwner.equals(req.user._id)) {
+      return res.status(401).json({ success: false, message: "Not Authorized" })
+    }
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ success: true, data: updatedRestaurant });
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({ success: false, message: 'Not valid ID' });
   }
 };
 
 //@desc   : Delete a restaurant
 //@route  : DELETE /api/v1/restaurants/:id
 //@access : Private
-exports.deleteRestaurant = async (req,res,next) => {
-    try {
-        let restaurant
-        if(req.params.id){
-            restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
-        }
-        
-        if(!restaurant){
-            return res.status(404).json({success: false, message: `Not found restaurant with id ${req.params.id}`});
-        }
-        if(!restaurant.restaurantOwner.equals(req.user._id)){
-            return res.status(401).json({success:false,message:"Not Authorized"})
-        }
-        await restaurant.deleteOne();
-        res.status(200).json({success: true, data: {}});
-    } catch(err) {
-        console.log(err)
-        res.status(400).json({success: false, message: 'Not valid ID'});
-    }
-}
-
-exports.uploadRestaurantImage = async(req,res,next)=>{
-    try{
-        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
-        if(restaurant==undefined){
-            return res.status(404).json({success:false,message:"cannot find restaurant with id "+req.params.id})
-        }
-        if(!req.user._id.equals(restaurant.restaurantOwner)){
-            return res.status(401).json({success:false,message:"Not Authorized"})
-        }
-        let file = await File.findOne({filename:restaurant.id});
-        if(file!=undefined){
-            return res.status(404).json({success:false,message:"restaurant already has image"})
-        }
-        let bucket = getGridFsBucket()
-        let uploadStream = bucket.openUploadStream(restaurant.id,{
-            metadata:{
-                contentType: req.file.mimetype
-            },
-        });
-        let fileStream = Readable.from(req.file.buffer);
-        fileStream.pipe(uploadStream)
-        res.status(200).json({success:true});
-    }
-    catch(err){
-        res.status(400).json({success:false,message:"restaurant already has image"})
-    }
-}
-
-
-exports.updateRestaurantImage = async (req, res, next) => {
+exports.deleteRestaurant = async (req, res, next) => {
   try {
-    let restaurant = await Restaurant.findById(req.params.id).select(
-      "restaurantOwner"
-    );
-    let file = await File.findOne({ filename: req.params.id });
+    let restaurant
+    if (req.params.id) {
+      restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+    }
+
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: `Not found restaurant with id ${req.params.id}` });
+    }
+    if (!restaurant.restaurantOwner.equals(req.user._id)) {
+      return res.status(401).json({ success: false, message: "Not Authorized" })
+    }
+    await restaurant.deleteOne();
+    res.status(200).json({ success: true, data: {} });
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({ success: false, message: 'Not valid ID' });
+  }
+}
+
+exports.uploadRestaurantImage = async (req, res, next) => {
+  try {
+    let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
     if (restaurant == undefined) {
-      return res.status(404).json({
-        success: false,
-        message: "cannot find restaurant with id " + req.params.id,
-      });
+      return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
     }
     if (!req.user._id.equals(restaurant.restaurantOwner)) {
-      // console.log(restaurant.restaurantOwner);
-      // console.log(req.user._id);
-      return res
-        .status(401)
-        .json({ success: false, message: "Not Authorized" });
+      return res.status(401).json({ success: false, message: "Not Authorized" })
     }
-    if (!file) {
-      return res.status(404).json({
-        success: false,
-        message: "cannot find image file with id " + req.params.id,
-      });
+    let file = await File.findOne({ filename: restaurant.id });
+    if (file != undefined) {
+      await file.deleteOne();
+      // return res.status(404).json({success:false,message:"restaurant already has image"})
     }
-    // console.log(req.user._id);
-    // let deleter = await File.findOneAndDelete({ filename: req.params.id });
-    await file.deleteOne();
-    let bucket = getGridFsBucket();
+    let bucket = getGridFsBucket()
     let uploadStream = bucket.openUploadStream(restaurant.id, {
       metadata: {
-        contentType: req.file.mimetype,
+        contentType: req.file.mimetype
       },
     });
     let fileStream = Readable.from(req.file.buffer);
-    fileStream.pipe(uploadStream);
+    fileStream.pipe(uploadStream)
     res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(400)
-      .json({ success: false, message: "restaurant already has image" });
   }
-};
+  catch (err) {
+    res.status(400).json({ success: false, message: "restaurant already has image" })
+  }
+}
 
-exports.deleteRestaurantImage = async(req,res,next)=>{
-    try{
-        let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
-        if(restaurant==undefined){
-            return res.status(404).json({success:false,message:"cannot find restaurant with id "+req.params.id})
-        }
-        if(!req.user._id.equals(restaurant.restaurantOwner)){
-            return res.status(401).json({success:false,message:"Not Authorized"})
-        }
-        let file = await File.findOne({filename:restaurant.id});
-        if(file==undefined){
-            return res.status(404).json({success:false,message:"restaurant has no image"})
-        }
-        let bucket = getGridFsBucket();
-        bucket.delete(file._id);
-        res.status(200).json({success:true});
+
+// exports.updateRestaurantImage = async (req, res, next) => {
+//   try {
+//     let restaurant = await Restaurant.findById(req.params.id).select(
+//       "restaurantOwner"
+//     );
+//     let file = await File.findOne({ filename: req.params.id });
+//     if (restaurant == undefined) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "cannot find restaurant with id " + req.params.id,
+//       });
+//     }
+//     if (!req.user._id.equals(restaurant.restaurantOwner)) {
+//       // console.log(restaurant.restaurantOwner);
+//       // console.log(req.user._id);
+//       return res
+//         .status(401)
+//         .json({ success: false, message: "Not Authorized" });
+//     }
+//     if (!file) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "cannot find image file with id " + req.params.id,
+//       });
+//     }
+//     // console.log(req.user._id);
+//     // let deleter = await File.findOneAndDelete({ filename: req.params.id });
+//     await file.deleteOne();
+//     let bucket = getGridFsBucket();
+//     let uploadStream = bucket.openUploadStream(restaurant.id, {
+//       metadata: {
+//         contentType: req.file.mimetype,
+//       },
+//     });
+//     let fileStream = Readable.from(req.file.buffer);
+//     fileStream.pipe(uploadStream);
+//     res.status(200).json({ success: true });
+//   } catch (err) {
+//     console.log(err);
+//     res
+//       .status(400)
+//       .json({ success: false, message: "restaurant already has image" });
+//   }
+// };
+
+exports.deleteRestaurantImage = async (req, res, next) => {
+  try {
+    let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+    if (restaurant == undefined) {
+      return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
     }
-    catch(err){
-        console.log(err)
-        res.status(400).json({success:false,message:"An error occured"})
+    if (!req.user._id.equals(restaurant.restaurantOwner)) {
+      return res.status(401).json({ success: false, message: "Not Authorized" })
     }
+    let file = await File.findOne({ filename: restaurant.id });
+    if (file == undefined) {
+      return res.status(404).json({ success: false, message: "restaurant has no image" })
+    }
+    let bucket = getGridFsBucket();
+    bucket.delete(file._id);
+    res.status(200).json({ success: true });
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).json({ success: false, message: "An error occured" })
+  }
 }
 
 //@desc   : Get image of a restaurant
 //@route  : GET /api/v1/restaurants/:id/image
 //@access : Public
 exports.getRestaurantImage = async function (req, res, next) {
-    try {
-        const restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+  try {
+    const restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
 
-        if (!restaurant) {
-            return res.status(404).json({ success: false, message: "Cannot find restaurant with id " + req.params.id });
-        }
-        
-        const bucket = getGridFsBucket()
-        const downloadStream = await bucket.openDownloadStreamByName(req.params.id);
-        downloadStream.on('error', (err) => {
-            console.log(err);
-            res.status(404).json({
-                success: false,
-                message: "This restaurant has no images"
-            });
-        });
-        
-        downloadStream.pipe(res);
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: "Cannot find restaurant with id " + req.params.id });
     }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ 
-            success: false, 
-            message: "Internal server error" 
-        });
-    }
+
+    const bucket = getGridFsBucket()
+    const downloadStream = await bucket.openDownloadStreamByName(req.params.id);
+    downloadStream.on('error', (err) => {
+      console.log(err);
+      res.status(404).json({
+        success: false,
+        message: "This restaurant has no images"
+      });
+    });
+
+    downloadStream.pipe(res);
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
 }

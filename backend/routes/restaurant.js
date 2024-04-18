@@ -34,12 +34,12 @@ router.route("/:id/image")
     upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
     uploadRestaurantImage
   )
-  .put(
-    checkToken,
-    checkRole("restaurantOwner"),
-    upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
-    updateRestaurantImage
-  )
+  // .put(
+  //   checkToken,
+  //   checkRole("restaurantOwner"),
+  //   upload(process.env.MAX_IMAGE_MB_SIZE, ["image/jpeg", "image/png"]),
+  //   updateRestaurantImage
+  // )
   .delete(
     checkToken,
     checkRole("restaurantOwner"),
