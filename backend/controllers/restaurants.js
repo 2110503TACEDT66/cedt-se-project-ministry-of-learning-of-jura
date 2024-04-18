@@ -157,7 +157,7 @@ exports.deleteRestaurant = async (req,res,next) => {
     }
 }
 
-exports.uploadRestaurantImage = async(req,res,next)=>{
+exports.deleteRestaurantImage = async(req,res,next)=>{
     try{
         let restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
         if(restaurant==undefined){

@@ -11,4 +11,6 @@ router.route("/:id")
     .get(checkTokenIfExists,getRestaurant)
     .put(checkToken, checkRole("admin"), updateRestaurant)
     .delete(checkToken, checkRole("admin"), deleteRestaurant)
+router.route("/:id/image")
+    .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurantImage);
 module.exports=router
