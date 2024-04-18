@@ -1,6 +1,6 @@
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
-const { getBucket } = require('../config/connectDB');
+const { getGridFsBucket } = require('../config/connectDB');
 const File = require('../models/File');
 
 //@desc   : Get all restaurants
@@ -168,7 +168,7 @@ exports.deleteRestaurantImage = async(req,res,next)=>{
             return res.status(401).json({success:false,message:"Not Authorized"})
         }
         let file = await File.findOne({filename:restaurant.id});
-        if(file==null || file==undefined){
+        if(file==undefined){
             return res.status(404).json({success:false,message:"restaurant has no image"})
         }
         let bucket = getGridFsBucket();
