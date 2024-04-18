@@ -1,6 +1,6 @@
 const express = require("express");
 const Restaurant = require("../models/Restaurant");
-const {getRestaurants,getRestaurant,createRestaurant,updateRestaurant,deleteRestaurant} = require("../controllers/restaurants");
+const {getRestaurants,getRestaurant,createRestaurant,updateRestaurant,deleteRestaurant,deleteRestaurantImage} = require("../controllers/restaurants");
 const { checkToken,checkRole,checkTokenIfExists } = require("../middleware/auth");
 const router = express.Router();
 
