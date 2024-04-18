@@ -1,6 +1,6 @@
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
-const { getBucket } = require('../config/connectDB');
+const { getGridFsBucket } = require('../config/connectDB');
 const File = require('../models/File');
 
 //@desc   : Get all restaurants
