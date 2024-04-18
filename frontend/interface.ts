@@ -29,8 +29,19 @@ export interface Restaurant{
     }[],
     reserverCapacity : number,
     reservation : string[],
+    discounts : Discount[],
     tags: string[],
     id: string
+}
+export interface Discount  {
+    _id: string,
+    name: string,
+
+    description : string,
+        
+    points: number,
+
+    isValid: boolean
 }
 
 interface BaseRestaurantResponse{

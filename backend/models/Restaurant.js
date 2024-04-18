@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { timeRegex, invalidTimeMsg } = require("../config/constants");
 const Reservation = require("./Reservation");
+const Discount = require("./Discount")
+
 const Restaurant = new mongoose.Schema(
   {
     name: {
@@ -42,6 +44,10 @@ const Restaurant = new mongoose.Schema(
       ref: 'User',
       required: true,
       select: false
+    },
+    discounts: {
+      type: [Discount],
+      default: []
     },
     tags: {
       type: [String],

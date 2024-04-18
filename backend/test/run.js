@@ -3,9 +3,20 @@ const setEnv = require("./env/setEnv");
 const path = require("path")
 let env = getEnv();
 const [_node,_file,...args] = process.argv
-const testPath = args.join("/")+".js";
+let testPath;
+if(args.length==1){
+    if(path.isAbsolute(args[0])){
+        testPath = args[0];
+    }
+    else{
+        testPath = path.join(__dirname,args[0]);
+    }
+}
+else{
+    testPath = path.join(__dirname,args.join("/")+".js");
+}
 
-const start = require(path.join(__dirname,testPath))
+const start = require(testPath)
 start(env).then(()=>{
     setEnv(env)
 })

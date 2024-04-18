@@ -5,6 +5,7 @@ module.exports=async function(env){
         "menu":["ชานมข้าวผัดชีส","พิซซ่าใส่"],
         "openingHours":"08:00",
         "closingHours":"12:00",
+        "reserverCapacity":40,
         "reservationPeriods":[
             {
                 "start":"12:00",
@@ -13,6 +14,8 @@ module.exports=async function(env){
         ],
         "discounts":[{
             "name":"ลดโหด",
+            "description":"ลดโหด naja",
+            "isValid":true,
             "points": 100
         }],
         "tags":"japanese"
