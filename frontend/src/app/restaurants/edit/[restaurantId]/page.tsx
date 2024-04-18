@@ -153,7 +153,7 @@ export default function({
                 <div className="right-0 top-0">
                     Delete Image Picture:
                     <IconButton
-                        className="text-black absolute right-0 bottom-0"
+                        className="text-black right-0 bottom-0"
                         onClick={deleteRestaurant}
                     >
                         <Delete 
