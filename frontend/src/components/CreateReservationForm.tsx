@@ -36,7 +36,8 @@ export default function({
             welcomedrink: false
         },
         async onSubmit(values,{setSubmitting, setErrors}){
-            let data = { ...formik.values };
+            let discount = discountsList[0][0]
+            let data = { ...formik.values,discount };
             const result = await fetch("/api/reservations",{
                 method:"POST",
                 headers:{
