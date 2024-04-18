@@ -79,7 +79,8 @@ export default function({
     }
 
     async function onDiscountChange(e:SelectChangeEvent<unknown>){
-        formik.handleChange(e)
+        console.log(e.target);
+        formik.setFieldValue("discountId",e.target.value);
         console.log(formik.values.discountId);
     }
     
@@ -141,6 +142,7 @@ export default function({
                 </LocalizationProvider>
                 <Select
                     onChange={onDiscountChange}
+                    value={formik.values.discountId}
                 >
                     {
                         restaurantsList.length === 1 &&
@@ -148,12 +150,7 @@ export default function({
                         discountsList[0].map((discount, index) => (
                             <MenuItem key={index} value = {discount._id}>
                                 <p>{discount.name}</p>
-                                <br></br>
-                                <p>{discount.description}</p>
-                                <br></br>
                                 <p>{discount.points}</p>
-                                <br></br>
-                                <p>{discount.isValid}</p>
                             </MenuItem>
                         ))
                     }

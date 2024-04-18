@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.route("/")
     .get(checkTokenIfExists,getRestaurants)
-    .post(checkToken, checkRole("admin"), createRestaurant);
+    .post(checkToken, checkRole("restaurantOwner"), createRestaurant);
 router.route("/:id")
     .get(checkTokenIfExists,getRestaurant)
     .put(checkToken, checkRole("admin"), updateRestaurant)
