@@ -1,6 +1,7 @@
 const { populate } = require('../models/Reservation');
 const Restaurant = require('../models/Restaurant');
 const { getBucket } = require('../config/connectDB');
+const File = require('../models/File');
 
 //@desc   : Get all restaurants
 //@route  : GET /api/v1/restaurant
@@ -175,6 +176,7 @@ exports.deleteRestaurantImage = async(req,res,next)=>{
         res.status(200).json({success:true});
     }
     catch(err){
+        console.log(err)
         res.status(400).json({success:false,message:"An error occured"})
     }
 }
