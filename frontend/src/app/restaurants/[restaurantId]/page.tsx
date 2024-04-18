@@ -6,6 +6,7 @@ import { List, ListItem, ListItemButton,ListItemText, Typography  } from "@mui/m
 import getRestaurant from "@/utils/getRestaurant"
 import RestaurantImage from "@/components/RestaurantImage"
 import {Menu} from "@/../interface"
+import getRestaurantImageData from "@/utils/getRestaurantImageData"
 
 export default async function({
     params
@@ -25,23 +26,22 @@ export default async function({
     console.log(restaurantResponse)
 
     const restaurant: Restaurant = restaurantResponse.data;
+
     return (
-      <main className="w-full h-full flex items-center justify-center">
-        <div className="bg-white text-black flex flex-row border-solid border-gray-400 border-2 p-2 rounded-2xl">
-          <div>
-            <RestaurantImage
-              alt={restaurant.name}
-              src={"/img/pure_logo.jpg"}
-              width={400}
-              height={400}
-              sizes={"100vw"}
-              className={`rounded-2xl aspect-square object-cover`}
-            ></RestaurantImage>
-          </div>
-          <div className="self-center m-2 flex flex-col gap-2">
-            <Typography variant="h2" className="font-bold">
-              {restaurant.name}
-            </Typography>
+        <main className="w-full h-full flex items-center justify-center">
+            <div className="bg-white text-black flex flex-row border-solid border-gray-400 border-2 p-2 rounded-2xl">
+                <div>
+                    <RestaurantImage
+                        alt={restaurant.name}
+                        src={getRestaurantImageData(params.restaurantId)}
+                        width={400}
+                        height={400}
+                        sizes={"100vw"}
+                        className={`rounded-2xl aspect-square object-cover`}
+                    ></RestaurantImage>
+                </div>
+                <div className="self-center m-2 flex flex-col gap-2">
+                    <Typography variant="h2"  className="font-bold">{restaurant.name}</Typography>
 
             <Typography variant="h5" className="font-semibold">
               Address

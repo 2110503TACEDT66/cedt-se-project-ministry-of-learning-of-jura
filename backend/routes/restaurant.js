@@ -8,7 +8,8 @@ const {
   updateRestaurant,
   deleteRestaurant,
   updateRestaurantImage,
-  deleteRestaurantImage
+  deleteRestaurantImage,
+  getRestaurantImage 
 } = require("../controllers/restaurants");
 const {
   checkToken,
@@ -26,6 +27,7 @@ router.route("/:id")
   .put(checkToken, checkRole("restaurantOwner"), updateRestaurant)
   .delete(checkToken, checkRole("restaurantOwner"), deleteRestaurant)
 router.route("/:id/image")
+  .get(checkTokenIfExists, getRestaurantImage)
   .post(
     checkToken,
     checkRole("restaurantOwner"),

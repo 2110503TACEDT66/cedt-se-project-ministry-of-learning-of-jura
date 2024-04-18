@@ -271,3 +271,35 @@ exports.deleteRestaurantImage = async(req,res,next)=>{
         res.status(400).json({success:false,message:"An error occured"})
     }
 }
+
+//@desc   : Get image of a restaurant
+//@route  : GET /api/v1/restaurants/:id/image
+//@access : Public
+exports.getRestaurantImage = async function (req, res, next) {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id).select("restaurantOwner");
+
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: "Cannot find restaurant with id " + req.params.id });
+        }
+        
+        const bucket = getGridFsBucket()
+        const downloadStream = await bucket.openDownloadStreamByName(req.params.id);
+        downloadStream.on('error', (err) => {
+            console.log(err);
+            res.status(404).json({
+                success: false,
+                message: "This restaurant has no images"
+            });
+        });
+        
+        downloadStream.pipe(res);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error" 
+        });
+    }
+}
