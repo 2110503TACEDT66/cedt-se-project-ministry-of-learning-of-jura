@@ -18,12 +18,12 @@ exports.register = async (req,res,next) => {
     try {
         const {username, email, password, role} = req.body;
         
-        // if(role=="admin" && !req.isSuperUser){
-        //     return res.status(400).json({
-        //         success:false,
-        //         message:"not authorized"
-        //     })
-        // }
+        if(role=="admin" && !req.isSuperUser){
+            return res.status(400).json({
+                success:false,
+                message:"not authorized"
+            })
+        }
         const user = await User.create({username, email, password, role});
 
         responseWithToken(user,200,res);

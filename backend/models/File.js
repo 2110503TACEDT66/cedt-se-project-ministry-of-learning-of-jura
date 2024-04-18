@@ -7,7 +7,7 @@ const FilesSchema = new mongoose.Schema(
       type: String,
       index: true,
       unique: true,
-      required: true
+      required: true,
     },
   },
   {
@@ -16,25 +16,31 @@ const FilesSchema = new mongoose.Schema(
 );
 FilesSchema.pre(
   "deleteOne",
-  { 
+  {
     document: true,
-    query: false
+    query: false,
   },
   async function (next) {
+    // console.log(this._id, "qkweoq");
     await getGridFsBucket().delete(this._id);
+    // console.log("bro");
     next();
   }
 );
 
 FilesSchema.pre(
   "deleteOne",
-  { 
+  {
     document: false,
-    query: false
+    query: false,
   },
   async function (next) {
-    let file = await this.model.findOne(this._condition)
+    // console.log("bro2");
+    console.log(this._condition);
+    let file = await this.model.findOne(this._condition);
+    // console.log(file._id + "gg");
     await getGridFsBucket().delete(file._id);
+    // console.log("bro");
     next();
   }
 );

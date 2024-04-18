@@ -4,10 +4,10 @@ const { getReservations, getReservation, addReservation, updateReservation, dele
 const router = express.Router();
 
 router.route("/")
-    .get(checkToken,checkRole("user","restaurantOwner"),getReservations)
+    .get(checkToken,checkRole("user","admin"),getReservations)
     .post(checkToken,addReservation)
 router.route("/:id")
     .get(checkToken,getReservation)
-    .put(checkToken,checkRole("user","restaurantOwner"),updateReservation)
-    .delete(checkToken,checkRole("user","restaurantOwner"),deleteReservation)
+    .put(checkToken,checkRole("user","admin"),updateReservation)
+    .delete(checkToken,checkRole("user","admin"),deleteReservation)
 module.exports=router
