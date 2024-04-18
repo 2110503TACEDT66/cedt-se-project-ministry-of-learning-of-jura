@@ -26,7 +26,7 @@ const Restaurant = new mongoose.Schema(
             }
         }],
         default: []
-    }
+    },
     openingHours:{
         type: String,
         match: [timeRegex,invalidTimeMsg],

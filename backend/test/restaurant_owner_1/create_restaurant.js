@@ -25,6 +25,6 @@ module.exports=async function(env){
         },
         body:JSON.stringify(body)
     }).then((res)=>res.json())
-    env.RESTAURANT_ID=response.data._id
     console.log(response)
+    env.RESTAURANT_ID=response.data._id
 }

@@ -1,6 +1,5 @@
 const express = require("express");
 const Restaurant = require("../models/Restaurant");
-const upload = require("../middleware/upload");
 const {
   uploadRestaurantImage,
   getRestaurants,
@@ -31,8 +30,7 @@ router.route("/:id/image")
       checkRole("restaurantOwner"),
       upload(process.env.MAX_IMAGE_MB_SIZE,["image/jpeg","image/png"]), 
       uploadRestaurantImage
-    );
-module.exports=router
+    )
     .put(
       checkToken,
       checkRole("restaurantOwner"),
