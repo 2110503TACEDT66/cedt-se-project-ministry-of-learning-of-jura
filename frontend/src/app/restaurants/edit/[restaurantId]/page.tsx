@@ -55,7 +55,7 @@ export default function({
         strokeWidth: 1
     };
 
-    async function deleteRestaurant(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+    async function deleteImage(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
         const response = await fetch(`/api/restaurants/${params.restaurantId}/image`,{
             method:"DELETE",
             headers:{
@@ -154,7 +154,7 @@ export default function({
                     Delete Image Picture:
                     <IconButton
                         className="text-black right-0 bottom-0"
-                        onClick={deleteRestaurant}
+                        onClick={deleteImage}
                     >
                         <Delete 
                         sx={iconSx}
