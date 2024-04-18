@@ -23,6 +23,12 @@ export interface Restaurant{
     menus: Menu[],
     openingHours: string,
     closingHours: string,
+    reservationPeriods : {
+        start : string,
+        end : string,
+    }[],
+    reserverCapacity : number,
+    reservation : string[],
     tags: string[],
     id: string
 }
