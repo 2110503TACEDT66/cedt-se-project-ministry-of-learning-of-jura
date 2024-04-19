@@ -16,9 +16,17 @@
     "dev": "concurrently -k \"npm:dev:*\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
+
+    "build":"cd frontend && npm run build",
+    
+    "start": "concurrently -k \"npm:start:*\"",
+    "start:backend": "cd backend && npm run start",
+    "start:frontend": "cd frontend && npm run start",
+
     "setup": "bun install && bun run setup:backend && bun run setup:frontend",
     "setup:backend": "cd backend && bun install",
     "setup:frontend": "cd frontend && bun install",
+
     "npm:setup": "npm install && npm run npm:setup:backend && npm run npm:setup:frontend",
     "npm:setup:backend": "cd backend && npm install",
     "npm:setup:frontend": "cd frontend && npm install"
