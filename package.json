@@ -13,7 +13,7 @@
     "cross-env": "^7.0.3"
   },
   "scripts": {
-    "dev": "concurrently --kill-others \"npm:dev:*\"",
+    "dev": "concurrently -k \"npm:dev:*\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "setup": "bun install && bun run setup:backend && bun run setup:frontend",
