@@ -104,7 +104,7 @@ export default function(){
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.name}
+                    helperText={String(formik.errors.name)}
                     error={Boolean(formik.errors.name)}
                 ></TextField>
                 
@@ -115,7 +115,7 @@ export default function(){
                     value={formik.values.address}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.address}
+                    helperText={String(formik.errors.address)}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
 
@@ -132,7 +132,7 @@ export default function(){
                     value={formik.values.openingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.openingHours}
+                    helperText={String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
                 
@@ -143,7 +143,7 @@ export default function(){
                     value={formik.values.closingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={formik.errors.closingHours}
+                    helperText={String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
 
