@@ -39,7 +39,7 @@ class menu{
       restaurantId: this._id,
     });
     await File.deleteOne({
-      filename: this._id,
+      filename: this._id.toString(),
     });
     next();
   },
