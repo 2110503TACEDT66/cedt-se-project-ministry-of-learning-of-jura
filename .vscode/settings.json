@@ -1,5 +1,6 @@
 {
     "code-runner.executorMap": {
         "javascript": "node backend/test/run.js ",
-    }
+    },
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

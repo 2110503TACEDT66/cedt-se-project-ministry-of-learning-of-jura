@@ -1,0 +1,19 @@
+export default [
+  {
+    "extends": "next/core-web-vitals",
+    "plugins": ["unused-imports"],
+    "rules": {
+      "react/display-name": "off",
+      "eslint-plugin-import/no-anonymous-default-export": "off",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    }
+  }
+]

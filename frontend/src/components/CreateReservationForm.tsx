@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 "use client"
 import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel , Select , MenuItem, SelectChangeEvent} from "@mui/material";
 import { useFormik } from "formik";
@@ -35,8 +36,9 @@ export default function({
             discountId: null as (string|null),
             welcomedrink: false
         },
-        async onSubmit(values,{setSubmitting, setErrors}){
+        async onSubmit(_values){
             let discount = discountsList[0][0]
+            console.log(discount)
             let data = { ...formik.values,discount };
             const result = await fetch("/api/reservations",{
                 method:"POST",
@@ -63,8 +65,6 @@ export default function({
             setIsAlerting(true);
             router.push("/reservations");
             router.refresh() ;
-            
-            
         }
     })
     
@@ -122,7 +122,7 @@ export default function({
                         alignSelf:"center"
                     }}
                     options={restaurantsList}
-                    filterOptions={(options, state) => options}
+                    filterOptions={(options, _state) => options}
                     // sx={{ width: 300 }}
                     renderInput={(params) => <TextField 
                         {...params} 

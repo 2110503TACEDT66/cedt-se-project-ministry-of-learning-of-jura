@@ -31,7 +31,7 @@ export interface Restaurant{
     reservation : string[],
     discounts : Discount[],
     tags: string[],
-    id: string
+    _id: string
 }
 export interface Discount  {
     _id: string,

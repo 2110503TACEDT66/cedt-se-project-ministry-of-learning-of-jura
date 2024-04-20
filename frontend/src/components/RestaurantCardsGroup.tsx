@@ -19,7 +19,7 @@ export default function({
             {
                 restaurants?.map((restaurant)=>{
                     return (
-                        <RestaurantCard key={restaurant.id} restaurant={restaurant}></RestaurantCard>
+                        <RestaurantCard key={restaurant._id} restaurant={restaurant}></RestaurantCard>
                     )
                 })
             }

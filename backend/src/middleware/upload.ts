@@ -1,8 +1,10 @@
-const mbToBytes = require("../utils/mbToBytes");
-const multer = require("multer");
-
-module.exports = function (maxSize, allowedMimeTypes) {
-  function fileFilter(req, file, cb) {
+// const mbToBytes = require("../utils/mbToBytes");
+// const multer = require("multer");
+import mbToBytes from "../utils/mbToBytes";
+import multer from "multer";
+import { NextFunction, Request, Response, response } from "express";
+export default function upload(maxSize: number, allowedMimeTypes: string[]) {
+  function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
     if (allowedMimeTypes.includes(file.mimetype)) {
       return cb(null, true);
     }
@@ -15,7 +17,7 @@ module.exports = function (maxSize, allowedMimeTypes) {
       fileSize: mbToBytes(maxSize),
     },
   }).single("image");
-  return function (req, res, next) {
+  return function (req: Request, res: Response, next: NextFunction) {
     upload(req, res, function onError(err) {
       if (err == undefined) {
         // console.log("lol");

@@ -4,10 +4,9 @@
   ,
   "rules": {
     "react/display-name": "off",
-    "no-unused-vars": "off",
-    // "unused-imports/no-unused-imports": "error",
+    "eslint-plugin-import/no-anonymous-default-export":"off",
     "unused-imports/no-unused-vars": [
-        "off",
+        "warn",
         {
             "vars": "all",
             "varsIgnorePattern": "^_",

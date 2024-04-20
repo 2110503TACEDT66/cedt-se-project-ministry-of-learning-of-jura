@@ -29,7 +29,7 @@ export default function({
     const router = useRouter();
 
     async function deleteRestaurant(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
-        const response = await fetch(`/api/restaurants/${restaurant.id}`,{
+        const response = await fetch(`/api/restaurants/${restaurant._id}`,{
             method:"DELETE",
             headers:{
                 "Authorization":`Bearer ${session?.token}`
@@ -53,7 +53,7 @@ export default function({
                 className || ""
             } relative md:w-[250px] sm:w-1/3 rounded-2xl p-2 border-solid border-2 border-grey text-black bg-white`}
         >
-            <Link href={`/restaurants/${restaurant.id}`}>
+            <Link href={`/restaurants/${restaurant._id}`}>
                 {!imageLoaded && (
                     <div className="w-full">
                         <div className="w-full rounded-2xl overflow-hidden aspect-square">
@@ -65,7 +65,7 @@ export default function({
                 )}
                 <RestaurantImage
                     alt={restaurant.name}
-                    src={getRestaurantImageUrl(restaurant.id)}
+                    src={getRestaurantImageUrl(restaurant._id)}
                     width={250}
                     height={250}
                     sizes={"100vw"}
@@ -91,7 +91,7 @@ export default function({
                 isRestaurantOwner &&
                 <div>
                     <Link
-                        href={`/restaurants/edit/${restaurant.id}`}
+                        href={`/restaurants/edit/${restaurant._id}`}
                         className="absolute right-0 top-0"
                     >
                         <IconButton className="text-black">
