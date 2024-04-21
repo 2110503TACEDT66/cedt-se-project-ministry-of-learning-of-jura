@@ -67,6 +67,16 @@ export class User {
   })
   public phone!: [string]
 
+  @prop({
+    default: 0
+  })
+  public karma!: number
+
+  @prop({
+    default:0
+  })
+  public point!: number
+
   async matchPassword(inputPassword:string) {
     // console.log(inputPassword,this.password)
     return await bcrypt.compare(inputPassword, this.password);
