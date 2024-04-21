@@ -31,6 +31,12 @@ export class Reservation {
         required: true
     })
     public welcomedrink?: Boolean
+
+    @prop({
+        type: String,
+        required: false,
+    })
+    public room?: string
 }
 
 // const ReservationSchema = new mongoose.Schema({
