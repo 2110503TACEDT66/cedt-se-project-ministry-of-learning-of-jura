@@ -51,8 +51,6 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
     const fields = req.query.select.split(",").join(" ");
     query = query.select(fields);
   }
-  query = query.select("+restaurantOwner");
-
   if (req.query.sort) {
     req.query.sort = req.query.select as string;
     const sortBy = req.query.sort.split(",").join(" ");
@@ -70,23 +68,7 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
     const total = await RestaurantModel.countDocuments(query);
     query = query.skip(startIndex).limit(limit);
 
-    let result = await query;
-
-    // Add fields to each restaurant
-    // result = result.map(restaurant => ({
-    //   ...restaurant.toObject(), // Convert the document to a plain JavaScript object
-    //   isOwner: req.user?.isOwner(restaurant),
-    // }));
-    let resultWithIsOwner = result.map(restaurant => {
-      let {restaurantOwner, ...restaurantJson} = restaurant.toJSON();
-      
-      return {
-        ...restaurantJson,
-        ...((req.query.select as string[])?.includes("restaurantOwner") && {restaurantOwner}),
-        isOwner: req.user?.isOwner(restaurant),
-      };
-    
-    });
+    const result = await query;
 
     const pagination:{
       limit: number,
@@ -109,7 +91,7 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
 
     res
       .status(200)
-      .json({ success: true, count: result.length, pagination, data: resultWithIsOwner });
+      .json({ success: true, count: result.length, pagination, data: result });
   } catch (err) {
     console.log(err);
     res.status(400).json({ success: false });
@@ -189,7 +171,7 @@ export async function updateRestaurant(req: Request,res: Response,next: NextFunc
     if (!restaurant) {
       return res.status(404).json({ success: false, message: `Not found restaurant with id ${req.params.id}` });
     }
-    if (!req.user!.isOwner(restaurant)) {
+    if (!restaurant.restaurantOwner.equals(req.user!._id)) {
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
     const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -213,7 +195,7 @@ export async function deleteRestaurant(req: Request,res: Response,next: NextFunc
     if (!restaurant) {
       return res.status(404).json({ success: false, message: `Not found restaurant with id ${req.params.id}` });
     }
-    if (!req.user!.isOwner(restaurant)) {
+    if (!restaurant.restaurantOwner.equals(req.user!._id)) {
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
     await restaurant.deleteOne();
@@ -230,7 +212,7 @@ export async function uploadRestaurantImage(req: Request,res: Response,next: Nex
     if (restaurant == undefined) {
       return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
     }
-    if (!req.user!.isOwner(restaurant)) {
+    if (!req.user!._id.equals(restaurant.restaurantOwner)) {
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
     let file = await File.findOne({ filename: restaurant.id });
@@ -308,7 +290,7 @@ export async function deleteRestaurantImage(req: Request,res: Response,next: Nex
     if (restaurant == undefined) {
       return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
     }
-    if (!req.user!.isOwner(restaurant)) {
+    if (!req.user!._id.equals(restaurant.restaurantOwner)) {
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
     let file = await File.findOne({ filename: restaurant.id });
