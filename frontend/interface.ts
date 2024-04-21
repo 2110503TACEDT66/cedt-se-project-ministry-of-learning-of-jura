@@ -9,6 +9,8 @@ export interface User{
     joinedAt:string,
     phone:string[],
     _id:string
+    point:number,
+    karma:number
 }
 
 export interface Session{

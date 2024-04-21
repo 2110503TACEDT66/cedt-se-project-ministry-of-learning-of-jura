@@ -11,12 +11,14 @@ import { Discount, Restaurant } from "../../interface";
 import { useSearchParams } from "next/navigation";
 import { Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import useSession from "@/hooks/useSession";
 
 export default function({
     token
 }:{
     token: string
 }){
+    const {session} = useSession();
     const searchParams = useSearchParams();
     const [restaurantsList,setRestaurantsList] = useState<string[]>([]);
     const [isAlerting,setIsAlerting] = useState<boolean>(false);
@@ -157,12 +159,17 @@ export default function({
                     {
                         restaurantsList.length === 1 &&
                         discountsList[0] !== undefined &&
-                        discountsList[0].map((discount, index) => (
-                            <MenuItem key={index} value = {discount._id}>
-                                <p>{discount.name}</p>
-                                <p>{discount.points}</p>
-                            </MenuItem>
-                        ))
+                        discountsList[0]
+                            .filter(discount => discount.isValid)
+                            .map((discount, index) => {
+                                const isDisabled = session!.user.point < discount.points;
+                                return(
+                                    <MenuItem key={index} value = {discount._id} disabled={isDisabled} style={{ color: isDisabled ? 'gray' : 'inherit' }}>
+                                        <p>{discount.name}</p>
+                                        <p>{discount.points}</p>
+                                    </MenuItem>
+                                    );
+                                })
                     }
                 </Select>
                     

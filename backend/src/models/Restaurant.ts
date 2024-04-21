@@ -90,7 +90,8 @@ export class Restaurant {
 
   @prop({
     type: [Discount],
-    default: []
+    default: [],
+    _id: true
   })
   public discounts!: [Discount]
   
