@@ -1,12 +1,13 @@
 "use client"
 import { useFormik } from "formik"
-import { Restaurant } from "@/../interface"
+import { Menu, Restaurant } from "@/../interface"
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
 import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
 import { useState } from "react"
+import MenuTextField from "@/components/MenuTextField"
 
 export default function(){
     const {session} = useSession();
@@ -42,7 +43,7 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menu: [] as string[],
+            menu: [] as Menu[],
             openingHours: "",
             closingHours: "",
             tags: [] as string[]
@@ -104,7 +105,7 @@ export default function(){
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.name)}
+                    helperText={formik.errors.name&&String(formik.errors.name)}
                     error={Boolean(formik.errors.name)}
                 ></TextField>
                 
@@ -115,12 +116,13 @@ export default function(){
                     value={formik.values.address}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.address)}
+                    helperText={formik.errors.address&&String(formik.errors.address)}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
 
                 <ResizableMultiInput
                     label="menu"
+                    InnerProps={MenuTextField}
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
@@ -132,7 +134,7 @@ export default function(){
                     value={formik.values.openingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.openingHours)}
+                    helperText={formik.errors.openingHours&&String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
                 
@@ -143,7 +145,7 @@ export default function(){
                     value={formik.values.closingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.closingHours)}
+                    helperText={formik.errors.closingHours&&String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
 
