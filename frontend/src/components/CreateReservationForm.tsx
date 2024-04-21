@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 "use client"
-import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel , Select , MenuItem, SelectChangeEvent} from "@mui/material";
+import { TextField, Button, Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel , Select , MenuItem, SelectChangeEvent, InputLabel, FormControl} from "@mui/material";
 import { useFormik } from "formik";
 import { SyntheticEvent, useState } from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -29,12 +29,14 @@ export default function({
     });
     const router = useRouter() ;
     const [discountsList , setDiscountsList] = useState<Discount[][]>([]) ;
+    const [roomList,setRoomList] = useState<string[]>([]);
     const formik = useFormik({
         initialValues:{
             restaurantName: searchParams.get("restaurantName")||"",
             reservationDate: null as (Dayjs|null),
             discountId: null as (string|null),
-            welcomedrink: false
+            welcomedrink: false,
+            room: ""
         },
         async onSubmit(_values){
             let discount = discountsList[0][0]
@@ -73,7 +75,7 @@ export default function({
             return
         }
         value = value.trim();
-        const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts`)
+        const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts,rooms`)
         .then((res)=>{
             return res.json()
         })
@@ -84,6 +86,10 @@ export default function({
         const newDiscountsList = restaurantsResponse.data.map((restaurant : Restaurant) => {
             return restaurant.discounts
         })
+        const newRoomList = restaurantsResponse.data.map((restaurant: Restaurant) => {
+                return restaurant.rooms;
+        }).flat();
+        setRoomList(newRoomList);
         console.log(restaurantsResponse) ;
         setDiscountsList(newDiscountsList) ;
     }
@@ -93,7 +99,12 @@ export default function({
         formik.setFieldValue("discountId",e.target.value);
         console.log(formik.values.discountId);
     }
-    
+
+    async function onRoomChange(e:SelectChangeEvent<unknown>){
+        console.log(e.target);
+        formik.setFieldValue("room",e.target.value);
+        console.log(formik.values.room);
+    }
     return (
         <div className="h-full flex items-center justify-center m-2">
             <Dialog
@@ -165,7 +176,23 @@ export default function({
                         ))
                     }
                 </Select>
-                    
+                <FormControl>
+                    <InputLabel id="select-room-label">Room</InputLabel>
+                    <Select
+                        onChange={onRoomChange}
+                        value={formik.values.room}
+                        labelId="select-room-label"
+                        label="Room"
+                    >
+                        {
+                            roomList.map((room,index) => (
+                                <MenuItem key={index} value={room}>
+                                    {room}
+                                </MenuItem>
+                            ))
+                        }
+                    </Select>
+                 </FormControl>    
 
                 <FormControlLabel
                     control={
