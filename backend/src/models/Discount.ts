@@ -1,6 +1,11 @@
 import { prop } from "@typegoose/typegoose";
+import { ObjectId } from "mongoose";
 
 class Discount{
+    @prop({
+        required: true
+    })
+    public _id!: ObjectId
     @prop({
         required: true
     })

@@ -6,7 +6,7 @@ import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import MenuTextField from "@/components/MenuTextField"
 
 export default function(){
@@ -32,8 +32,8 @@ export default function(){
         menu:yup.array().of(
             yup.string().required(invalidMenuMessage)
         ),
-        openingHours: yup.string().matches(hourRegex,invalidHourMessage),
-        closingHours: yup.string().matches(hourRegex,invalidHourMessage),
+        openingHours: yup.string().matches(hourRegex,invalidHourMessage).required(invalidHourMessage),
+        closingHours: yup.string().matches(hourRegex,invalidHourMessage).required(invalidHourMessage),
         tags:yup.array().of(
             yup.string().required(invalidTagsMessage)
         ),
@@ -43,13 +43,14 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menu: [] as Menu[],
+            menus: [] as Menu[],
             openingHours: "",
             closingHours: "",
             tags: [] as string[]
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
+            console.log("on submit")
             const response = await fetch("/api/restaurants/",{
                 method:"POST",
                 headers:{
@@ -103,7 +104,10 @@ export default function(){
                     name="name"
                     label="Restaurant Name"
                     value={formik.values.name}
-                    onChange={formik.handleChange}
+                    onChange={(e)=>{
+                        console.log(formik.errors);
+                        formik.handleChange(e)
+                    }}
                     onBlur={formik.handleBlur}
                     helperText={formik.errors.name&&String(formik.errors.name)}
                     error={Boolean(formik.errors.name)}
@@ -123,7 +127,7 @@ export default function(){
                 <ResizableMultiInput
                     label="menu"
                     InnerProps={MenuTextField}
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
+                    onChange={(newValue)=>{formik.setFieldValue("menus",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
 
@@ -151,7 +155,7 @@ export default function(){
 
                 <ResizableMultiInput
                     label="tags"
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("tags",newValue)}}
+                    onChange={(newValue)=>{formik.setFieldValue("tags",newValue)}}
                     helperTexts={formik.errors.tags as string[]|undefined}
                 />
                 <Button 
