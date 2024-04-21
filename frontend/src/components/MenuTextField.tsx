@@ -1,5 +1,5 @@
 import { TextField } from "@mui/material";
-import { ResizableMultiInputEvent } from "../../interface";
+import { Menu, ResizableMultiInputEvent } from "../../interface";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as yup from "yup"
@@ -7,11 +7,13 @@ import * as yup from "yup"
 export default function({
     label,
     onChange,
-    helperText
+    helperText,
+    value
 }:{
     onChange: (event:ResizableMultiInputEvent)=>void,
     label: string,
-    helperText?: any
+    helperText?: any,
+    value: Menu|undefined
 }){
     const invalidNameMessage = "name can't be left empty"
     const invalidPriceMessage = "price is invalid"
@@ -24,8 +26,8 @@ export default function({
         price: string|undefined
     }>({
         initialValues: {
-            name: "",
-            price: ""
+            name: value?.name||"",
+            price: value?.price==undefined? "":String(value?.price)
         },
         validationSchema:ValidationSchema,
         async onSubmit(){

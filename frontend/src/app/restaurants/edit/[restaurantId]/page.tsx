@@ -1,16 +1,17 @@
 "use client"
 import { useFormik } from "formik"
-import { Restaurant } from "@/../interface"
+import { Menu, Restaurant, RestaurantResponse } from "@/../interface"
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
 import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { IconButton } from "@mui/material"
 import FileUploadIcon from "@mui/icons-material/FileUpload"
 import { Delete } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
+import MenuTextField from "@/components/MenuTextField"
 
 export default function({
     params
@@ -19,7 +20,6 @@ export default function({
         restaurantId:string
     }
 }){
-    console.log(params)
     const {session} = useSession();
     const [isSubmitting,setIsSubmitting] = useState(false);
     const [isAlerting,setIsAlerting] = useState<boolean>(false);
@@ -40,7 +40,7 @@ export default function({
     const ValidationSchema=yup.object().shape({
         name:yup.string().required(invalidNameMessage),
         address:yup.string().required(invalidAddressMessage),
-        menu:yup.array().of(
+        menus:yup.array().of(
             yup.string().required(invalidMenuMessage)
         ),
         openingHours: yup.string().matches(hourRegex,invalidHourMessage),
@@ -91,7 +91,7 @@ export default function({
         initialValues:{
             name: "",
             address: "",
-            menu: [] as string[],
+            menus: [] as Menu[],
             openingHours: "",
             closingHours: "",
             tags: [] as string[]
@@ -123,6 +123,23 @@ export default function({
             setIsSubmitting(false);
         }
     })
+
+    useEffect(()=>{
+        async function onStart(){
+            let restaurantResponse: RestaurantResponse = await fetch(`/api/restaurants/${params.restaurantId}`)
+            .then(res=>res.json())
+            let restaurant: Restaurant = restaurantResponse.data;
+            for(let field in restaurant){
+                console.log("field "+field)
+                formik.setFieldValue(field,restaurant[field]);
+            }
+        }
+        onStart();
+    },[])
+
+    useEffect(()=>{
+        console.log(formik.values)
+    },[formik.values])
 
     return (
         <div>
@@ -204,7 +221,9 @@ export default function({
 
                 <ResizableMultiInput
                     label="menu"
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
+                    values={formik.values.menus}
+                    InnerProps={MenuTextField}
+                    onChange={(newValue)=>{console.log("newValue "+newValue);formik.setFieldValue("menus",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
 
@@ -232,6 +251,7 @@ export default function({
 
                 <ResizableMultiInput
                     label="tags"
+                    values={formik.values.tags}
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("tags",newValue)}}
                     helperTexts={formik.errors.tags as string[]|undefined}
                 />

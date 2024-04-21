@@ -43,10 +43,13 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menus: [] as Menu[],
+            menus: [{
+                name: "",
+                price: ""
+            }],
             openingHours: "",
             closingHours: "",
-            tags: [] as string[]
+            tags: [""]
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
@@ -126,6 +129,7 @@ export default function(){
 
                 <ResizableMultiInput
                     label="menu"
+                    values={formik.values.menus}
                     InnerProps={MenuTextField}
                     onChange={(newValue)=>{formik.setFieldValue("menus",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
@@ -155,6 +159,7 @@ export default function(){
 
                 <ResizableMultiInput
                     label="tags"
+                    values={formik.values.tags}
                     onChange={(newValue)=>{formik.setFieldValue("tags",newValue)}}
                     helperTexts={formik.errors.tags as string[]|undefined}
                 />
