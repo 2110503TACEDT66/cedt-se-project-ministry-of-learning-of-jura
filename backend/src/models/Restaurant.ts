@@ -121,6 +121,13 @@ export class Restaurant {
     justOne: false,
   })
   public reservations?: Ref<Reservation>;
+  
+  @prop({
+    type: [String],
+    required: true,
+    default: []
+  })
+  public rooms!: [string]
 }
 
 // const Restaurant = new mongoose.Schema(
