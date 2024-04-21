@@ -3,8 +3,8 @@ import type { InferSchemaType } from "mongoose";
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
 import validator from "email-validator"
-import {ReservationModel} from "./Reservation"
-import { buildSchema, getModelForClass, pre, prop, queryMethod } from "@typegoose/typegoose";
+import {Reservation, ReservationModel} from "./Reservation"
+import { buildSchema, getModelForClass, pre, prop, queryMethod, Ref } from "@typegoose/typegoose";
 import { Restaurant } from "./Restaurant";
 
 export enum UserType{
@@ -13,8 +13,10 @@ export enum UserType{
 }
 
 @pre<User>("save",async function (next) {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.password) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 })
 
@@ -69,6 +71,12 @@ export class User {
   public phone!: [string]
 
   public _id!: mongoose.Types.ObjectId;
+
+  @prop({
+    ref:"Reservation",
+    default: []
+  })
+  public reservationHistory!: [Ref<Reservation>]
 
   async matchPassword(inputPassword:string) {
     // console.log(inputPassword,this.password)

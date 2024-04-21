@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Reservation, ReservationModel } from "../models/Reservation";
 import { RestaurantModel } from "../models/Restaurant";
-import { UserType } from "../models/User";
+import { UserModel, UserType } from "../models/User";
 import { ObjectId,Document } from "mongoose";
 
 export async function getReservations(req: Request,res: Response,next: NextFunction){
@@ -169,12 +169,39 @@ export async function confirmReservation(req: Request,res: Response,next: NextFu
                 message:"reservation already confirmed"
             })
         }
-        reservation.isConfirmed=true;
-        await reservation.save();
-        return res.status(200).json({
-            success:true,
-            data:reservation
-        })
+        const reserver = await UserModel.findById(reservation.reservorId);
+        if (!reserver) {
+            return res.status(404).json({ success: false, message: "Cannot find user with id " + reservation.reservorId })
+        }
+
+        reservation.isConfirmed = true;
+        reserver.reservationHistory.push(reservation);
+        if (reserver.reservationHistory.length > 10) {
+            reserver.reservationHistory.shift();
+        }
+
+        console.log(reserver);
+      
+        const session = await ReservationModel.startSession();
+        session.startTransaction();
+        try {
+            await reservation.save({ session });
+            await reserver.save({ session });
+            await session.commitTransaction();
+            session.endSession();
+            return res.status(200).json({
+                success: true,
+                data: reservation
+            });
+        } catch (err) {
+            await session.abortTransaction();
+            session.endSession();
+            console.log(err);
+            return res.status(400).json({
+                success: false,
+                message: "An error occurred while confirming the reservation."
+            });
+        }
     }
     catch(err){
         console.log(err)
