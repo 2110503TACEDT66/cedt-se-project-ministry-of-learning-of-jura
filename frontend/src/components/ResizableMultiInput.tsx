@@ -26,27 +26,21 @@ export default function<T>({
     values: (T|undefined)[]
 }){
     InnerProps=InnerProps||TextField;
-    console.log("values: ",values)
-    // const [values,setTextValuesList] = useState<(T|undefined)[]>(values);
 
     function onAdd(){
-        // values.push(undefined)
+        values.push(undefined)
         onChange(values);
     }
 
     function onDelete(index:number){
-        // values=(removeFromArrayByIndex(values,index));
+        values=(removeFromArrayByIndex(values,index));
         onChange(values);
     }
 
     function onTextChange(event: ResizableMultiInputEvent,index:number){
-        // values[index]=event.currentTarget.value
+        values[index]=event.currentTarget.value
         onChange(values);
     }
-
-    useEffect(()=>{
-        console.log("values "+values)
-    },[values])
     
     return (
         <div>

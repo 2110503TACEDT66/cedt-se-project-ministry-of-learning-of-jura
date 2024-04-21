@@ -41,7 +41,10 @@ export default function({
         name:yup.string().required(invalidNameMessage),
         address:yup.string().required(invalidAddressMessage),
         menus:yup.array().of(
-            yup.string().required(invalidMenuMessage)
+            yup.object().shape({
+                name: yup.string().required(invalidMenuMessage),
+                price: yup.number().required(invalidMenuMessage)
+            })
         ),
         openingHours: yup.string().matches(hourRegex,invalidHourMessage),
         closingHours: yup.string().matches(hourRegex,invalidHourMessage),
@@ -138,7 +141,7 @@ export default function({
     },[])
 
     useEffect(()=>{
-        console.log(formik.values)
+        console.log(formik.errors)
     },[formik.values])
 
     return (

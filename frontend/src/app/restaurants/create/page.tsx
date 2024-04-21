@@ -29,8 +29,11 @@ export default function(){
     const ValidationSchema=yup.object().shape({
         name:yup.string().required(invalidNameMessage),
         address:yup.string().required(invalidAddressMessage),
-        menu:yup.array().of(
-            yup.string().required(invalidMenuMessage)
+        menus:yup.array().of(
+            yup.object().shape({
+                name: yup.string().required(invalidMenuMessage),
+                price: yup.number().required(invalidMenuMessage)
+            })
         ),
         openingHours: yup.string().matches(hourRegex,invalidHourMessage).required(invalidHourMessage),
         closingHours: yup.string().matches(hourRegex,invalidHourMessage).required(invalidHourMessage),
