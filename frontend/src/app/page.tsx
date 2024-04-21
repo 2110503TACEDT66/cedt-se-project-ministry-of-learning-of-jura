@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default async function Home() {
   const session = await useServerSession();
-
+  console.log(session)
   return (
     <main className="flex flex-col gap-2">
       {
