@@ -36,7 +36,6 @@ export default function({
     }
 
     function onTextChange(event: ResizableMultiInputEvent,index:number){
-        console.log("ggggg")
         textValuesList[index]=event.currentTarget.value as string
         console.log(event.currentTarget.value)
         onChange(textValuesList);

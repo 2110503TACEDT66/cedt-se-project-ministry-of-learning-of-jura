@@ -21,9 +21,11 @@
     "install": "^0.13.0",
     "next": "^14.1.4",
     "next-themes": "^0.3.0",
-    "npm": "^10.5.2",
+    "npm": "^10.5.0",
     "react": "^18",
+    "react-dom": "^18",
     "react-loading-skeleton": "^3.4.0",
+    "react-material-ui-carousel": "^3.4.2",
     "react-slick": "^0.30.2",
     "slick-carousel": "^1.8.1",
     "yup": "^1.4.0"
