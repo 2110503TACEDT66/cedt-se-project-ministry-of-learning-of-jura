@@ -36,7 +36,7 @@ export default function({
             reservationDate: null as (Dayjs|null),
             discountId: null as (string|null),
             welcomedrink: false,
-            room: ""
+            room: null as (string|null)
         },
         async onSubmit(_values){
             let discount = discountsList[0][0]
