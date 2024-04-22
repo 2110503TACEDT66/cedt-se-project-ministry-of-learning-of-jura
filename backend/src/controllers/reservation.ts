@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Reservation, ReservationModel } from "../models/Reservation";
 import { RestaurantModel } from "../models/Restaurant";
+import { UserModel } from "../models/User";
 import { UserType } from "../models/User";
 import { ObjectId,Document } from "mongoose";
 
@@ -56,7 +57,7 @@ export async function getReservation(req: Request,res: Response,next: NextFuncti
 }
 export async function addReservation(req: Request,res: Response,next: NextFunction){
     try{
-        let {restaurantId,reservationDate,restaurantName,discount,welcomedrink} = req.body;
+        let {restaurantId,reservationDate,restaurantName,discountId,welcomedrink} = req.body;
         const reservorId = req.user!._id
         let existingReservations = ReservationModel.find({reservorId});
         const existingReservationsCount = await existingReservations.countDocuments(existingReservations);
@@ -70,12 +71,36 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
             const restaurant: Document = await RestaurantModel.findOne({name:req.body.restaurantName}).select({"_id":1})
             restaurantId=restaurant._id;
         }
+
+        let pointsToDeduct = 0;
+        if(discountId!=undefined) {
+            const restaurant = await RestaurantModel.findById(restaurantId);
+            const discount = restaurant!.discounts.find(d => d._id.toString() === discountId);
+            pointsToDeduct = -(discount!.points);
+            if(!discount?.isValid){
+                return res.status(400).json({
+                    success:false,
+                    message:"This discount is not valid."
+                })
+            }
+        }
+
+        if(pointsToDeduct > 0){
+            if(req.user!.point + pointsToDeduct < 0){
+                return res.status(400).json({
+                    success:false,
+                    message:"The required points is more than the available points."
+                })
+            }
+            UserModel.findByIdAndUpdate(req.user!._id, {$inc:{point: pointsToDeduct}})
+        }
+
         const reservation = await ReservationModel.create({
             restaurantId,
             reservorId,
             reservationDate,
             welcomedrink,
-            discount
+            discountId
         })
         res.status(201).json({
             success:true,
