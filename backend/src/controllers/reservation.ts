@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Reservation, ReservationModel } from "../models/Reservation";
 import { RestaurantModel } from "../models/Restaurant";
-import { UserType } from "../models/User";
+import { User, UserModel, UserType } from "../models/User";
 import { ObjectId,Document } from "mongoose";
+import { KARMA_DEDUCTED_FOR_CANCELLATION, POINTS_DEDUCTED_FOR_CANCELLATION } from "../config/constants";
 
 export async function getReservations(req: Request,res: Response,next: NextFunction){
     try{
@@ -131,6 +132,8 @@ export async function deleteReservation(req: Request,res: Response,next: NextFun
             })
         }
         await reservation.deleteOne();
+        UserModel.findByIdAndUpdate(req.user!._id, { $inc: { point: POINTS_DEDUCTED_FOR_CANCELLATION } })
+        UserModel.findByIdAndUpdate(req.user!._id, { $inc: { karma: KARMA_DEDUCTED_FOR_CANCELLATION } })
         return res.status(200).json({
             success:true,
             data:{}
