@@ -102,7 +102,7 @@ export class Restaurant {
 
   @prop({
     required: true,
-    min: 1
+    min: 1,
   })
   public reserverCapacity!: number
 

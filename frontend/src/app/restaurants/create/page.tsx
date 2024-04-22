@@ -7,6 +7,7 @@ import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
 import { useState } from "react"
+import TimePeriodTextField from "@/components/TimePeriodTextField"
 
 export default function(){
     const {session} = useSession();
@@ -42,10 +43,15 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menu: [] as string[],
+            menu: [],
+            discount : [],
             openingHours: "",
             closingHours: "",
-            tags: [] as string[]
+            reservationPeriods : [{
+                start : "",
+                end : ""
+            }],
+            tags: []
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
@@ -58,6 +64,7 @@ export default function(){
                 body: JSON.stringify(values)
             })
             const responseJson = await response.json();
+            console.log(responseJson) ;
             if(!responseJson.success){
                 setIsAlerting(true);
                 setAlertMessage({
@@ -124,7 +131,11 @@ export default function(){
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
-
+                <ResizableMultiInput
+                    label="discount"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("discount",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
                 <TextField
                     id="openingHours"
                     name="openingHours"
@@ -135,7 +146,12 @@ export default function(){
                     helperText={String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
-                
+                <ResizableMultiInput
+                    InnerProps={TimePeriodTextField}
+                    label="reservationPeriods"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("reservationPeriods",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
                 <TextField
                     id="closingHours"
                     name="closingHours"

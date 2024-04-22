@@ -15,7 +15,10 @@ export interface Session{
     user: User,
     token: string
 }
-
+export interface Period{
+    start:string,
+    end:string
+}
 export interface Restaurant{
     [x: string]: any
     name: string,
@@ -23,10 +26,7 @@ export interface Restaurant{
     menus: Menu[],
     openingHours: string,
     closingHours: string,
-    reservationPeriods : {
-        start : string,
-        end : string,
-    }[],
+    reservationPeriods : Period[],
     reserverCapacity : number,
     reservation : string[],
     discounts : Discount[],
@@ -83,7 +83,7 @@ export interface ReservationsResponse{
 
 export interface ResizableMultiInputEvent{
     currentTarget:{
-        value:string
+        value:any
     }
 }
 
