@@ -6,8 +6,9 @@ import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
 import hourRegex from "@/constants/hourRegex"
 import useSession from "@/hooks/useSession"
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
+import TimePeriodTextField from "@/components/TimePeriodTextField"
+import DiscountTextField from "@/components/DiscountTextField"
 export default function(){
     const {session} = useSession();
     const [isSubmitting,setIsSubmitting] = useState(false);
@@ -25,6 +26,7 @@ export default function(){
     const invalidTagsMessage = "tag name can't be empty!"
     const invalidAddressMessage = "address can't be empty!"
     const invalidNameMessage = "restaurant name can't be empty!"
+    const invalidCapacityMessage = "capacity must be number!" 
     const ValidationSchema=yup.object().shape({
         name:yup.string().required(invalidNameMessage),
         address:yup.string().required(invalidAddressMessage),
@@ -33,6 +35,7 @@ export default function(){
         ),
         openingHours: yup.string().matches(hourRegex,invalidHourMessage),
         closingHours: yup.string().matches(hourRegex,invalidHourMessage),
+        reserverCapacity : yup.number().required(invalidCapacityMessage),
         tags:yup.array().of(
             yup.string().required(invalidTagsMessage)
         ),
@@ -42,10 +45,16 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menu: [] as string[],
+            menu: [],
+            discount : [],
             openingHours: "",
             closingHours: "",
-            tags: [] as string[]
+            reservationPeriods : [{
+                start : "",
+                end : ""
+            }],
+            reserverCapacity : "",
+            tags: []
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
@@ -58,6 +67,7 @@ export default function(){
                 body: JSON.stringify(values)
             })
             const responseJson = await response.json();
+            console.log(responseJson) ;
             if(!responseJson.success){
                 setIsAlerting(true);
                 setAlertMessage({
@@ -74,7 +84,10 @@ export default function(){
             setIsSubmitting(false);
         }
     })
-
+    useEffect(() => {
+        console.log(formik.values) ;
+        console.log(formik.errors) ;
+    }, [formik.values])
     return (
         <div>
             <Dialog
@@ -120,11 +133,18 @@ export default function(){
                 ></TextField>
 
                 <ResizableMultiInput
+                    value = ""
                     label="menu"
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
-
+                <ResizableMultiInput
+                    value = ""
+                    InnerProps={DiscountTextField}
+                    label="discount"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("discount",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
                 <TextField
                     id="openingHours"
                     name="openingHours"
@@ -135,7 +155,7 @@ export default function(){
                     helperText={String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
-                
+
                 <TextField
                     id="closingHours"
                     name="closingHours"
@@ -146,8 +166,26 @@ export default function(){
                     helperText={String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
-
+                
                 <ResizableMultiInput
+                    InnerProps={TimePeriodTextField}
+                    value = ""
+                    label="reservationPeriods"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("reservationPeriods",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
+                <TextField
+                    id="reserverCapacity"
+                    name="reserverCapacity"
+                    label="Restaurant Capacity"
+                    value={formik.values.reserverCapacity}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    helperText={String(formik.errors.reserverCapacity)}
+                    error={Boolean(formik.errors.reserverCapacity)}
+                ></TextField>
+                <ResizableMultiInput
+                    value = ""
                     label="tags"
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("tags",newValue)}}
                     helperTexts={formik.errors.tags as string[]|undefined}

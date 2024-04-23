@@ -11,6 +11,7 @@ import { IconButton } from "@mui/material"
 import FileUploadIcon from "@mui/icons-material/FileUpload"
 import { Delete } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
+import TimePeriodTextField from "@/components/TimePeriodTextField"
 
 export default function({
     params
@@ -91,10 +92,16 @@ export default function({
         initialValues:{
             name: "",
             address: "",
-            menu: [] as string[],
+            menu: [],
+            discounts : [],
             openingHours: "",
             closingHours: "",
-            tags: [] as string[]
+            reservationPeriods : [{
+                start : "",
+                end : ""
+            }],
+            reserverCapacity : "" ,
+            tags: []
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
@@ -107,6 +114,7 @@ export default function({
                 body: JSON.stringify(values)
             })
             const responseJson = await response.json();
+            console.log(responseJson) ;
             if(!responseJson.success){
                 setIsAlerting(true);
                 setAlertMessage({
@@ -203,11 +211,18 @@ export default function({
                 </div>
 
                 <ResizableMultiInput
+                    value = ""
                     label="menu"
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
                     helperTexts={formik.errors.menu as string[]|undefined}
                 />
-
+                <ResizableMultiInput
+                    // InnerProps={}
+                    value = ""
+                    label="discount"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("discounts",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
                 <TextField
                     id="openingHours"
                     name="openingHours"
@@ -229,8 +244,17 @@ export default function({
                     helperText={String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
+                
+                <ResizableMultiInput
+                    value = ""
+                    InnerProps={TimePeriodTextField}
+                    label="reservationPeriods"
+                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("reservationPeriods",newValue)}}
+                    helperTexts={formik.errors.discount as string[]|undefined}
+                />
 
                 <ResizableMultiInput
+                    value = ""
                     label="tags"
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("tags",newValue)}}
                     helperTexts={formik.errors.tags as string[]|undefined}
