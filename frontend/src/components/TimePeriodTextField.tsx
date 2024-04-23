@@ -1,72 +1,77 @@
 import { TextField } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Period, ResizableMultiInputEvent } from "../../interface";
-
-enum Time{
-    startTime,
-    endTime
-}
-
+import { useFormik } from "formik";
+import * as yup from "yup"
+import hourRegex from "@/constants/hourRegex";
 export default function({
     className,
     onChange,
     label,
-    helperText
+    helperText,
+    value
 }:{
     className?:string,
     onChange: (event:ResizableMultiInputEvent)=>void,
     label:string,
-    helperText?: {
-        startTime?:string,
-        endTime?:string,
-    }
+    helperText?: any,
+    value: {
+        start:string,
+        end: string
+    } | undefined
 }){
-    const [startTime,setStartTime] = useState("");
-    const [endTime,setEndTime] = useState("");
-    function onInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,time: Time){
-        let newStartTime=startTime;
-        let newEndTime=endTime;
-        const newValue=event.currentTarget.value;
-        if(time==Time.startTime){
-            setStartTime(newValue)
-            newStartTime=newValue
+    const invalidHourMessage = "invalid hour time"
+    const ValidationSchema = yup.object().shape({
+        start: yup.string().matches(hourRegex,invalidHourMessage),
+        end: yup.string().matches(hourRegex,invalidHourMessage)
+    })
+    let formik = useFormik<{
+        start:string,
+        end: string
+    }>({
+        initialValues:value||{
+            start: "",
+            end:""
+        },
+        validationSchema: ValidationSchema,
+        async onSubmit(values){
+            throw new Error("this method should not be submitted")
         }
-        else{
-            setEndTime(newValue)
-            newEndTime=newValue
-        }
+    });
+
+    useEffect(()=>{
+        console.log(formik.values,formik.errors)
         let newEvent: ResizableMultiInputEvent = {
             currentTarget:{
-                value:{
-                    start: newStartTime,
-                    end: newEndTime
-                } as Period
+                value:formik.values
             }
         };
         onChange(newEvent)
-    }
-    useEffect(()=>{
-        console.log(helperText)
-    },[helperText])
+    },[formik.values])
+    
     return (
         <div className="w-full flex flex-col">
-            <div className={`${className||''} w-full flex items-center gap-2`}>
+            <div className={`${className||''} w-full flex gap-2`}>
                 <TextField
+                    id="start"
                     label="Start Time"
-                    value={startTime}
+                    value={formik.values.start}
                     className="w-full"
-                    error={Boolean(helperText)}
-                    onChange={(e)=>{onInputChange(e,Time.startTime)}}
-                    helperText={helperText?.startTime}
+                    error={Boolean(formik.errors.start)}
+                    onChange={formik.handleChange}
+                    helperText={formik.errors.start&&String(formik.errors.start)}
                 />
-                <p>-</p>
+                <p
+                    className="self-center"
+                >-</p>
                 <TextField
+                    id="end"
                     label="End Time"
-                    value={endTime}
+                    value={formik.values.end}
                     className="w-full"
-                    error={Boolean(helperText)}
-                    onChange={(e)=>{onInputChange(e,Time.endTime)}}
-                    helperText={helperText?.endTime}
+                    error={Boolean(formik.errors.end)}
+                    onChange={formik.handleChange}
+                    helperText={formik.errors.end&&String(formik.errors.end)}
                 />
             </div>
             {/* <p className="text-[red]">{helperText}</p> */}

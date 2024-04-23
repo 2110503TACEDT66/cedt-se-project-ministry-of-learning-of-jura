@@ -30,11 +30,17 @@ export default function(){
     const ValidationSchema=yup.object().shape({
         name:yup.string().required(invalidNameMessage),
         address:yup.string().required(invalidAddressMessage),
-        menu:yup.array().of(
+        menus:yup.array().of(
             yup.string().required(invalidMenuMessage)
         ),
         openingHours: yup.string().matches(hourRegex,invalidHourMessage),
         closingHours: yup.string().matches(hourRegex,invalidHourMessage),
+        reservationPeriods: yup.array().of(
+            yup.object().shape({
+                start: yup.string().matches(hourRegex,invalidHourMessage),
+                end: yup.string().matches(hourRegex,invalidHourMessage)
+            })
+        ),
         reserverCapacity : yup.number().required(invalidCapacityMessage),
         tags:yup.array().of(
             yup.string().required(invalidTagsMessage)
@@ -45,8 +51,13 @@ export default function(){
         initialValues:{
             name: "",
             address: "",
-            menu: [],
-            discount : [],
+            menus: [""],
+            discount : [{
+                name:"",
+                description:"",
+                points:0,
+                isValid: true
+            }],
             openingHours: "",
             closingHours: "",
             reservationPeriods : [{
@@ -84,10 +95,6 @@ export default function(){
             setIsSubmitting(false);
         }
     })
-    useEffect(() => {
-        console.log(formik.values) ;
-        console.log(formik.errors) ;
-    }, [formik.values])
     return (
         <div>
             <Dialog
@@ -117,7 +124,7 @@ export default function(){
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.name)}
+                    helperText={formik.errors.name&&String(formik.errors.name)}
                     error={Boolean(formik.errors.name)}
                 ></TextField>
                 
@@ -128,21 +135,21 @@ export default function(){
                     value={formik.values.address}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.address)}
+                    helperText={formik.errors.address&&String(formik.errors.address)}
                     error={Boolean(formik.errors.address)}
                 ></TextField>
 
                 <ResizableMultiInput
-                    value = ""
+                    value = {formik.values.menus}
                     label="menu"
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("menu",newValue)}}
-                    helperTexts={formik.errors.menu as string[]|undefined}
+                    onChange={(newValue)=>{formik.setFieldValue("menus",newValue)}}
+                    helperTexts={formik.errors.menus as string[]|undefined}
                 />
                 <ResizableMultiInput
-                    value = ""
+                    value = {formik.values.discounts}
                     InnerProps={DiscountTextField}
                     label="discount"
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("discount",newValue)}}
+                    onChange={(newValue)=>{formik.setFieldValue("discount",newValue)}}
                     helperTexts={formik.errors.discount as string[]|undefined}
                 />
                 <TextField
@@ -152,7 +159,7 @@ export default function(){
                     value={formik.values.openingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.openingHours)}
+                    helperText={formik.errors.openingHours&&String(formik.errors.openingHours)}
                     error={Boolean(formik.errors.openingHours)}
                 ></TextField>
 
@@ -163,14 +170,14 @@ export default function(){
                     value={formik.values.closingHours}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.closingHours)}
+                    helperText={formik.errors.closingHours&&String(formik.errors.closingHours)}
                     error={Boolean(formik.errors.closingHours)}
                 ></TextField>
                 
                 <ResizableMultiInput
                     InnerProps={TimePeriodTextField}
-                    value = ""
-                    label="reservationPeriods"
+                    value = {formik.values.reservationPeriods}
+                    label="Reservation Periods"
                     onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("reservationPeriods",newValue)}}
                     helperTexts={formik.errors.discount as string[]|undefined}
                 />
@@ -181,7 +188,7 @@ export default function(){
                     value={formik.values.reserverCapacity}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    helperText={String(formik.errors.reserverCapacity)}
+                    helperText={formik.errors.reserverCapacity&&String(formik.errors.reserverCapacity)}
                     error={Boolean(formik.errors.reserverCapacity)}
                 ></TextField>
                 <ResizableMultiInput

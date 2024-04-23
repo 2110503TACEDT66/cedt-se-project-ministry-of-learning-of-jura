@@ -74,7 +74,7 @@ export default function ({
   }, [formik.values]);
   return (
     <div className="w-full flex flex-col">
-      <div className={`${className || ""} w-full flex items-center gap-2`}>
+      <div className={`${className || ""} w-full flex gap-2`}>
         <TextField
           id="name"
           label="name"
