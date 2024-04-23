@@ -1,7 +1,7 @@
 module.exports=async function(env){
     const body = {
-        "name":"เจ๊ไก่",
-        "address":"ถนน bing chilling ซอย 4",
+        "name":"เจ๊ไก่ test",
+        "address":"ถนน bing chilling ซอย 4 test",
         "menus":[{
             name: "something nasty",
             price: 56164

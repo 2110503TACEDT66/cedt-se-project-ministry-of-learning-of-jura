@@ -145,8 +145,21 @@ export async function getRestaurant(req: Request, res: Response, next: NextFunct
 //@access : Private
 export async function createRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
-    req.body.restaurantOwner = req.user!._id;
-    const restaurant = await RestaurantModel.create(req.body);
+    const restaurantOwner = req.user!._id;
+    const { name, address, menus, openingHours, closingHours, discounts, tags, reserverCapacity, reservationPeriods } = req.body;
+    const requestRestaurant: Restaurant = {
+      name, 
+      address, 
+      menus, 
+      openingHours, 
+      closingHours, 
+      discounts, 
+      tags, 
+      reserverCapacity, 
+      reservationPeriods,
+      restaurantOwner
+    }
+    const restaurant = await RestaurantModel.create(requestRestaurant);
     res.status(201).json({ success: true, data: restaurant });
   }
   catch (err) {
@@ -179,21 +192,21 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
       for (let indexStr in requestDiscounts) {
         let index = parseInt(indexStr);
         if (index >= restaurant.discounts.length) {
-          const {name,description,points,isValid} = requestDiscounts[indexStr];
-          updateDiscounts["discounts."+index]={name,description,points,isValid};
+          const { name, description, points, isValid } = requestDiscounts[indexStr];
+          updateDiscounts["discounts." + index] = { name, description, points, isValid };
           // continue;
         }
         else if (restaurant.discounts[index].isValid) {
           const { isValid } = requestDiscounts[indexStr];
           updateDiscounts["discounts." + index + ".isValid"] = isValid;
         }
-        else{
-          return res.status(400).json({success:false,message:"invalid discounts: cannot edit invalidated discount"})
+        else {
+          return res.status(400).json({ success: false, message: "invalid discounts: cannot edit invalidated discount" })
         }
       }
     }
-    if(!validUpdateDiscounts(updateDiscounts,restaurant.discounts.length)){
-      return res.status(400).json({success:false,message:"invalid discounts"})
+    if (!validUpdateDiscounts(updateDiscounts, restaurant.discounts.length)) {
+      return res.status(400).json({ success: false, message: "invalid discounts" })
     }
     // console.log(updateDiscounts);
     const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(req.params.id, {
@@ -205,7 +218,7 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
       tags,
       reserverCapacity,
       reservationPeriods,
-      "$set":updateDiscounts
+      "$set": updateDiscounts
     }, { new: true });
     res.status(200).json({ success: true, data: updatedRestaurant });
   } catch (err) {
