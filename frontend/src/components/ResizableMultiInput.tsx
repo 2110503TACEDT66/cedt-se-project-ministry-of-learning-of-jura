@@ -10,7 +10,8 @@ export default function({
     label,
     onChange,
     InnerProps,
-    helperTexts
+    helperTexts,
+    value
 }:{
     label:string,
     onChange: (newValue: (string)[])=>void,
@@ -19,8 +20,10 @@ export default function({
         onChange: (event:ResizableMultiInputEvent)=>void,
         label:string,
         helperText?:any
+        value : any
     }>,
     helperTexts?: string[]
+    value : "" | undefined
 }){
     const initialValue: string = ""
 
@@ -53,7 +56,7 @@ export default function({
                     return (
                         <div key={index} className="pl-10 w-full flex flex-row items-center justify-center gap-2">
                             {
-                                InnerProps && <InnerProps
+                                InnerProps && <InnerProps value = ""
                                     key={index}
                                     className="flex-1"
                                     onChange={(e)=>{onTextChange(e,index)}}
