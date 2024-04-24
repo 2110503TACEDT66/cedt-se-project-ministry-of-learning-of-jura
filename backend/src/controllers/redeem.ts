@@ -19,7 +19,7 @@ export async function redeem(req: Request, res: Response, next: NextFunction){
 
     let diffMillisecond =  Duration.milliseconds.of(new Date().getTime() - new Date(lastReservation.reservationDate).getTime());
     // console.log(req.user.lastestChurnDate,lastReservation.reservationDate,req.user.lastestChurnDate!=undefined && req.user.lastestChurnDate<lastReservation.reservationDate)
-    if(Duration.days.from(diffMillisecond)>=env.CHURN_DURATION && (req.user.lastestChurnDate==undefined || req.user.lastestChurnDate<lastReservation.reservationDate)){
+    if(Duration.days.from(diffMillisecond)>=env.CHURN_DURATION && (req.user.lastestChurnDate==undefined || req.user.lastestChurnDate.getTime()<lastReservation.reservationDate.getTime())){
         await UserModel.findByIdAndUpdate(req.user._id,{
             "$inc":{
                 point: env.CHURN_POINTS
