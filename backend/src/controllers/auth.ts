@@ -1,13 +1,12 @@
 import {UserModel, User} from "../models/User"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
-import {dayToMilliseconds} from "../utils/time"
 import type {CookieOptions, NextFunction, Request, Response} from "express"
 import env from "../config/env";
 import { Document } from "mongoose";
-
+import {Duration} from "typed-duration"
 const tokenCookieOptions: CookieOptions = {
-    maxAge: dayToMilliseconds(env.JWT_EXPIRING_DAYS),
+    maxAge: Duration.milliseconds.from(Duration.days.from(env.JWT_EXPIRING_DAYS)),
     httpOnly: true
 }
 if(env.DEPLOY_MODE=="production"){

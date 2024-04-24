@@ -74,7 +74,7 @@ export class User {
 
   @prop({
     ref:"Reservation",
-    default: []
+    default: [],
   })
   public reservationHistory!: [Ref<Reservation>]
 
