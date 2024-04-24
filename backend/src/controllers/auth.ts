@@ -6,7 +6,7 @@ import env from "../config/env";
 import { Document } from "mongoose";
 import {Duration} from "typed-duration"
 const tokenCookieOptions: CookieOptions = {
-    maxAge: Duration.milliseconds.from(Duration.days.from(env.JWT_EXPIRING_DAYS)),
+    maxAge: Duration.milliseconds.from(Duration.days.of(env.JWT_EXPIRING_DAYS)),
     httpOnly: true
 }
 if(env.DEPLOY_MODE=="production"){

@@ -56,7 +56,7 @@ export async function getReservation(req: Request,res: Response,next: NextFuncti
 }
 export async function addReservation(req: Request,res: Response,next: NextFunction){
     try{
-        let {restaurantId,reservationDate,restaurantName,discount,welcomedrink} = req.body;
+        let {restaurantId,reservationDate,restaurantName,discount,welcomeDrink} = req.body;
         const reservorId = req.user!._id
         let existingReservations = ReservationModel.find({reservorId});
         const existingReservationsCount = await existingReservations.countDocuments(existingReservations);
@@ -74,7 +74,7 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
             restaurantId,
             reservorId,
             reservationDate,
-            welcomedrink,
+            welcomeDrink,
             discount
         })
         res.status(201).json({

@@ -56,7 +56,7 @@ export default async function(){
                             <div className="">
                                 <Typography>Restaurant: {reservation.restaurant?.name}</Typography>
                                 <Typography>Reservation Date: {new Date(Date.parse(reservation.reservationDate)).toLocaleDateString("en-UK")}</Typography>
-                                <Typography>Welcome Drink:{reservation.welcomedrink?  " Yes" : " No"}</Typography>
+                                <Typography>Welcome Drink:{reservation.welcomeDrink?  " Yes" : " No"}</Typography>
                                 {
                                     isRestaurantOwner && 
                                     <Typography>By: {reservation.reservorId==session.user._id? "you":reservation.reservorId}</Typography>

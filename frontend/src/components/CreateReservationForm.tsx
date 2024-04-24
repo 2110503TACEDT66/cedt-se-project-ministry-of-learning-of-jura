@@ -34,7 +34,7 @@ export default function({
             restaurantName: searchParams.get("restaurantName")||"",
             reservationDate: null as (Dayjs|null),
             discountId: null as (string|null),
-            welcomedrink: false
+            welcomeDrink: false
         },
         async onSubmit(_values){
             let discount = discountsList[0][0]
@@ -170,14 +170,13 @@ export default function({
                 <FormControlLabel
                     control={
                     // <>
-                        <input 
-                            // checked={welcomedrink} 
-                            checked={formik.values.welcomedrink}
+                        <input
+                            checked={formik.values.welcomeDrink}
                             id="checked-checkbox" 
                             type="checkbox" 
                             value="" 
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            onChange={(e) => formik.setFieldValue("welcomedrink",e.target.checked)} 
+                            onChange={(e) => formik.setFieldValue("welcomeDrink",e.target.checked)} 
                         />
                         
                     }

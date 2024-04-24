@@ -30,7 +30,7 @@ export class Reservation {
     @prop({
         required: true
     })
-    public welcomedrink?: Boolean
+    public welcomeDrink?: Boolean
 
     @prop({
         required: true,
@@ -39,28 +39,4 @@ export class Reservation {
     public isConfirmed?: Boolean
 }
 
-// const ReservationSchema = new mongoose.Schema({
-//     reservorId:{
-//         type: mongoose.Schema.ObjectId,
-//         ref:"User",
-//         required:true
-//     },
-//     restaurantId:{
-//         type: mongoose.Schema.ObjectId,
-//     },
-//     reservationDate:{
-//         required: true,
-//         type: Date
-//     },
-//     discount:{
-//         required: false,
-//         type: Discount
-//     },
-//     welcomedrink:{
-//         required: true,
-//         type:Boolean
-//     }
-// })
-// const ReservationSchema = buildSchema(Reservation);
-// export default mongoose.model("Reservation",ReservationSchema)
 export const ReservationModel = getModelForClass(Reservation);
