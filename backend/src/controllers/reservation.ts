@@ -57,7 +57,7 @@ export async function getReservation(req: Request,res: Response,next: NextFuncti
 }
 export async function addReservation(req: Request,res: Response,next: NextFunction){
     try{
-        let {restaurantId,reservationDate,restaurantName,discountId,welcomedrink} = req.body;
+        let {restaurantId,reservationDate,restaurantName,discountIndex,welcomedrink} = req.body;
         const reservorId = req.user!._id
         let existingReservations = ReservationModel.find({reservorId});
         const existingReservationsCount = await existingReservations.countDocuments(existingReservations);
@@ -73,9 +73,9 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
         }
 
         let pointsToDeduct = 0;
-        if(discountId!=undefined) {
+        if(discountIndex!=undefined) {
             const restaurant = await RestaurantModel.findById(restaurantId);
-            const discount = restaurant!.discounts.find(d => d._id.toString() === discountId);
+            const discount = restaurant!.discounts[discountIndex];
             pointsToDeduct = -(discount!.points);
             if(!discount?.isValid){
                 return res.status(400).json({
@@ -83,16 +83,13 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
                     message:"This discount is not valid."
                 })
             }
-        }
-
-        if(pointsToDeduct > 0){
             if(req.user!.point + pointsToDeduct < 0){
                 return res.status(400).json({
                     success:false,
                     message:"The required points is more than the available points."
                 })
             }
-            UserModel.findByIdAndUpdate(req.user!._id, {$inc:{point: pointsToDeduct}})
+            await UserModel.findByIdAndUpdate(req.user!._id, {$inc:{point: pointsToDeduct}})
         }
 
         const reservation = await ReservationModel.create({
@@ -100,7 +97,7 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
             reservorId,
             reservationDate,
             welcomedrink,
-            discountId
+            discountIndex
         })
         res.status(201).json({
             success:true,

@@ -82,11 +82,12 @@ export default async function ({
               </ListItem>
             ))}
           </List>
-          <Typography variant="h5"  className="font-semibold">Available Reservation Periods</Typography>
+          <Typography variant="h5" className="font-semibold">
+            Available Reservation Periods
+          </Typography>
           {restaurant.reservationPeriods ? (
             <List>
-              {
-              restaurant.reservationPeriods.map(({ start, end }, index) => {
+              {restaurant.reservationPeriods.map(({ start, end }, index) => {
                 const periodString = `${start}-${end}`;
                 const searchParams = new URLSearchParams({
                   restaurantName: restaurant.name,
@@ -101,8 +102,28 @@ export default async function ({
                     <ListItemText key={index} primary={periodString} />
                   </ListItemButton>
                 );
-              })
-              }
+              })}
+            </List>
+          ) : null}{" "}
+          <Typography variant="h5" className="font-semibold">
+            Discount List
+          </Typography>
+          {restaurant.discounts ? (
+            <List>
+              {restaurant.discounts.map(
+                ({ name, description, points }, index) => {
+                  return (
+                    <ListItem>
+                      <ListItemText key={index} primary={name}></ListItemText>
+                      <ListItemText
+                        key={index}
+                        primary={description}
+                      ></ListItemText>
+                      <ListItemText key={index} primary={points}></ListItemText>
+                    </ListItem>
+                  );
+                }
+              )}
             </List>
           ) : null}{" "}
         </div>

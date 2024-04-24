@@ -23,6 +23,11 @@ class Discount{
         required:true
     })
     public isValid!: boolean
+
+    @prop({
+        required: false
+    })
+    public discountIndex?: number
 }
 // const discount = {
 //     // _id:true,

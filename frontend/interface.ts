@@ -22,7 +22,7 @@ export interface Period{
     end:string
 }
 export interface Restaurant{
-    [x: string]: any
+    // [x: string]: any
     name: string,
     address: string,
     menus: Menu[],
@@ -36,7 +36,7 @@ export interface Restaurant{
     _id: string
 }
 export interface Discount  {
-    _id: string,
+    _id?: string,
     name: string,
 
     description : string,
@@ -73,7 +73,7 @@ export interface Reservation{
     reservorId: string,
     restaurantId: string,
     reservationDate: string,
-    _id: string,
+    _id?: string,
     restaurant?: Restaurant,
     welcomedrink: boolean
 }

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.route("/")
     .get(checkToken,checkRole(UserType.User,UserType.RestaurantOwner),getReservations)
-    .post(checkToken,addReservation)
+    .post(checkToken,checkRole(UserType.User),addReservation)
 router.route("/:id")
     .get(checkToken,getReservation)
     .put(checkToken,checkRole(UserType.User,UserType.RestaurantOwner),updateReservation)
