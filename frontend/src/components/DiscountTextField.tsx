@@ -57,9 +57,6 @@ export default function ({
   });
   useEffect(() => {
     let { name, description, points, isValid } = formik.values;
-    if (name == "" || description == "" || points == "" || isValid == true) {
-      return;
-    }
     onChange({
       currentTarget: {
         value: {
@@ -70,7 +67,6 @@ export default function ({
         },
       },
     });
-    console.log(formik.values);
   }, [formik.values]);
   return (
     <div className="w-full flex flex-col">

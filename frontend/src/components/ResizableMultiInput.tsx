@@ -25,13 +25,12 @@ export default function ({
   helperTexts?: string[];
   value: (any | undefined)[];
 }) {
-  const initialValue: string = "";
 
   InnerProps = InnerProps || TextField;
-  const [textValuesList, setTextValuesList] = useState([initialValue]);
+  const [textValuesList, setTextValuesList] = useState<(any | undefined)[]>(value||[undefined]);
 
   function onAdd() {
-    setTextValuesList([...textValuesList, initialValue]);
+    setTextValuesList([...textValuesList, undefined]);
   }
 
   function onDelete(index: number) {
@@ -59,7 +58,7 @@ export default function ({
             >
               {InnerProps && (
                 <InnerProps
-                  value=""
+                  value={(InnerProps==TextField)? textValue || "" : textValue}
                   key={index}
                   className="flex-1"
                   onChange={(e) => {

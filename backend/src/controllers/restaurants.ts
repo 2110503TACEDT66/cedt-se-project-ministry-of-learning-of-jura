@@ -216,7 +216,7 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
       reserverCapacity,
       reservationPeriods,
       "$set": updateDiscounts
-    }, { new: true });
+    }, { new: true,runValidators: true });
     res.status(200).json({ success: true, data: updatedRestaurant });
   } catch (err) {
     console.log(err)

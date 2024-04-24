@@ -1,6 +1,6 @@
 "use client";
 import { useFormik } from "formik";
-import { Discount, Restaurant } from "@/../interface";
+import { DeepPartial, Discount, Restaurant } from "@/../interface";
 import {
   Button,
   Dialog,
@@ -108,45 +108,41 @@ export default function ({
     }
   }
 
-  const formik = useFormik<
-    Omit<Restaurant, "reservation" | "_id" | "menus" | "reserverCapacity"> & {
-      reserverCapacity: string;
-      menus: string[];
-    }
-  >({
+  const formik = useFormik<DeepPartial<Restaurant>>({
     initialValues: {
-      name: "",
-      address: "",
-      menus: [""],
+      name: undefined,
+      address: undefined,
+      menus: undefined,
       discounts: [
         {
-          name: "",
-          description: "",
-          points: 0,
+          name: undefined,
+          description: undefined,
+          points: undefined,
           isValid: true,
         },
       ],
-      openingHours: "",
-      closingHours: "",
+      openingHours: undefined,
+      closingHours: undefined,
       reservationPeriods: [
         {
-          start: "",
-          end: "",
+          start: undefined,
+          end: undefined,
         },
       ],
-      reserverCapacity: "",
-      tags: [],
+      reserverCapacity: undefined,
+      tags: undefined,
     },
     validationSchema: ValidationSchema,
     async onSubmit(values) {
-      let data: any = { ...values };
-      data.discounts = data.discounts.map(
-        (discount: Discount, index: number) => {
-          return {
-            [index]: { ...discount },
-          };
+      const {discounts,...rest} = values;
+      let data: any = rest;
+      data.discounts = discounts?.reduce<any>((prev: Partial<Discount> | undefined, cur: Partial<Discount> | undefined, index)=>{
+        return {
+          [index]: cur,
+          ...prev
         }
-      );
+      },{})
+      console.log(data)
       const response = await fetch(`/api/restaurants/${params.restaurantId}`, {
         method: "PUT",
         headers: {
@@ -196,12 +192,12 @@ export default function ({
         onSubmit={formik.handleSubmit}
         className="bg-white p-2 flex flex-col gap-2 text-black"
       >
-        <p className="self-center">Create Restaurant!</p>
+        <p className="self-center">Edit Restaurant!</p>
         <TextField
           id="name"
           name="name"
           label="Restaurant Name"
-          value={formik.values.name}
+          value={formik.values.name || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           helperText={formik.errors.name && String(formik.errors.name)}
@@ -212,7 +208,7 @@ export default function ({
           id="address"
           name="address"
           label="Restaurant Address"
-          value={formik.values.address}
+          value={formik.values.address || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           helperText={formik.errors.address && String(formik.errors.address)}
@@ -244,7 +240,7 @@ export default function ({
         </div>
 
         <ResizableMultiInput
-          value={formik.values.menus}
+          value={formik.values.menus!}
           label="menu"
           onChange={(newValue) => {
             formik.setFieldValue("menus", newValue);
@@ -252,7 +248,7 @@ export default function ({
           helperTexts={formik.errors.menus as string[] | undefined}
         />
         <ResizableMultiInput
-          value={formik.values.discounts}
+          value={formik.values.discounts!}
           InnerProps={DiscountTextField}
           label="discount"
           onChange={(newValue) => {
@@ -265,7 +261,7 @@ export default function ({
           id="openingHours"
           name="openingHours"
           label="Opening Hours"
-          value={formik.values.openingHours}
+          value={formik.values.openingHours || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           helperText={
@@ -278,7 +274,7 @@ export default function ({
           id="closingHours"
           name="closingHours"
           label="Closing Hours"
-          value={formik.values.closingHours}
+          value={formik.values.closingHours || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           helperText={
@@ -289,7 +285,7 @@ export default function ({
 
         <ResizableMultiInput
           InnerProps={TimePeriodTextField}
-          value={formik.values.reservationPeriods}
+          value={formik.values.reservationPeriods!}
           label="Reservation Periods"
           onChange={(newValue) => {
             console.log(newValue);
@@ -301,7 +297,7 @@ export default function ({
           id="reserverCapacity"
           name="reserverCapacity"
           label="Restaurant Capacity"
-          value={formik.values.reserverCapacity}
+          value={formik.values.reserverCapacity || ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           helperText={
@@ -311,7 +307,7 @@ export default function ({
           error={Boolean(formik.errors.reserverCapacity)}
         ></TextField>
         <ResizableMultiInput
-          value={formik.values.tags}
+          value={formik.values.tags!}
           label="tags"
           onChange={(newValue) => {
             console.log(newValue);

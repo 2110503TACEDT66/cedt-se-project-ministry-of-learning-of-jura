@@ -1,7 +1,7 @@
 module.exports=async function(env){
     const body = {
-        "name":"เจ๊ไก่ test",
-        "address":"ถนน bing chilling ซอย 4 test",
+        "name":"som ting wong",
+        "address":"ถนนไก่",
         "menus":[{
             name: "something nasty",
             price: 56164
@@ -21,7 +21,7 @@ module.exports=async function(env){
             "isValid":true,
             "points": 100
         }],
-        "tags":"thai"
+        "tags":"japanese"
     }
     let response = await fetch(`${env.URL}/api/v1/restaurants`,{
         method:"POST",
