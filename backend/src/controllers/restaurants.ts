@@ -200,9 +200,6 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
           const { isValid } = requestDiscounts[indexStr];
           updateDiscounts["discounts." + index + ".isValid"] = isValid;
         }
-        else {
-          return res.status(400).json({ success: false, message: "invalid discounts: cannot edit invalidated discount" })
-        }
       }
     }
     if (!validUpdateDiscounts(updateDiscounts, restaurant.discounts.length)) {
