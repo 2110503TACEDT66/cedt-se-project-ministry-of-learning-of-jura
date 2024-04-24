@@ -35,7 +35,7 @@ export default function ({
   const ValidationSchema = yup.object({
     name: yup.string().required(nameErrorMessage),
     description: yup.string().required(descriptionErrorMessage),
-    points: yup.number().required(pointsErrorMessage),
+    points: yup.number().required(pointsErrorMessage).typeError(pointsErrorMessage),
     isValid: yup.boolean().required(isValidErrorMessage),
   });
   const formik = useFormik<{

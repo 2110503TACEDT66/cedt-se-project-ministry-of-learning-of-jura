@@ -114,20 +114,12 @@ export default function ({
       address: undefined,
       menus: undefined,
       discounts: [
-        {
-          name: undefined,
-          description: undefined,
-          points: undefined,
-          isValid: true,
-        },
+        undefined
       ],
       openingHours: undefined,
       closingHours: undefined,
       reservationPeriods: [
-        {
-          start: undefined,
-          end: undefined,
-        },
+        undefined
       ],
       reserverCapacity: undefined,
       tags: undefined,

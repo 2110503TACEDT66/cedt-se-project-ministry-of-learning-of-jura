@@ -1,7 +1,7 @@
 "use client";
 import { TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import removeFromArrayByIndex from "@/utils/removeFromArrayByIndex";
 import { ResizableMultiInputEvent } from "../../interface";
@@ -34,14 +34,20 @@ export default function ({
   }
 
   function onDelete(index: number) {
+    console.log("delete", index,"changed: ",removeFromArrayByIndex(textValuesList, index))
     setTextValuesList(removeFromArrayByIndex(textValuesList, index));
   }
 
   function onTextChange(event: ResizableMultiInputEvent, index: number) {
-    textValuesList[index] = event.currentTarget.value as string;
+    let clone = [...textValuesList];
+    clone[index] = event.currentTarget.value as string;
     console.log(event.currentTarget.value);
-    onChange(textValuesList);
+    setTextValuesList(clone)
   }
+
+  useEffect(()=>{
+    onChange(textValuesList);
+  },[textValuesList])
 
   return (
     <div>
