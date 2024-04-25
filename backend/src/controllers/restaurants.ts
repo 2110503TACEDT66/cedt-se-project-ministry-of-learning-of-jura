@@ -1,21 +1,19 @@
-// const { populate } = require('../models/Reservation');
-// const RestaurantModel = require('../models/RestaurantModel');
-// const { getGridFsBucket } = require('../config/connectDB');
-// const mongoose = require("mongoose")
-// const { Readable } = require('stream');
-// const File = require("../models/File")
-import { RestaurantModel } from "../models/Restaurant";
+import { Restaurant, RestaurantModel } from "../models/Restaurant";
 import { getGridFsBucket } from "../config/connectDB";
 import mongoose, { ObjectId } from "mongoose";
-import {Readable} from "stream";
+import { Readable } from "stream";
 import File from "../models/File";
-import { Request,Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { UserType } from "../models/User";
+import filterKeyAllDepth from "../utils/filterKeyAllDepth";
+import Discount from "../models/Discount";
+import { isDocument } from "@typegoose/typegoose";
+import validUpdateDiscounts from "../utils/validUpdateDiscounts";
 
 //@desc   : Get all restaurants
-//@route  : GET /api/v1/restaurant
+//@route  : GET /api/v1/restaurants
 //@access : Public
-export async function getRestaurants(req: Request,res: Response,next: NextFunction){
+export async function getRestaurants(req: Request, res: Response, next: NextFunction) {
   let query;
   const reqQuery = { ...req.query };
   const removeFields = ["select", "sort", "page", "limit"];
@@ -28,8 +26,8 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
   );
   query = RestaurantModel.find(JSON.parse(queryStr));
 
-  if (req.user!=undefined) {
-    let populateQuery:{
+  if (req.user != undefined) {
+    let populateQuery: {
       path: string,
       match?: {
         reservorId: ObjectId
@@ -70,13 +68,13 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
 
     const result = await query;
 
-    const pagination:{
+    const pagination: {
       limit: number,
       total: number,
       next?: {
         page: number
       },
-      prev?:{
+      prev?: {
         page: number
       }
     } = { limit, total };
@@ -99,20 +97,20 @@ export async function getRestaurants(req: Request,res: Response,next: NextFuncti
 };
 
 //@desc   : Get a restaurant
-//@route  : GET /api/v1/restaurant/:id
+//@route  : GET /api/v1/restaurants/:id
 //@access : Public
-export async function getRestaurant(req: Request,res: Response,next: NextFunction){
+export async function getRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
     let restaurant = await RestaurantModel.findById(req.params.id).select("restaurantOwner");
-    if(restaurant==undefined){
-      return res.status(404).json({success:false})
+    if (restaurant == undefined) {
+      return res.status(404).json({ success: false })
     }
     let query = RestaurantModel.findById(req.params.id);
     if (req.user) {
-      let populateQuery:{
-        path:string,
-        match?:{
-          reservorId:string
+      let populateQuery: {
+        path: string,
+        match?: {
+          reservorId: string
         }
       } = {
         path: 'reservations'
@@ -143,12 +141,25 @@ export async function getRestaurant(req: Request,res: Response,next: NextFunctio
 };
 
 //@desc   : Create a restaurant
-//@route  : POST /api/v1/restaurants
+//@route  : POST /api/v1/restaurantss
 //@access : Private
-export async function createRestaurant(req: Request,res: Response,next: NextFunction){
+export async function createRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
-    req.body.restaurantOwner = req.user!._id;
-    const restaurant = await RestaurantModel.create(req.body);
+    const restaurantOwner = req.user!._id;
+    const { name, address, menus, openingHours, closingHours, discounts, tags, reserverCapacity, reservationPeriods } = req.body;
+    const requestRestaurant: Restaurant = {
+      name, 
+      address, 
+      menus, 
+      openingHours, 
+      closingHours, 
+      discounts, 
+      tags, 
+      reserverCapacity, 
+      reservationPeriods,
+      restaurantOwner
+    }
+    const restaurant = await RestaurantModel.create(requestRestaurant);
     res.status(201).json({ success: true, data: restaurant });
   }
   catch (err) {
@@ -161,20 +172,51 @@ export async function createRestaurant(req: Request,res: Response,next: NextFunc
 }
 
 //@desc   : Update a restaurant
-//@route  : PUT /api/v1/restaurants/:id
+//@route  : PUT /api/v1/restaurantss/:id
 //@access : Private
-export async function updateRestaurant(req: Request,res: Response,next: NextFunction){
+export async function updateRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
     const restaurant = await RestaurantModel.findOne({
       _id: req.params.id,
-    }).select("restaurantOwner");;
+    }).select("restaurantOwner discounts");
     if (!restaurant) {
       return res.status(404).json({ success: false, message: `Not found restaurant with id ${req.params.id}` });
     }
     if (!restaurant.restaurantOwner.equals(req.user!._id)) {
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
-    const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    const { name, discounts: requestDiscounts, address, menus, openingHours, closingHours, tags, reserverCapacity, reservationPeriods } = req.body;
+    let updateDiscounts: any = {};
+    if (requestDiscounts != undefined) {
+      for (let indexStr in requestDiscounts) {
+        let index = parseInt(indexStr);
+        if (index >= restaurant.discounts.length) {
+          const { name, description, points, isValid } = requestDiscounts[indexStr];
+          updateDiscounts["discounts." + index] = { name, description, points, isValid };
+          // continue;
+        }
+        else if (restaurant.discounts[index].isValid) {
+          const { isValid } = requestDiscounts[indexStr];
+          updateDiscounts["discounts." + index + ".isValid"] = isValid;
+        }
+      }
+    }
+    if (!validUpdateDiscounts(updateDiscounts, restaurant.discounts.length)) {
+      return res.status(400).json({ success: false, message: "invalid discounts" })
+    }
+    // console.log(updateDiscounts);
+    const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(req.params.id, {
+      name,
+      address,
+      menus,
+      openingHours,
+      closingHours,
+      tags,
+      reserverCapacity,
+      reservationPeriods,
+      "$set": updateDiscounts
+    }, { new: true,runValidators: true });
     res.status(200).json({ success: true, data: updatedRestaurant });
   } catch (err) {
     console.log(err)
@@ -183,9 +225,9 @@ export async function updateRestaurant(req: Request,res: Response,next: NextFunc
 };
 
 //@desc   : Delete a restaurant
-//@route  : DELETE /api/v1/restaurants/:id
+//@route  : DELETE /api/v1/restaurantss/:id
 //@access : Private
-export async function deleteRestaurant(req: Request,res: Response,next: NextFunction){
+export async function deleteRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
     let restaurant
     if (req.params.id) {
@@ -206,7 +248,7 @@ export async function deleteRestaurant(req: Request,res: Response,next: NextFunc
   }
 }
 
-export async function uploadRestaurantImage(req: Request,res: Response,next: NextFunction){
+export async function uploadRestaurantImage(req: Request, res: Response, next: NextFunction) {
   try {
     let restaurant = await RestaurantModel.findById(req.params.id).select("restaurantOwner");
     if (restaurant == undefined) {
@@ -220,8 +262,8 @@ export async function uploadRestaurantImage(req: Request,res: Response,next: Nex
       await file.deleteOne();
       // return res.status(404).json({success:false,message:"restaurant already has image"})
     }
-    if(req.file == undefined){
-      return res.status(400).json({success:false,message:"invalid file attached"})
+    if (req.file == undefined) {
+      return res.status(400).json({ success: false, message: "invalid file attached" })
     }
     let bucket = getGridFsBucket()
     let uploadStream = bucket!.openUploadStream(restaurant.id, {
@@ -284,7 +326,7 @@ export async function uploadRestaurantImage(req: Request,res: Response,next: Nex
 //   }
 // };
 
-export async function deleteRestaurantImage(req: Request,res: Response,next: NextFunction){
+export async function deleteRestaurantImage(req: Request, res: Response, next: NextFunction) {
   try {
     let restaurant = await RestaurantModel.findById(req.params.id).select("restaurantOwner");
     if (restaurant == undefined) {
@@ -308,9 +350,9 @@ export async function deleteRestaurantImage(req: Request,res: Response,next: Nex
 }
 
 //@desc   : Get image of a restaurant
-//@route  : GET /api/v1/restaurants/:id/image
+//@route  : GET /api/v1/restaurantss/:id/image
 //@access : Public
-export async function getRestaurantImage (req: Request,res: Response,next: NextFunction) {
+export async function getRestaurantImage(req: Request, res: Response, next: NextFunction) {
   try {
     const restaurant = await RestaurantModel.findById(req.params.id).select("restaurantOwner");
 

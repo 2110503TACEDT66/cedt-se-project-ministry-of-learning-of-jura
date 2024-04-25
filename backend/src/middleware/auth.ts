@@ -56,7 +56,6 @@ export async function checkToken(req: Request,res: Response,next: NextFunction){
 }
 export function checkRole(...roles: UserType[]){
     return function(req: Request,res: Response,next: NextFunction){
-        console.log(roles,req.user?.role)
         if(req.user!=undefined && roles.includes(req.user.role)){
             return next();
         }

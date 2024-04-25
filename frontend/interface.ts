@@ -9,24 +9,26 @@ export interface User{
     joinedAt:string,
     phone:string[],
     _id:string
+    point:number,
+    karma:number
 }
 
 export interface Session{
     user: User,
     token: string
 }
-
+export interface Period{
+    start:string,
+    end:string
+}
 export interface Restaurant{
-    [x: string]: any
+    // [x: string]: any
     name: string,
     address: string,
     menus: Menu[],
     openingHours: string,
     closingHours: string,
-    reservationPeriods : {
-        start : string,
-        end : string,
-    }[],
+    reservationPeriods : Period[],
     reserverCapacity : number,
     reservation : string[],
     discounts : Discount[],
@@ -34,7 +36,7 @@ export interface Restaurant{
     _id: string
 }
 export interface Discount  {
-    _id: string,
+    _id?: string,
     name: string,
 
     description : string,
@@ -71,7 +73,7 @@ export interface Reservation{
     reservorId: string,
     restaurantId: string,
     reservationDate: string,
-    _id: string,
+    _id?: string,
     restaurant?: Restaurant,
     welcomedrink: boolean
 }
@@ -91,3 +93,7 @@ export interface Menu{
     name:string,
     price:number
 }
+
+export type DeepPartial<T> = T extends object ? {
+    [P in keyof T]?: DeepPartial<T[P]>;
+} : T;

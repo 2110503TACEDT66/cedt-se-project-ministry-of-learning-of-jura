@@ -5,7 +5,7 @@ import Discount from "./Discount"
 import { Ref, getModelForClass, pre, prop } from "@typegoose/typegoose";
 import {User} from "./User";
 
-class reservationPeriod{
+class ReservationPeriod{
   @prop({
     match: [timeRegex, invalidTimeMsg],
     required: true,
@@ -19,7 +19,7 @@ class reservationPeriod{
   public end!: string
 }
 
-class menu{
+class Menu{
   @prop({
     required:true
   })
@@ -62,10 +62,10 @@ export class Restaurant {
   public address!: string
 
   @prop({
-    type: [menu],
+    type: [Menu],
     default: []
   })
-  public menus!: [menu]
+  public menus!: [Menu]
 
   @prop({
     required: true,
@@ -90,7 +90,8 @@ export class Restaurant {
 
   @prop({
     type: [Discount],
-    default: []
+    default: [],
+    _id: true
   })
   public discounts!: [Discount]
   
@@ -102,17 +103,17 @@ export class Restaurant {
 
   @prop({
     required: true,
-    min: 1
+    min: 1,
   })
   public reserverCapacity!: number
 
   @prop({
     _id: false,
     validate: (array: any) => array.length >= 1,
-    type: [reservationPeriod],
+    type: [ReservationPeriod],
     required: true
   })
-  public reservationPeriods!: [reservationPeriod]
+  public reservationPeriods!: [ReservationPeriod]
 
   @prop({
     ref: "Reservation",
@@ -122,122 +123,4 @@ export class Restaurant {
   })
   public reservations?: Ref<Reservation>;
 }
-
-// const Restaurant = new mongoose.Schema(
-//   {
-//     name: {
-//       type: String,
-//       required: true,
-//       unique: true,
-//       minLength: 1,
-//     },
-//     address: {
-//       type: String,
-//       unique: true,
-//       required: true,
-//     },
-//     menus: {
-//       type: [{
-//         name: {
-//           type: String,
-//           required: true
-//         },
-//         price: {
-//           type: Number,
-//           required: true
-//         }
-//       }],
-//       default: []
-//     },
-//     openingHours: {
-//       type: String,
-//       match: [timeRegex, invalidTimeMsg],
-//       required: true
-//     },
-//     closingHours: {
-//       type: String,
-//       match: [timeRegex, invalidTimeMsg],
-//       required: true
-//     },
-//     restaurantOwner: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: 'User',
-//       required: true,
-//       select: false
-//     },
-//     discounts: {
-//       type: [Discount],
-//       default: []
-//     },
-//     tags: {
-//       type: [String],
-//       required: true
-//     },
-//     reserverCapacity: {
-//       type: Number,
-//       min: 0,
-//       required: true,
-//     },
-//     reservationPeriods: {
-//       type: [
-//         {
-//           _id: false,
-//           start: {
-//             type: String,
-//             match: [timeRegex, invalidTimeMsg],
-//             required: true,
-//           },
-//           end: {
-//             type: String,
-//             match: [timeRegex, invalidTimeMsg],
-//             required: true,
-//           },
-//         },
-//       ],
-//       required: true,
-//       validate: (array: any) => array.length >= 1,
-//     },
-//   },
-//   {
-//     toJSON: { virtuals: true },
-//     toObject: { virtuals: true },
-//   }
-// );
-// Restaurant.pre(
-//   "deleteOne",
-//   { document: true, query: false },
-//   async function (next) {
-//     await Reservation.deleteMany({
-//       restaurantId: this._id,
-//     });
-//     await File.deleteOne({
-//       filename: this._id,
-//     });
-//     next();
-//   }
-// );
-// Restaurant.pre(
-//   "deleteOne",
-//   { document: false, query: false },
-//   async function (next) {
-//     let restaurant = await (this as any).model.findOne((this as any)._condition)
-//     if(restaurant==undefined){
-//       return;
-//     }
-//     await Reservation.deleteMany({
-//       restaurantId: restaurant._id,
-//     });
-//     await File.deleteOne({
-//       filename: restaurant._id,
-//     });
-//     next();
-//   }
-// );
-// Restaurant.virtual("reservations", {
-//   ref: "Reservation",
-//   localField: "_id",
-//   foreignField: "restaurantId",
-//   justOne: false,
-// });
-// export default mongoose.model("Restaurant", Restaurant);
 export const RestaurantModel = getModelForClass(Restaurant);

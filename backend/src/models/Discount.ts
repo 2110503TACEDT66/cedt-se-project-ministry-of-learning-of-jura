@@ -2,10 +2,8 @@ import { prop } from "@typegoose/typegoose";
 import { ObjectId } from "mongoose";
 
 class Discount{
-    @prop({
-        required: true
-    })
     public _id!: ObjectId
+
     @prop({
         required: true
     })
@@ -25,6 +23,11 @@ class Discount{
         required:true
     })
     public isValid!: boolean
+
+    @prop({
+        required: false
+    })
+    public discountIndex?: number
 }
 // const discount = {
 //     // _id:true,

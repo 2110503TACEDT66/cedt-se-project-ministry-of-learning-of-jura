@@ -1,5 +1,5 @@
 import { TextField } from "@mui/material";
-import { Menu, ResizableMultiInputEvent } from "../../interface";
+import { DeepPartial, Menu, ResizableMultiInputEvent } from "../../interface";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as yup from "yup"
@@ -13,21 +13,19 @@ export default function({
     onChange: (event:ResizableMultiInputEvent)=>void,
     label: string,
     helperText?: any,
-    value: Menu|undefined
+    value: DeepPartial<Menu>|undefined
 }){
+    console.log("init value menu ",value)
     const invalidNameMessage = "name can't be left empty"
     const invalidPriceMessage = "price is invalid"
     const ValidationSchema=yup.object().shape({
         name:yup.string().required(invalidNameMessage),
         price: yup.number().min(0).required(invalidPriceMessage).typeError(invalidPriceMessage)
     })
-    const formik = useFormik<{
-        name: string|undefined,
-        price: string|undefined
-    }>({
-        initialValues: {
-            name: value?.name||"",
-            price: value?.price==undefined? "":String(value?.price)
+    const formik = useFormik<DeepPartial<Menu>>({
+        initialValues: value || {
+            name: undefined,
+            price: undefined
         },
         validationSchema:ValidationSchema,
         async onSubmit(){
@@ -35,11 +33,10 @@ export default function({
         }
     })
     useEffect(()=>{
-        let {name,price: priceStr} = formik.values;
-        if(name=="" || priceStr=="" || priceStr==undefined){
+        let {name,price} = formik.values;
+        if(name || price){
             return;
         }
-        const price=parseFloat(priceStr);
         onChange({
             currentTarget:{
                 value: {
