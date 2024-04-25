@@ -1,4 +1,4 @@
-import type { InferSchemaType } from "mongoose";
+import type { InferSchemaType, ObjectId } from "mongoose";
 
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
@@ -77,6 +77,11 @@ export class User {
     default:0
   })
   public point!: number
+
+  @prop({
+    required: true
+  })
+  public _id!: mongoose.Types.ObjectId
 
   async matchPassword(inputPassword:string) {
     // console.log(inputPassword,this.password)
