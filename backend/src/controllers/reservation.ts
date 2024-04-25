@@ -70,6 +70,21 @@ export async function addReservation(req: Request,res: Response,next: NextFuncti
             const restaurant: Document = await RestaurantModel.findOne({name:req.body.restaurantName}).select({"_id":1})
             restaurantId=restaurant._id;
         }
+        //Implement checking capacity when making a reservation
+        const [reservationCount, restaurant] = await Promise.all([
+            ReservationModel.countDocuments({ restaurantId}),
+            RestaurantModel.findById(restaurantId, "reserverCapacity"),
+        ]);
+        //console.log("reservationCount", reservationCount);
+        const capacity = restaurant?.reserverCapacity;
+
+        if (reservationCount >= capacity!) {
+            return res.status(400).json({
+                success: false,
+                message: `${restaurantName} is full. Please try another restaurant.`,
+            });
+        }
+        
         const reservation = await ReservationModel.create({
             restaurantId,
             reservorId,
