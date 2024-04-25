@@ -1,6 +1,5 @@
 "use server";
-
-import { Restaurant, RestaurantResponse } from "@/../interface";
+import { Reservation, ReservationsResponse, Restaurant, RestaurantResponse } from "@/../interface";
 import { notFound } from "next/navigation";
 import {
   List,
@@ -15,11 +14,14 @@ import { Menu } from "@/../interface";
 import getRestaurantImageData from "@/utils/getRestaurantImageData";
 import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl";
 import Link from "next/link";
+import getReservations from "@/utils/getReservations";
+
 export default async function ({
   params,
 }: {
   params: {
     restaurantId: string;
+    reservationId: string;
   };
 }) {
   const restaurantResponse: RestaurantResponse = await getRestaurant(
@@ -35,6 +37,21 @@ export default async function ({
   console.log(restaurantResponse);
 
   const restaurant: Restaurant = restaurantResponse.data;
+
+  /*
+  const reservationsResponse: ReservationsResponse = await getReservations(
+    params.reservationId
+  )
+    .then((res) => {
+      if (res?.ok) {
+        notFound();
+      }
+      return res;
+    })
+    .then((res) => res!.json());
+  console.log(reservationsResponse);
+  const reservations : Reservation[] = reservationsResponse.data ;
+  */
 
   return (
     <main className="w-full h-full flex items-center justify-center">
@@ -105,6 +122,14 @@ export default async function ({
               }
             </List>
           ) : null}{" "}
+
+          <Typography variant="h5"  className="font-semibold">All Reservations</Typography>
+          {restaurant.reservation ? (
+              <List>
+                
+              </List>
+            ) : null
+          }
         </div>
       </div>
     </main>
