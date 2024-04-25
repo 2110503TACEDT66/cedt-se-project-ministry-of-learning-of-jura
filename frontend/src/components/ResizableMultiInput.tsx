@@ -1,44 +1,45 @@
 "use client"
 import { TextField } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import removeFromArrayByIndex from "@/utils/removeFromArrayByIndex";
 import { ResizableMultiInputEvent } from "../../interface";
 
-export default function({
+export default function<T>({
     label,
     onChange,
     InnerProps,
-    helperTexts
+    helperTexts,
+    values
 }:{
     label:string,
-    onChange: (newValue: (string)[])=>void,
+    onChange: (newValue: (T|undefined)[])=>void,
     InnerProps?: React.ComponentType<{
         className?:string,
         onChange: (event:ResizableMultiInputEvent)=>void,
         label:string,
-        helperText?:any
+        helperText?:any,
+        value: T|undefined
     }>,
-    helperTexts?: string[]
+    helperTexts?: string[],
+    values: (T|undefined)[]
 }){
-    const initialValue: string = ""
-
     InnerProps=InnerProps||TextField;
-    const [textValuesList,setTextValuesList] = useState([initialValue]);
 
     function onAdd(){
-        setTextValuesList([...textValuesList,initialValue])
+        values.push(undefined)
+        onChange(values);
     }
 
     function onDelete(index:number){
-        setTextValuesList(removeFromArrayByIndex(textValuesList,index));
+        values=(removeFromArrayByIndex(values,index));
+        onChange(values);
     }
 
     function onTextChange(event: ResizableMultiInputEvent,index:number){
-        textValuesList[index]=event.currentTarget.value as string
-        console.log(event.currentTarget.value)
-        onChange(textValuesList);
+        values[index]=event.currentTarget.value
+        onChange(values);
     }
     
     return (
@@ -49,13 +50,14 @@ export default function({
             </div>
             <div className="flex flex-col w-full gap-2">
                 {
-                textValuesList.map((textValue,index)=>{
+                values.map((textValue,index)=>{
                     return (
                         <div key={index} className="pl-10 w-full flex flex-row items-center justify-center gap-2">
                             {
-                                InnerProps && <InnerProps
+                                <InnerProps
                                     key={index}
                                     className="flex-1"
+                                    value={textValue}
                                     onChange={(e)=>{onTextChange(e,index)}}
                                     label={`${label} ${index+1}`}
                                     helperText={helperTexts==undefined?undefined:helperTexts[index]}

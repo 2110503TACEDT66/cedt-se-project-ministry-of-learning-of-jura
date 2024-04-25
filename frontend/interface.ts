@@ -83,7 +83,7 @@ export interface ReservationsResponse{
 
 export interface ResizableMultiInputEvent{
     currentTarget:{
-        value:string
+        value:any
     }
 }
 
