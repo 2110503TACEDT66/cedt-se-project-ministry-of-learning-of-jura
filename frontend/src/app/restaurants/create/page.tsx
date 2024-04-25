@@ -72,35 +72,36 @@ export default function(){
                 end : ""
             }],
             reserverCapacity : 0,
-            tags: []
+            tags: [""]
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
             console.log("on submit")
-            const response = await fetch("/api/restaurants/",{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
-                    "Authorization":`Bearer ${session?.token}`
-                },
-                body: JSON.stringify(values)
-            })
-            const responseJson = await response.json();
-            console.log(responseJson) ;
-            if(!responseJson.success){
-                setIsAlerting(true);
-                setAlertMessage({
-                    title:"Error",
-                    description:"Restaurant might be duplicated, and we don't allow it"
-                })
-                return
-            }
-            setIsAlerting(true)
-            setAlertMessage({
-                title:"Success!",
-                description:"Successfully create a restaurant"
-            })
-            setIsSubmitting(false);
+            console.log(values)
+            // const response = await fetch("/api/restaurants/",{
+            //     method:"POST",
+            //     headers:{
+            //         "Content-Type":"application/json",
+            //         "Authorization":`Bearer ${session?.token}`
+            //     },
+            //     body: JSON.stringify(values)
+            // })
+            // const responseJson = await response.json();
+            // console.log(responseJson) ;
+            // if(!responseJson.success){
+            //     setIsAlerting(true);
+            //     setAlertMessage({
+            //         title:"Error",
+            //         description:"Restaurant might be duplicated, and we don't allow it"
+            //     })
+            //     return
+            // }
+            // setIsAlerting(true)
+            // setAlertMessage({
+            //     title:"Success!",
+            //     description:"Successfully create a restaurant"
+            // })
+            // setIsSubmitting(false);
         }
     })
     return (
@@ -190,7 +191,7 @@ export default function(){
                     InnerProps={TimePeriodTextField}
                     values = {formik.values.reservationPeriods}
                     label="Reservation Periods"
-                    onChange={(newValue)=>{console.log(newValue);formik.setFieldValue("reservationPeriods",newValue)}}
+                    onChange={(newValue)=>{formik.setFieldValue("reservationPeriods",newValue)}}
                     helperTexts={formik.errors.reservationPeriods as string[]|undefined}
                 />
                 <TextField

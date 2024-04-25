@@ -17,9 +17,10 @@ import DiscountTextField from "@/components/DiscountTextField";
 
 
 export default function ({
-    initialValues
+    restaurantInformation,
+    restaurantId
 }:{
-    initialValues: DeepPartial<Restaurant>,
+  restaurantInformation: RestaurantResponse,
     restaurantId: string
 }) {
   const { session } = useSession();
@@ -46,7 +47,7 @@ export default function ({
     menus: yup.array().of(
       yup.object().shape({
         name: yup.string().required(invalidMenuMessage),
-        price: yup.number().required(invalidMenuMessage)
+        price: yup.number().required(invalidMenuMessage).typeError(invalidMenuMessage)
       })
     ),
     openingHours: yup.string().matches(hourRegex, invalidHourMessage),
@@ -57,7 +58,7 @@ export default function ({
         end: yup.string().matches(hourRegex, invalidHourMessage),
       })
     ),
-    reserverCapacity: yup.number(),
+    reserverCapacity: yup.number().required(invalidCapacityMessage).typeError(invalidCapacityMessage),
     tags: yup.array().of(
       yup.string().required(invalidTagsMessage)
     )
@@ -75,7 +76,7 @@ export default function ({
     let formData = new FormData();
     formData.append("image", e.currentTarget.files[0]);
     const response = await fetch(
-      `/api/restaurants/${params.restaurantId}/image`,
+      `/api/restaurants/${restaurantId}/image`,
       {
         method: "POST",
         headers: {
@@ -94,7 +95,7 @@ export default function ({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) {
     const response = await fetch(
-      `/api/restaurants/${params.restaurantId}/image`,
+      `/api/restaurants/${restaurantId}/image`,
       {
         method: "DELETE",
         headers: {
@@ -106,6 +107,14 @@ export default function ({
     if (responseJson.success) {
       router.refresh();
     }
+  }
+
+  let initialValues: any = {};
+
+  let restaurant: Restaurant & Record<string,any> = restaurantInformation.data;
+  for (let field in restaurant) {
+    console.log("field " + field + restaurant[field])
+    initialValues[field]=restaurant[field];
   }
 
   const formik = useFormik<DeepPartial<Restaurant>>({
@@ -121,7 +130,7 @@ export default function ({
         }
       }, {})
       console.log(data)
-      const response = await fetch(`/api/restaurants/${params.restaurantId}`, {
+      const response = await fetch(`/api/restaurants/${restaurantId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -147,19 +156,6 @@ export default function ({
       setIsSubmitting(false);
     },
   });
-
-  useEffect(() => {
-    async function onStart() {
-      let restaurantResponse: RestaurantResponse = await fetch(`/api/restaurants/${params.restaurantId}`)
-        .then(res => res.json())
-      let restaurant: Restaurant & Record<string,any> = restaurantResponse.data;
-      for (let field in restaurant) {
-        console.log("field " + field + restaurant[field])
-        formik.setFieldValue(field, restaurant[field]);
-      }
-    }
-    onStart();
-  }, [])
 
   useEffect(() => {
     console.log(formik.values)

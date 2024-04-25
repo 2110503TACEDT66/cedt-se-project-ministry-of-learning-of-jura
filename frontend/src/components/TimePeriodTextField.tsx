@@ -34,7 +34,7 @@ export default function({
     });
 
     useEffect(()=>{
-        console.log(formik.values,formik.errors)
+        // console.log(formik.values,formik.errors)
         let newEvent: ResizableMultiInputEvent = {
             currentTarget:{
                 value:formik.values

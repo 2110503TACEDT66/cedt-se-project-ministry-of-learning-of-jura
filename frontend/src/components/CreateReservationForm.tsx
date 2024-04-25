@@ -20,13 +20,23 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
-import { Discount, Restaurant } from "../../interface";
+import { DeepPartial, Discount, Period, Reservation, Restaurant } from "../../interface";
 import { useSearchParams } from "next/navigation";
 import { Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import useSession from "@/hooks/useSession";
 
 export default function ({ token }: { token: string }) {
+  function parsePeriod(periodString: string|null|undefined): Period|undefined{
+    if(periodString==undefined){
+      return undefined;
+    }
+    let [start,end] = periodString.split("-");
+    return {
+      start,
+      end
+    }
+  }
   const { session } = useSession();
   const searchParams = useSearchParams();
   const [restaurantsList, setRestaurantsList] = useState<string[]>([]);
@@ -40,12 +50,16 @@ export default function ({ token }: { token: string }) {
   });
   const router = useRouter();
   const [discountsList, setDiscountsList] = useState<Discount[][]>([]);
-  const formik = useFormik({
+  const formik = useFormik<DeepPartial<Omit<Reservation,"reservationDate">> & {
+    restaurantName: string,
+    reservationDate?: Dayjs
+  }>({
     initialValues: {
       restaurantName: searchParams.get("restaurantName") || "",
-      reservationDate: null as Dayjs | null,
-      discountIndex: null as number | null,
-      welcomedrink: false,
+      reservationDate: undefined,
+      discountIndex: undefined,
+      reservationPeriod: parsePeriod(searchParams.get("reservationPeriod")) || undefined,
+      welcomeDrink: false,
     },
     async onSubmit(values) {
       console.log(values);
@@ -102,14 +116,11 @@ export default function ({ token }: { token: string }) {
         return restaurant.discounts;
       }
     );
-    console.log(restaurantsResponse);
     setDiscountsList(newDiscountsList);
   }
 
   async function onDiscountChange(e: SelectChangeEvent<unknown>) {
-    console.log(e.target);
     formik.setFieldValue("discountIndex", e.target.value);
-    console.log(formik.values.discountIndex);
   }
 
   useEffect(() => {
@@ -146,14 +157,12 @@ export default function ({ token }: { token: string }) {
           }}
           options={restaurantsList}
           filterOptions={(options, _state) => options}
-          // sx={{ width: 300 }}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Restaurant Name"
               InputProps={{
                 ...params.InputProps,
-                // type: 'search',
               }}
             />
           )}
@@ -202,13 +211,13 @@ export default function ({ token }: { token: string }) {
             // <>
             <input
               // checked={welcomedrink}
-              checked={formik.values.welcomedrink}
+              checked={formik.values.welcomeDrink}
               id="checked-checkbox"
               type="checkbox"
               value=""
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               onChange={(e) =>
-                formik.setFieldValue("welcomedrink", e.target.checked)
+                formik.setFieldValue("welcomeDrink", e.target.checked)
               }
             />
           }

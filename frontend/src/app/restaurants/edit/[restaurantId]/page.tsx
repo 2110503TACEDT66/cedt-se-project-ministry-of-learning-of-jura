@@ -24,13 +24,12 @@ export default async function ({
     restaurantId: string
   }
 }) {
-  let initialValues = await getRestaurant(params.restaurantId);
+  let restaurantInformation = await getRestaurant(params.restaurantId);
   return (
     <EditRestaurantForm
-      initialValues={initialValues}
+      restaurantInformation={restaurantInformation}
       restaurantId={params.restaurantId}
     >
-
     </EditRestaurantForm>
   )
 }

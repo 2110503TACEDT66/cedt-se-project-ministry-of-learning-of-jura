@@ -39,7 +39,7 @@ export default function ({
                 }
             })
             .then(res=>res.json())
-            const restaurantId = restaurantResponse.data[0].id;
+            const restaurantId = restaurantResponse.data[0]._id;
             let data = {
                 restaurantId,
                 reservationDate

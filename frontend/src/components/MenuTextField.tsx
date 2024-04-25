@@ -15,7 +15,7 @@ export default function({
     helperText?: any,
     value: DeepPartial<Menu>|undefined
 }){
-    console.log("init value menu ",value)
+    // console.log("init value menu ",value)
     const invalidNameMessage = "name can't be left empty"
     const invalidPriceMessage = "price is invalid"
     const ValidationSchema=yup.object().shape({

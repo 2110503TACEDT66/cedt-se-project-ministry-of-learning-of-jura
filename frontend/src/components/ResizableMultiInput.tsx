@@ -20,7 +20,8 @@ export default function<T>({
         onChange: (event:ResizableMultiInputEvent)=>void,
         label:string,
         helperText?:any,
-        value: T|undefined
+        value: T|undefined,
+        error: boolean
     }>,
     helperTexts?: string[],
     values: (T|undefined)[]
@@ -60,6 +61,7 @@ export default function<T>({
                                     value={textValue}
                                     onChange={(e)=>{onTextChange(e,index)}}
                                     label={`${label} ${index+1}`}
+                                    error={helperTexts==undefined?true:Boolean(helperTexts[index])}
                                     helperText={helperTexts==undefined?undefined:helperTexts[index]}
                                 />
                             }

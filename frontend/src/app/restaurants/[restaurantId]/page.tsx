@@ -22,17 +22,10 @@ export default async function ({
     restaurantId: string;
   };
 }) {
-  const restaurantResponse: RestaurantResponse = await getRestaurant(
-    params.restaurantId
-  )
-    .then((res) => {
-      if (!res.ok) {
-        notFound();
-      }
-      return res;
-    })
-    .then((res) => res.json());
-  console.log(restaurantResponse);
+  const restaurantResponse: RestaurantResponse = await getRestaurant(params.restaurantId)
+  .catch(()=>{
+    notFound();
+  })
 
   const restaurant: Restaurant = restaurantResponse.data;
 
@@ -113,13 +106,12 @@ export default async function ({
               {restaurant.discounts.map(
                 ({ name, description, points }, index) => {
                   return (
-                    <ListItem>
-                      <ListItemText key={index} primary={name}></ListItemText>
+                    <ListItem key={index}>
+                      <ListItemText primary={name}></ListItemText>
                       <ListItemText
-                        key={index}
                         primary={description}
                       ></ListItemText>
-                      <ListItemText key={index} primary={points}></ListItemText>
+                      <ListItemText primary={points}></ListItemText>
                     </ListItem>
                   );
                 }
