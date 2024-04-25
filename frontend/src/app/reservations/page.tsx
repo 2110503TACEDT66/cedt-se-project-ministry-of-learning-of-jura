@@ -5,7 +5,7 @@ import getReservations from "@/utils/getReservations";
 import getRestaurant from "@/utils/getRestaurant";
 import getRestaurantUrl from "@/utils/getRestaurantUrl";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ReservationsResponse, RestaurantResponse } from "../../../interface";
@@ -61,6 +61,9 @@ export default async function(){
                                     isRestaurantOwner && 
                                     <Typography>By: {reservation.reservorId==session.user._id? "you":reservation.reservorId}</Typography>
                                 }
+                                <Button className = "bg-cyan-600 text-white border border-transparent font-light rounded hover:bg-slate-200 hover:text-cyan-600 hover:border-cyan-600 mt-1">
+                                    Confirm this reservation
+                                </Button>
                             </div>
                             <div className="flex flex-col self-stretch justify-between">
                                 <Link href={`/reservations/edit/${reservation._id}`}>
