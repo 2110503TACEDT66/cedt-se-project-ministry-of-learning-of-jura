@@ -15,6 +15,7 @@ import getRestaurantImageData from "@/utils/getRestaurantImageData";
 import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl";
 import Link from "next/link";
 import getReservations from "@/utils/getReservations";
+import useServerSession from "@/hooks/useServerSession";
 
 export default async function ({
   params,
@@ -24,6 +25,7 @@ export default async function ({
     reservationId: string;
   };
 }) {
+  const session = await useServerSession();
   const restaurantResponse: RestaurantResponse = await getRestaurant(
     params.restaurantId
   )
@@ -37,20 +39,25 @@ export default async function ({
   console.log(restaurantResponse);
 
   const restaurant: Restaurant = restaurantResponse.data;
-
-
-  const reservationsResponse: ReservationsResponse = await getReservations(
-    restaurant._id
-  )
-    .then((res) => {
-      if (res?.ok) {
-        notFound();
-      }
-      return res;
-    })
-    .then((res) => res!.json());
-  console.log(reservationsResponse);
-  const reservations : Reservation[] = reservationsResponse.data ;
+  
+  let reservations : Reservation[];
+  if (session) {
+    const reservationsResponse: ReservationsResponse = await getReservations(
+      session?.token,
+      restaurant._id
+    )
+      .then((res) => {
+        if (!res?.ok) {
+          notFound();
+        }
+        return res;
+      })
+      .then((res) => res!.json());
+    console.log(reservationsResponse);
+    reservations = reservationsResponse.data ;
+  } else {
+    reservations = [];
+  }
 
 
   return (
@@ -126,9 +133,9 @@ export default async function ({
           <Typography variant="h5"  className="font-semibold">All Reservations</Typography>
           {reservations.map(reservation => (
               <List>
-                {reservation._id}
-                {reservation.reservationDate}
-                {reservation.welcomedrink}
+                <div>ID: {reservation._id}</div>
+                <div>Reservation Date: {new Date(reservation.reservationDate).toLocaleDateString("en-UK")}</div>
+                <div>Welcome Drink: {reservation.welcomedrink ? "Yes" : "No"}</div>
               </List>
           ))}
         </div>
