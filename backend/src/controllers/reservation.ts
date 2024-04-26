@@ -4,6 +4,7 @@ import { Restaurant, RestaurantModel } from "../models/Restaurant";
 import { UserModel } from "../models/User";
 import { UserType } from "../models/User";
 import { ObjectId, Document } from "mongoose";
+import { getRestaurant } from "./restaurants";
 
 export async function getReservations(
     req: Request,
@@ -85,21 +86,28 @@ export async function addReservation(
                 success: false,
                 message: "reservations exceeding limits",
             });
-        }        
-        let findRestaurant = restaurantId==undefined?RestaurantModel.findOne({name:restaurantName}):RestaurantModel.findById(restaurantId);
-        
+        }
+
+        if(restaurantId==undefined && restaurantName!=undefined){
+            let restaurantResponse:(Restaurant&Document) |null = await RestaurantModel.findOne({
+                name:restaurantName
+            });
+            restaurantId=restaurantResponse?._id;
+        }
+
         //Implement checking capacity when making a reservation
         const [reservationCount, restaurant] = await Promise.all([
             ReservationModel.countDocuments({
                 restaurantId,
                 reservationPeriod
             }),
-            findRestaurant,
+            RestaurantModel.findOne({_id:restaurantId}),
         ]);
         if(restaurant==undefined){
             return res.status(404).json({success:false});
         }
         restaurantId=restaurant?._id;
+        restaurantName=restaurant?.name;
         const capacity = restaurant?.reserverCapacity;
 
         if (reservationCount >= capacity!) {

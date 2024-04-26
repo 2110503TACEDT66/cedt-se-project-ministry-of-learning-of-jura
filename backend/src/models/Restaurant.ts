@@ -2,7 +2,7 @@ import File from "./File"
 import { timeRegex, invalidTimeMsg } from "../config/constants";
 import {ReservationModel, Reservation} from "./Reservation";
 import Discount from "./Discount"
-import { Ref, getModelForClass, pre, prop } from "@typegoose/typegoose";
+import { Ref, getModelForClass, mongoose, pre, prop } from "@typegoose/typegoose";
 import {User} from "./User";
 import Menu from "./Menu";
 import ReservationPeriod from "./ReservationPeriod";
@@ -98,5 +98,7 @@ export class Restaurant {
     justOne: false,
   })
   public reservations?: Ref<Reservation>;
+
+  public _id!: mongoose.Types.ObjectId;
 }
 export const RestaurantModel = getModelForClass(Restaurant);

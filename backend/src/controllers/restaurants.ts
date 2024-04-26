@@ -147,7 +147,7 @@ export async function createRestaurant(req: Request, res: Response, next: NextFu
   try {
     const restaurantOwner = req.user!._id;
     const { name, address, menus, openingHours, closingHours, discounts, tags, reserverCapacity, reservationPeriods } = req.body;
-    const requestRestaurant: Restaurant = {
+    const requestRestaurant: Omit<Restaurant,"_id"> = {
       name, 
       address, 
       menus, 
