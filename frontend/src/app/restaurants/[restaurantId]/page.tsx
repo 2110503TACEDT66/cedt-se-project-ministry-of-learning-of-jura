@@ -38,9 +38,9 @@ export default async function ({
 
   const restaurant: Restaurant = restaurantResponse.data;
 
-  /*
+
   const reservationsResponse: ReservationsResponse = await getReservations(
-    params.reservationId
+    restaurant._id
   )
     .then((res) => {
       if (res?.ok) {
@@ -51,7 +51,7 @@ export default async function ({
     .then((res) => res!.json());
   console.log(reservationsResponse);
   const reservations : Reservation[] = reservationsResponse.data ;
-  */
+
 
   return (
     <main className="w-full h-full flex items-center justify-center">
@@ -124,12 +124,13 @@ export default async function ({
           ) : null}{" "}
 
           <Typography variant="h5"  className="font-semibold">All Reservations</Typography>
-          {restaurant.reservation ? (
+          {reservations.map(reservation => (
               <List>
-                
+                {reservation._id}
+                {reservation.reservationDate}
+                {reservation.welcomedrink}
               </List>
-            ) : null
-          }
+          ))}
         </div>
       </div>
     </main>
