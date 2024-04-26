@@ -4,33 +4,8 @@ import {ReservationModel, Reservation} from "./Reservation";
 import Discount from "./Discount"
 import { Ref, getModelForClass, pre, prop } from "@typegoose/typegoose";
 import {User} from "./User";
-
-class ReservationPeriod{
-  @prop({
-    match: [timeRegex, invalidTimeMsg],
-    required: true,
-  })
-  public start!: string;
-
-  @prop({
-    match: [timeRegex, invalidTimeMsg],
-    required: true,
-  })
-  public end!: string
-}
-
-class Menu{
-  @prop({
-    required:true
-  })
-  public name!: string
-
-  @prop({
-    required:true,
-    min:1
-  })
-  public price!: number
-}
+import Menu from "./Menu";
+import ReservationPeriod from "./ReservationPeriod";
 
 @pre<Restaurant>(
   "deleteOne",
@@ -63,6 +38,7 @@ export class Restaurant {
 
   @prop({
     type: [Menu],
+    _id: false,
     default: []
   })
   public menus!: [Menu]

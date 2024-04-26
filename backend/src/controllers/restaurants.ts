@@ -363,7 +363,7 @@ export async function getRestaurantImage(req: Request, res: Response, next: Next
     const bucket = getGridFsBucket()
     const downloadStream = await bucket!.openDownloadStreamByName(req.params.id);
     downloadStream.on('error', (err) => {
-      console.log(err);
+      // console.log(err);
       res.status(404).json({
         success: false,
         message: "This restaurant has no images"
@@ -373,7 +373,7 @@ export async function getRestaurantImage(req: Request, res: Response, next: Next
     downloadStream.pipe(res);
   }
   catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       success: false,
       message: "Internal server error"

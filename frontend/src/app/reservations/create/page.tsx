@@ -7,6 +7,9 @@ export default async function(){
   if(session==undefined){
     redirect("/login")
   }
+  if(session.user.role=="restaurantOwner"){
+    redirect("/")
+  }
   return (
     <main>
       <CreateReservationForm token={session.token}></CreateReservationForm>

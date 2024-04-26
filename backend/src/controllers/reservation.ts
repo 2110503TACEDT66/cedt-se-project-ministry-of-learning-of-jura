@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Reservation, ReservationModel } from "../models/Reservation";
-import { RestaurantModel } from "../models/Restaurant";
+import { Restaurant, RestaurantModel } from "../models/Restaurant";
 import { UserModel } from "../models/User";
 import { UserType } from "../models/User";
 import { ObjectId, Document } from "mongoose";
@@ -72,7 +72,8 @@ export async function addReservation(
             reservationDate,
             restaurantName,
             discountIndex,
-            welcomedrink,
+            welcomeDrink,
+            reservationPeriod
         } = req.body;
         const reservorId = req.user!._id;
         let existingReservations = ReservationModel.find({ reservorId });
@@ -84,19 +85,21 @@ export async function addReservation(
                 success: false,
                 message: "reservations exceeding limits",
             });
-        }
-        if (!restaurantId && restaurantName) {
-            const restaurant: Document = await RestaurantModel.findOne({
-                name: req.body.restaurantName,
-            }).select({ _id: 1 });
-            restaurantId = restaurant._id;
-        }
+        }        
+        let findRestaurant = restaurantId==undefined?RestaurantModel.findOne({name:restaurantName}):RestaurantModel.findById(restaurantId);
+        
         //Implement checking capacity when making a reservation
         const [reservationCount, restaurant] = await Promise.all([
-            ReservationModel.countDocuments({ restaurantId}),
-            RestaurantModel.findById(restaurantId, "reserverCapacity"),
+            ReservationModel.countDocuments({
+                restaurantId,
+                reservationPeriod
+            }),
+            findRestaurant,
         ]);
-        //console.log("reservationCount", reservationCount);
+        if(restaurant==undefined){
+            return res.status(404).json({success:false});
+        }
+        restaurantId=restaurant?._id;
         const capacity = restaurant?.reserverCapacity;
 
         if (reservationCount >= capacity!) {
@@ -105,7 +108,10 @@ export async function addReservation(
                 message: `${restaurantName} is full. Please try another restaurant.`,
             });
         }
-        
+
+        if (!restaurant?.reservationPeriods.some((period)=>period.equals(reservationPeriod))){
+            return res.status(400).json({success:false,message:"wrong period"})
+        }
 
         let pointsToDeduct = 0;
         if (discountIndex != undefined) {
@@ -135,8 +141,9 @@ export async function addReservation(
             restaurantId,
             reservorId,
             reservationDate,
-            welcomedrink,
+            welcomeDrink,
             discountIndex,
+            reservationPeriod
         });
         res.status(201).json({
             success: true,

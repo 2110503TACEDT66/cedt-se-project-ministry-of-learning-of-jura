@@ -3,6 +3,7 @@ import Discount from "./Discount"
 import { Ref, buildSchema, getModelForClass, prop } from "@typegoose/typegoose";
 import { User } from "./User";
 import {Restaurant} from "./Restaurant"
+import ReservationPeriod from "./ReservationPeriod";
 
 export class Reservation {
     @prop({
@@ -30,7 +31,13 @@ export class Reservation {
     @prop({
         required: true
     })
-    public welcomedrink?: Boolean
+    public welcomeDrink?: Boolean
+
+    @prop({
+        required: true,
+        _id: false
+    })
+    public reservationPeriod!: ReservationPeriod
 }
 
 // const ReservationSchema = new mongoose.Schema({
