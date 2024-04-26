@@ -54,7 +54,9 @@ export default async function ({
       })
       .then((res) => res!.json());
     console.log(reservationsResponse);
-    reservations = reservationsResponse.data ;
+    reservations = reservationsResponse.data.filter(
+        (reservation) => reservation.restaurantId === restaurant._id
+    );
   } else {
     reservations = [];
   }
