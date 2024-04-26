@@ -134,7 +134,7 @@ export default async function ({
 
           <Typography variant="h5"  className="font-semibold">All Reservations</Typography>
           {reservations.map(reservation => (
-              <List>
+              <List key={reservation._id}>
                 <div>ID: {reservation._id}</div>
                 <div>Reservation Date: {new Date(reservation.reservationDate).toLocaleDateString("en-UK")}</div>
                 <div>Welcome Drink: {reservation.welcomedrink ? "Yes" : "No"}</div>
