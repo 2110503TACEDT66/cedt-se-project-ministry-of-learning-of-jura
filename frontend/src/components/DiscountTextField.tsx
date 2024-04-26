@@ -4,9 +4,9 @@ import {
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { DeepPartial, Discount, ResizableMultiInputEvent } from "../../interface";
+import { DeepPartial, Discount, DiscountWithEdit, ResizableMultiInputEvent } from "../../interface";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -26,8 +26,10 @@ export default function ({
     points?: number;
     isValid?: boolean;
   };
-  value: DeepPartial<Discount> | undefined;
+  value: DeepPartial<DiscountWithEdit> | undefined;
 }) {
+  let initialCanEdit = value?.canEdit ?? true
+
   const nameErrorMessage = "name must be string";
   const descriptionErrorMessage = "description must be string";
   const pointsErrorMessage = "points must be number";
@@ -48,13 +50,14 @@ export default function ({
       name: value?.name || "",
       description: value?.description || "",
       points: value?.points == undefined ? "" : String(value?.points),
-      isValid: value?.isValid || true,
+      isValid: value?.isValid ?? true,
     },
     validationSchema: ValidationSchema,
     async onSubmit() {
       throw new Error("this form is not intended to be submitted!");
     },
   });
+
   useEffect(() => {
     let { name, description, points, isValid } = formik.values;
     onChange({
@@ -64,16 +67,19 @@ export default function ({
           description,
           points,
           isValid,
+          canEdit: initialCanEdit
         },
       },
     });
   }, [formik.values]);
+
   return (
     <div className="w-full flex flex-col">
       <div className={`${className || ""} w-full flex gap-2`}>
         <TextField
           id="name"
           label="name"
+          disabled={!initialCanEdit}
           value={formik.values.name}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -84,6 +90,7 @@ export default function ({
         <TextField
           id="description"
           label="description"
+          disabled={!initialCanEdit}
           value={formik.values.description}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -94,6 +101,7 @@ export default function ({
         <TextField
           id="points"
           label="points"
+          disabled={!initialCanEdit}
           value={formik.values.points}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -104,7 +112,15 @@ export default function ({
         <FormGroup>
           <FormControlLabel
             id="isValid"
-            control={<Checkbox id="isValid" onChange={formik.handleChange} />}
+            disabled={!initialCanEdit}
+            control={
+              <Checkbox 
+                id="isValid"
+                defaultChecked={initialCanEdit}
+                value={formik.values.isValid}
+                onChange={formik.handleChange} 
+              />
+            }
             label={formik.values.isValid ? "valid" : "invalid"}
             onChange={formik.handleChange}
           />

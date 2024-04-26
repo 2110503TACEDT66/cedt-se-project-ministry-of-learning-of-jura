@@ -1,6 +1,6 @@
 "use client"
 import { useFormik } from "formik"
-import { DeepPartial, Discount, Menu, RestaurantResponse, Restaurant, Period } from "@/../interface"
+import { DeepPartial, Discount, Menu, RestaurantResponse, Restaurant, Period, DiscountWithEdit } from "@/../interface"
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
 import ResizableMultiInput from "@/components/ResizableMultiInput"
 import * as yup from "yup"
@@ -23,6 +23,7 @@ export default function ({
   restaurantInformation: RestaurantResponse,
   restaurantId: string
 }) {
+  console.log("restaurantInformation.data.discounts",restaurantInformation.data.discounts)
   const { session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
@@ -113,7 +114,7 @@ export default function ({
 
   let restaurant: Restaurant & Record<string, any> = restaurantInformation.data;
   for (let field in restaurant) {
-    // console.log("field " + field + restaurant[field])
+    console.log("field " , field , restaurant[field])
     initialValues[field] = restaurant[field];
   }
 
@@ -129,7 +130,6 @@ export default function ({
           ...prev
         }
       }, {})
-      console.log(data)
       const response = await fetch(`/api/restaurants/${restaurantId}`, {
         method: "PUT",
         headers: {
@@ -157,10 +157,10 @@ export default function ({
     },
   });
 
-  useEffect(() => {
-    console.log("values", formik.values)
-    console.log("errors", formik.errors)
-  }, [formik.values])
+  // useEffect(() => {
+  //   console.log("values", formik.values)
+  //   console.log("errors", formik.errors)
+  // }, [formik.values])
 
   return (
     <div>
@@ -241,7 +241,7 @@ export default function ({
           }}
           helperTexts={formik.errors.menus as string[] | undefined}
         />
-        <ResizableMultiInput<DeepPartial<Discount>>
+        <ResizableMultiInput<DeepPartial<DiscountWithEdit>>
           values={formik.values.discounts!}
           InnerProps={DiscountTextField}
           label="discount"

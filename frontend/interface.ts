@@ -31,9 +31,12 @@ export interface Restaurant{
     reservationPeriods : Period[],
     reserverCapacity : number,
     reservation : string[],
-    discounts : Discount[],
+    discounts : DiscountWithEdit[],
     tags: string[],
     _id: string
+}
+export interface DiscountWithEdit extends Discount{
+    canEdit: boolean
 }
 export interface Discount  {
     _id?: string,

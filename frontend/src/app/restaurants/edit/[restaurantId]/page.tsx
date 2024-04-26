@@ -1,18 +1,5 @@
-import { useFormik } from "formik"
-import { DeepPartial, Discount, Menu, RestaurantResponse, Restaurant, Period } from "@/../interface"
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
-import ResizableMultiInput from "@/components/ResizableMultiInput"
-import * as yup from "yup"
-import hourRegex from "@/constants/hourRegex"
-import useSession from "@/hooks/useSession"
-import { ChangeEvent, useEffect, useState } from "react"
-import { IconButton } from "@mui/material"
-import FileUploadIcon from "@mui/icons-material/FileUpload"
-import { Delete } from "@mui/icons-material"
-import { useRouter } from "next/navigation"
-import MenuTextField from "@/components/MenuTextField"
-import TimePeriodTextField from "@/components/TimePeriodTextField";
-import DiscountTextField from "@/components/DiscountTextField";
+"use server"
+import { RestaurantResponse, DiscountWithEdit } from "@/../interface"
 import EditRestaurantForm from "@/components/EditRestaurantForm"
 import getRestaurant from "@/utils/getRestaurant"
 
@@ -24,7 +11,10 @@ export default async function ({
     restaurantId: string
   }
 }) {
-  let restaurantInformation = await getRestaurant(params.restaurantId);
+  let restaurantInformation: RestaurantResponse = await getRestaurant(params.restaurantId+"?time="+new Date());
+  restaurantInformation.data.discounts.forEach((discount:DiscountWithEdit)=>{
+    discount.canEdit=discount.isValid;
+  })
   return (
     <EditRestaurantForm
       restaurantInformation={restaurantInformation}
