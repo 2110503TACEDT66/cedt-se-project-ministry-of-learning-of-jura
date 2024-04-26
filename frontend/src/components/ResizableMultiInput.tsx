@@ -42,6 +42,10 @@ export default function<T>({
         values[index]=event.currentTarget.value
         onChange(values);
     }
+
+    // useEffect(()=>{
+    //     console.log("values",values)
+    // },[values])
     
     return (
         <div>
@@ -61,7 +65,7 @@ export default function<T>({
                                     value={textValue}
                                     onChange={(e)=>{onTextChange(e,index)}}
                                     label={`${label} ${index+1}`}
-                                    error={helperTexts==undefined?true:Boolean(helperTexts[index])}
+                                    error={helperTexts==undefined?false:Boolean(helperTexts[index])}
                                     helperText={helperTexts==undefined?undefined:helperTexts[index]}
                                 />
                             }

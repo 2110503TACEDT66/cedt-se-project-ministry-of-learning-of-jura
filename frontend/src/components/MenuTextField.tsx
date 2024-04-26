@@ -34,7 +34,7 @@ export default function({
     })
     useEffect(()=>{
         let {name,price} = formik.values;
-        if(name || price){
+        if(name==undefined || price==undefined){
             return;
         }
         onChange({

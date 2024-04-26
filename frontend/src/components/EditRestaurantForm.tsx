@@ -17,11 +17,11 @@ import DiscountTextField from "@/components/DiscountTextField";
 
 
 export default function ({
-    restaurantInformation,
-    restaurantId
-}:{
+  restaurantInformation,
+  restaurantId
+}: {
   restaurantInformation: RestaurantResponse,
-    restaurantId: string
+  restaurantId: string
 }) {
   const { session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,13 +111,13 @@ export default function ({
 
   let initialValues: any = {};
 
-  let restaurant: Restaurant & Record<string,any> = restaurantInformation.data;
+  let restaurant: Restaurant & Record<string, any> = restaurantInformation.data;
   for (let field in restaurant) {
-    console.log("field " + field + restaurant[field])
-    initialValues[field]=restaurant[field];
+    // console.log("field " + field + restaurant[field])
+    initialValues[field] = restaurant[field];
   }
 
-  const formik = useFormik<DeepPartial<Restaurant>>({
+  const formik = useFormik<DeepPartial<Omit<Restaurant, "tags">> & { tags: string[] }>({
     initialValues: initialValues,
     validationSchema: ValidationSchema,
     async onSubmit(values) {
@@ -158,7 +158,8 @@ export default function ({
   });
 
   useEffect(() => {
-    console.log(formik.values)
+    console.log("values", formik.values)
+    console.log("errors", formik.errors)
   }, [formik.values])
 
   return (
@@ -235,7 +236,8 @@ export default function ({
           InnerProps={MenuTextField}
           label="menu"
           onChange={(newValue) => {
-            formik.setFieldValue("menus", newValue);
+            console.log("triggered: menus",newValue)
+            formik.setFieldValue("menus", structuredClone(newValue));
           }}
           helperTexts={formik.errors.menus as string[] | undefined}
         />
@@ -244,7 +246,7 @@ export default function ({
           InnerProps={DiscountTextField}
           label="discount"
           onChange={(newValue) => {
-            formik.setFieldValue("discounts", newValue);
+            formik.setFieldValue("discounts", structuredClone(newValue));
           }}
           helperTexts={formik.errors.discounts as string[] | undefined}
         />
@@ -281,7 +283,7 @@ export default function ({
           label="Reservation Periods"
           onChange={(newValue) => {
             console.log(newValue);
-            formik.setFieldValue("reservationPeriods", newValue);
+            formik.setFieldValue("reservationPeriods", structuredClone(newValue));
           }}
           helperTexts={formik.errors.discounts as string[] | undefined}
         />
@@ -298,12 +300,13 @@ export default function ({
           }
           error={Boolean(formik.errors.reserverCapacity)}
         ></TextField>
-        <ResizableMultiInput<string|undefined>
+
+        <ResizableMultiInput<string>
           label="tags"
           values={formik.values.tags!}
-          onChange={(newValue) => {
-            console.log(newValue);
-            formik.setFieldValue("tags", newValue);
+          onChange={async (newValue) => {
+            console.log("tags newValue", newValue)
+            let result = await formik.setFieldValue("tags", structuredClone(newValue));
           }}
           helperTexts={formik.errors.tags as string[] | undefined}
         />

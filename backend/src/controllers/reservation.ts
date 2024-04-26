@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { Reservation, ReservationModel } from "../models/Reservation";
+import { ReservationModel } from "../models/Reservation";
 import { Restaurant, RestaurantModel } from "../models/Restaurant";
 import { UserModel } from "../models/User";
 import { UserType } from "../models/User";
 import { ObjectId, Document } from "mongoose";
-import { getRestaurant } from "./restaurants";
 
 export async function getReservations(
     req: Request,
