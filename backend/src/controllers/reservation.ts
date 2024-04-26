@@ -156,44 +156,6 @@ export async function addReservation(
         });
     }
 }
-export async function updateReservation(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
-    try {
-        delete req.body.reservorId;
-        let filterQuery: any = {
-            _id: req.params.id,
-        };
-        if (req.user!.role != UserType.RestaurantOwner) {
-            filterQuery.reservorId = req.user!.id;
-        }
-        const reservation = await ReservationModel.findOneAndUpdate(
-            filterQuery,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-        if (!reservation) {
-            return res.status(400).json({
-                success: false,
-                message: "reservation not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: reservation,
-        });
-    } catch (err) {
-        console.log(err);
-        res.status(400).json({
-            success: false,
-        });
-    }
-}
 export async function deleteReservation(
     req: Request,
     res: Response,
