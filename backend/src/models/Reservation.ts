@@ -28,7 +28,8 @@ export class Reservation {
     public discount?: Discount
 
     @prop({
-        required: true
+        required: true,
+        default: false
     })
     public welcomedrink?: Boolean
 
