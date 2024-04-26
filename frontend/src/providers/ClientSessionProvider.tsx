@@ -14,7 +14,7 @@ export default async function({
 
     let user: User|undefined = undefined;
 
-    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL+'/api/v1/auth/me',{
+    const response = await fetch(process.env.BACKEND_URL+'/api/v1/auth/me',{
         method:"GET",
         headers: new Headers({
             'Authorization': 'Bearer '+token

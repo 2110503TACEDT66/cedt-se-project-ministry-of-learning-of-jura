@@ -10,10 +10,10 @@ export default async function({
     function makeFirstCharUppercase(str: string){
         return str.charAt(0).toUpperCase()+str.slice(1)
     }
-    // const backendURL = new URL(`/api/v1/restaurants/`,process.env.NEXT_PUBLIC_BACKEND_URL)
+    // const backendURL = new URL(`/api/v1/restaurants/`,process.env.BACKEND_URL)
     // console.log(backendURL.href)
-    // const restaurants: RestaurantsResponse = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL+`/api/v1/restaurants/`,{
-    const restaurants: RestaurantsResponse = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL+`/api/v1/restaurants/?tags[in]=${tag}`,{
+    // const restaurants: RestaurantsResponse = await fetch(process.env.BACKEND_URL+`/api/v1/restaurants/`,{
+    const restaurants: RestaurantsResponse = await fetch(process.env.BACKEND_URL+`/api/v1/restaurants/?tags[in]=${tag}`,{
         cache:"no-cache"
     })
     .then(

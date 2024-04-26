@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const path = matches[1];
   return NextResponse.rewrite(
     new URL(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/${path}${request.nextUrl.search}`
+      `${process.env.BACKEND_URL}/api/v1/${path}${request.nextUrl.search}`
     ),
     { request }
   );

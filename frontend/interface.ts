@@ -36,7 +36,7 @@ export interface Restaurant{
     _id: string
 }
 export interface DiscountWithEdit extends Discount{
-    canEdit: boolean
+    canEdit?: boolean
 }
 export interface Discount  {
     _id?: string,
