@@ -67,7 +67,9 @@ export default function <T>({
     }
 
     useEffect(()=>{
-        onChange(state)
+        onChange(state.map((value)=>{
+            return value.value
+        }))
     },[state])
 
     return (
@@ -79,7 +81,7 @@ export default function <T>({
             <div className="flex flex-col w-full gap-2">
                 {
                     state.map((value, index) => {
-                        console.log("index ",index,"value",value)
+                        // console.log("index ",index,"value",value)
                         let key = value?.id ?? idGenerator.next();
                         value.id=key;
                         return (

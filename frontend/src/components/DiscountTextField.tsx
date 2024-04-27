@@ -28,7 +28,7 @@ export default function ({
   };
   value: DeepPartial<DiscountWithEdit> | undefined;
 }) {
-  let initialCanEdit = value?.canEdit ?? true
+  const initialCanEdit = value?.canEdit ?? true
 
   const nameErrorMessage = "name must be string";
   const descriptionErrorMessage = "description must be string";

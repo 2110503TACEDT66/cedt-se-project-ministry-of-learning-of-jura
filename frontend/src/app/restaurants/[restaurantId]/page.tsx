@@ -12,9 +12,8 @@ import {
 import getRestaurant from "@/utils/getRestaurant";
 import RestaurantImage from "@/components/RestaurantImage";
 import { Menu } from "@/../interface";
-import getRestaurantImageData from "@/utils/getRestaurantImageData";
 import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl";
-import Link from "next/link";
+import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
 export default async function ({
   params,
 }: {
@@ -35,7 +34,7 @@ export default async function ({
         <div>
           <RestaurantImage
             alt={restaurant.name}
-            src={getRestaurantImageUrl(params.restaurantId)}
+            src={await getServerRestaurantImageUrl(params.restaurantId)}
             width={400}
             height={400}
             sizes={"100vw"}

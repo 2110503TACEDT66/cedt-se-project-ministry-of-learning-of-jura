@@ -13,7 +13,8 @@ import DiscountTextField from "@/components/DiscountTextField"
 import { redirect } from "next/navigation"
 export default function(){
     const {session} = useSession();
-    if(session?.user?.role || session?.user?.role=="restaurantOwner"){
+    console.log(session)
+    if(session?.user?.role==undefined || session?.user?.role!="restaurantOwner"){
         redirect("/")
     }
     const [isSubmitting,setIsSubmitting] = useState(false);

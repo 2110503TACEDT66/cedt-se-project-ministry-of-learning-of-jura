@@ -23,7 +23,7 @@ export default function ({
   restaurantInformation: RestaurantResponse,
   restaurantId: string
 }) {
-  console.log("restaurantInformation.data.discounts",restaurantInformation.data.discounts)
+  // console.log("restaurantInformation.data.discounts",restaurantInformation.data.discounts)
   const { session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
@@ -282,7 +282,7 @@ export default function ({
           values={formik.values.reservationPeriods!}
           label="Reservation Periods"
           onChange={(newValue) => {
-            console.log(newValue);
+            // console.log(newValue);
             formik.setFieldValue("reservationPeriods", structuredClone(newValue));
           }}
           helperTexts={formik.errors.discounts as string[] | undefined}
@@ -305,7 +305,7 @@ export default function ({
           label="tags"
           values={formik.values.tags!}
           onChange={async (newValue) => {
-            console.log("tags newValue", newValue)
+            // console.log("tags newValue", newValue)
             let result = await formik.setFieldValue("tags", structuredClone(newValue));
           }}
           helperTexts={formik.errors.tags as string[] | undefined}
