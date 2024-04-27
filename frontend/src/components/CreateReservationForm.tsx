@@ -124,8 +124,12 @@ export default function ({ token }: { token: string }) {
   }
 
   useEffect(() => {
-    console.log(discountsList);
+    console.log("discountsList",discountsList);
   }, [discountsList]);
+  
+  useEffect(() => {
+    console.log("restaurantsList",restaurantsList);
+  }, [restaurantsList]);
 
   return (
     <div className="h-full flex items-center justify-center m-2">
@@ -185,8 +189,9 @@ export default function ({ token }: { token: string }) {
           ></DatePicker>
         </LocalizationProvider>
         <Select onChange={onDiscountChange} value={formik.values.discountIndex}>
-          {restaurantsList[0] == formik.values.restaurantName &&
-            discountsList[0] !== undefined &&
+          {
+            restaurantsList[0] == formik.values.restaurantName &&
+            discountsList[0] != undefined &&
             discountsList[0]
               .filter((discount) => discount.isValid)
               .map((discount, index) => {

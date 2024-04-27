@@ -29,7 +29,7 @@ export default async function ({
   const restaurant: Restaurant = restaurantResponse.data;
 
   return (
-    <main className="w-full h-full flex items-center justify-center">
+    <main className=" flex  justify-center">
       <div className="bg-white text-black flex flex-row border-solid border-gray-400 border-2 p-2 rounded-2xl">
         <div>
           <RestaurantImage
@@ -77,7 +77,7 @@ export default async function ({
           <Typography variant="h5" className="font-semibold">
             Available Reservation Periods
           </Typography>
-          {restaurant.reservationPeriods ? (
+          {restaurant.reservationPeriods && (
             <List>
               {restaurant.reservationPeriods.map(({ start, end }, index) => {
                 const periodString = `${start}-${end}`;
@@ -96,22 +96,24 @@ export default async function ({
                 );
               })}
             </List>
-          ) : null}{" "}
+          )}
           <Typography variant="h5" className="font-semibold">
             Discount List
           </Typography>
           {restaurant.discounts ? (
             <List>
               {restaurant.discounts.map(
-                ({ name, description, points }, index) => {
+                ({ name, description, points,isValid }, index) => {
                   return (
-                    <ListItem key={index}>
-                      <ListItemText primary={name}></ListItemText>
-                      <ListItemText
-                        primary={description}
-                      ></ListItemText>
-                      <ListItemText primary={points}></ListItemText>
-                    </ListItem>
+                    <div key={index} className="flex flex-row items-start">
+                      <p>{index+1}.</p>
+                      <ListItem className="flex flex-col items-start pt-0 pl-0 pr-0">
+                        <ListItemText primary={"name: "+name} className="ml-2"></ListItemText>
+                        <ListItemText primary={"description: "+description}  className="ml-2"></ListItemText>
+                        <ListItemText primary={"points: "+points}  className="ml-2"></ListItemText>
+                        <ListItemText primary={"can be used: "+(isValid? "yes":"no")}  className="ml-2"></ListItemText>
+                      </ListItem>
+                    </div>
                   );
                 }
               )}
