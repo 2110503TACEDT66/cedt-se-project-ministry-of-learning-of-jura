@@ -7,7 +7,7 @@ export default async function({
 }:{
   searchParams:{
     restaurantName?: string,
-    restaurantPeriod?: string
+    reservationPeriod?: string
   }
 }){
   const session = await useServerSession();
@@ -22,7 +22,7 @@ export default async function({
       <CreateReservationForm 
         session={session}
         restaurantName={searchParams.restaurantName}
-        reservationPeriod={searchParams.restaurantPeriod}
+        reservationPeriod={searchParams.reservationPeriod}
       ></CreateReservationForm>
     </main>
   )

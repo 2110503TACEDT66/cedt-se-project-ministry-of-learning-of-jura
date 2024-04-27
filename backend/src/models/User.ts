@@ -1,10 +1,11 @@
-import type { InferSchemaType } from "mongoose";
+import type { InferSchemaType, ObjectId } from "mongoose";
 
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
 import validator from "email-validator"
 import {ReservationModel} from "./Reservation"
 import { buildSchema, getModelForClass, pre, prop, queryMethod } from "@typegoose/typegoose";
+import { Restaurant } from "./Restaurant";
 
 export enum UserType{
   User="user",
@@ -77,9 +78,18 @@ export class User {
   })
   public point!: number
 
+  @prop({
+    required: true
+  })
+  public _id!: mongoose.Types.ObjectId
+
   async matchPassword(inputPassword:string) {
     // console.log(inputPassword,this.password)
     return await bcrypt.compare(inputPassword, this.password);
+  }
+
+  isOwner(restaurant: Restaurant) {
+    return restaurant.restaurantOwner._id.equals(this._id);
   }
 }
 

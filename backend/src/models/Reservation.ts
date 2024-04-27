@@ -26,7 +26,7 @@ export class Reservation {
     @prop({
         required: false,
     })
-    public discount?: Discount
+    public discountIndex?: number
 
     @prop({
         required: true

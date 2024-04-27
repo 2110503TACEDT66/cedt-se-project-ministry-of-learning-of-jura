@@ -8,9 +8,9 @@ export interface User{
     role:string,
     joinedAt:string,
     phone:string[],
-    _id:string
-    point:number,
-    karma:number
+    _id:string,
+    point: number,
+    karma: number
 }
 
 export interface Session{

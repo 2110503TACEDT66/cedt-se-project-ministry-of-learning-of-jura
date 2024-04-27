@@ -1,17 +1,26 @@
 "use client"
+import getClientRestaurantImageUrl from "@/utils/getClientRestaurantImageUrl";
 import getRestaurantImageData from "@/utils/getRestaurantImageData";
+import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function(props:React.ComponentProps<typeof Image>){
-    
-    const [imgSrc, setImgSrc] = useState(props.src);
-    const {src, ...rest} = props;
+interface Props extends Omit<React.ComponentProps<typeof Image>,"src">{
+    restaurantId: string,
+    onLoad: ()=>void
+}
+
+export default function({
+    restaurantId,
+    ...rest
+}:Props){
+    const initialImage = getClientRestaurantImageUrl(restaurantId);
+    const [imgSrc, setImgSrc] = useState<string>(initialImage);
 
     useEffect(() => {
         const fetchImage = async () => {
             try {
-                const imageData = await getRestaurantImageData(imgSrc.toString());
+                const imageData = await getRestaurantImageData(imgSrc);
                 setImgSrc(imageData);
             } catch (error) {
                 console.error("Error fetching image:", error);

@@ -2,7 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Restaurant } from "../../interface"
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import useSession from "@/hooks/useSession"
@@ -25,7 +25,7 @@ export default function({
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
     const isRestaurantOwner = session?.user.role=="restaurantOwner";
-
+    
     const router = useRouter();
 
     async function deleteRestaurant(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
@@ -51,9 +51,11 @@ export default function({
         <div
             className={`${
                 className || ""
+            } ${
+                imageLoaded? "" : `overflow-hidden h-[280px]`
             } relative md:w-[250px] sm:w-1/3 rounded-2xl p-2 border-solid border-2 border-grey text-black bg-white`}
         >
-            <Link href={`/restaurants/${restaurant._id}`}>
+            <Link href={`/restaurants/${restaurant._id}`} className="relative">
                 {!imageLoaded && (
                     <div className="w-full">
                         <div className="w-full rounded-2xl overflow-hidden aspect-square">
@@ -62,18 +64,18 @@ export default function({
                         <Skeleton className="w-full h-5"></Skeleton>
                         <Skeleton className="w-full h-5"></Skeleton>
                     </div>
-                )}
+                )} 
                 <RestaurantImage
                     alt={restaurant.name}
-                    src={getRestaurantImageUrl(restaurant._id)}
+                    restaurantId={restaurant._id}
                     width={250}
                     height={250}
                     sizes={"100vw"}
-                    className={`rounded-2xl aspect-square object-cover ${
-                        imageLoaded ? "" : "w-0 h-0"
-                    } `}
+                    className={`rounded-2xl aspect-square object-cover`}
                     onLoad={() => {
-                        setImageLoaded(true);
+                        setTimeout(()=>{
+                            setImageLoaded(true);
+                        },10)
                     }}
                 ></RestaurantImage>
                 <p className={`text-center ${imageLoaded ? "" : "hidden"}`}>

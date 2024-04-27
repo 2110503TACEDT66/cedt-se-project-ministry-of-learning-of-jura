@@ -35,107 +35,104 @@ export default function ({
   restaurantName: string | undefined,
   reservationPeriod: string | undefined
 }) {
-  function parsePeriod(periodString: string|null|undefined): Period|undefined{
-    if(periodString==undefined){
+  console.log(reservationPeriod, parsePeriod(reservationPeriod));
+  function parsePeriod(periodString: string | null | undefined): Period | undefined {
+    if (periodString == undefined) {
       return undefined;
     }
-    let [start,end] = periodString.split("-");
+    let [start, end] = periodString.split("-");
     return {
       start,
       end
     }
   }
-  const [restaurantsList, setRestaurantsList] = useState<string[]>([]);
-  const [isAlerting, setIsAlerting] = useState<boolean>(false);
-  const [alertMessages, setAlertMessage] = useState<{
-    title: string | null;
-    description: string | null;
-  }>({
-    title: null,
-    description: null,
-  });
   const router = useRouter();
   const [discountsList, setDiscountsList] = useState<Discount[][]>([]);
-  const formik = useFormik<DeepPartial<Omit<Reservation,"reservationDate">> & {
+  const [restaurantsList, setRestaurantsList] = useState<string[]>([]);
+  const [periodsList, setPeriodsList] = useState<Period[][]>([]);
+  const [isAlerting, setIsAlerting] = useState<boolean>(false);
+  const [alertMessages, setAlertMessage] = useState<{
+    title: string | null,
+    description: string | null
+  }>({
+    title: null,
+    description: null
+  });
+  const formik = useFormik<DeepPartial<Omit<Reservation, "reservationDate">> & {
     restaurantName: string,
     reservationDate?: Dayjs
   }>({
     initialValues: {
-      restaurantName: restaurantName || "",
+      restaurantName: restaurantName ?? "",
       reservationDate: undefined,
       discountIndex: undefined,
-      reservationPeriod: parsePeriod(reservationPeriod) || undefined,
-      welcomeDrink: false,
+      reservationPeriod: parsePeriod(reservationPeriod),
+      welcomeDrink: false
     },
-    async onSubmit(values) {
-      console.log(values);
-      let data = values;
+    async onSubmit(_values) {
+      let discount = discountsList[0][0]
+      console.log(discount)
+      let data = { ...formik.values, discount };
       const result = await fetch("/api/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`,
+          Authorization: `Bearer ${session.token}`
         },
-        body: JSON.stringify(data),
-      });
+        body: JSON.stringify(data)
+      })
       const responseJson = await result.json();
       if (!result.ok || !responseJson.success) {
         setAlertMessage({
           title: "Error!",
-          description: responseJson.message || "Wrong restaurant name",
-        });
+          description: responseJson.message || "Wrong restaurant name"
+        })
         setIsAlerting(true);
         return;
       }
       setAlertMessage({
         title: "Success!",
-        description: "Successfully create reservation",
-      });
+        description: "Successfully create reservation"
+      })
 
       setIsAlerting(true);
       router.push("/reservations");
       router.refresh();
-    },
-  });
+    }
+  })
 
-  async function onRestaurantNameChange(
-    _e: SyntheticEvent<Element, Event>,
-    value: string | null
-  ) {
+  async function onRestaurantNameChange(_e: SyntheticEvent<Element, Event>, value: string | null) {
     if (!value || value.trim() == "") {
-      return;
+      return
     }
     value = value.trim();
-    const restaurantsResponse = await fetch(
-      `/api/restaurants?name[regex]=${value}&select=name,discounts`
-    ).then((res) => {
-      return res.json();
-    });
-    const newRestaurantsList = restaurantsResponse.data.map(
-      (restaurant: Restaurant) => {
-        return restaurant.name;
-      }
-    );
-    setRestaurantsList(newRestaurantsList);
-    const newDiscountsList = restaurantsResponse.data.map(
-      (restaurant: Restaurant) => {
-        return restaurant.discounts;
-      }
-    );
+    const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts,reservationPeriods`)
+      .then((res) => {
+        return res.json()
+      })
+    const newRestaurantsList = restaurantsResponse.data.map((restaurant: Restaurant) => {
+      return restaurant.name
+    })
+    setRestaurantsList(newRestaurantsList)
+
+    const newDiscountsList = restaurantsResponse.data.map((restaurant: Restaurant) => {
+      return restaurant.discounts
+    })
     setDiscountsList(newDiscountsList);
+
+    const newPeriodsList = restaurantsResponse.data.map(
+      (restaurant: Restaurant) => {
+        return restaurant.reservationPeriods
+      }
+    )
+    setPeriodsList(newPeriodsList)
   }
 
   async function onDiscountChange(e: SelectChangeEvent<unknown>) {
+    console.log(e.target);
     formik.setFieldValue("discountIndex", e.target.value);
+    console.log(formik.values.discountIndex);
   }
-
-  useEffect(() => {
-    console.log("discountsList",discountsList);
-  }, [discountsList]);
-  
-  useEffect(() => {
-    console.log("restaurantsList",restaurantsList);
-  }, [restaurantsList]);
 
   return (
     <div className="h-full flex items-center justify-center m-2">
@@ -145,7 +142,9 @@ export default function ({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{alertMessages.title}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {alertMessages.title}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             {alertMessages.description}
@@ -155,32 +154,29 @@ export default function ({
           <Button onClick={() => setIsAlerting(false)}>Ok</Button>
         </DialogActions>
       </Dialog>
-      <form
-        onSubmit={formik.handleSubmit}
-        className="flex flex-col gap-2 w-2/3 sm:w-1/2 bg-white rounded-2xl p-2"
-      >
+      <form onSubmit={formik.handleSubmit} className="flex flex-col gap-2 w-2/3 sm:w-1/2 bg-white rounded-2xl p-2">
         <Autocomplete
           disablePortal
           sx={{
             width: "100%",
-            alignSelf: "center",
+            alignSelf: "center"
           }}
           options={restaurantsList}
           filterOptions={(options, _state) => options}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Restaurant Name"
-              InputProps={{
-                ...params.InputProps,
-              }}
-            />
-          )}
+          // sx={{ width: 300 }}
+          renderInput={(params) => <TextField
+            {...params}
+            label="Restaurant Name"
+            InputProps={{
+              ...params.InputProps,
+              // type: 'search',
+            }}
+          />}
           value={formik.values.restaurantName}
           onInputChange={onRestaurantNameChange}
           onChange={async (e, value) => {
-            console.log("on change triggered");
-            formik.setFieldValue("restaurantName", value);
+            console.log("on change triggered")
+            formik.setFieldValue("restaurantName", value)
           }}
           freeSolo
           autoSelect
@@ -188,33 +184,51 @@ export default function ({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             label="reservation date"
-            value={formik.values.reservationDate}
+            // value={formik.values.reservationDate ?? ""}
             onChange={(value) => {
-              formik.setFieldValue("reservationDate", value);
+              formik.setFieldValue("reservationDate", value)
             }}
           ></DatePicker>
         </LocalizationProvider>
-        <Select onChange={onDiscountChange} value={formik.values.discountIndex}>
+
+        <Select
+          value={JSON.stringify(formik.values.reservationPeriod)}
+          onChange={(e)=>{
+            formik.setFieldValue("reservationPeriod",JSON.parse(e.target.value))
+          }}
+        >
           {
             restaurantsList[0] == formik.values.restaurantName &&
-            discountsList[0] != undefined &&
-            discountsList[0]
-              .filter((discount) => discount.isValid)
-              .map((discount, index) => {
-                const isDisabled = session!.user.point < discount.points;
+            periodsList[0] !== undefined &&
+            periodsList[0]
+              .map((period, index) => {
                 return (
                   <MenuItem
-                    key={discount._id}
-                    value={index}
-                    disabled={isDisabled}
-                    style={{ color: isDisabled ? "gray" : "inherit" }}
+                    key={`${period.start}-${period.end}`}
+                    value={JSON.stringify(period)}
                   >
                     <p>
-                      {discount.name} - {discount.points}
+                      {period.start} - {period.end}
                     </p>
                   </MenuItem>
                 );
-              })}
+              })
+          }
+        </Select>
+        <Select
+          onChange={onDiscountChange}
+          value={formik.values.discountIndex ?? ""}
+        >
+          {
+            restaurantsList.length === 1 &&
+            discountsList[0] !== undefined &&
+            discountsList[0].map((discount, index) => (
+              <MenuItem key={index} value={index}>
+                <p>{discount.name}</p>
+                <p>{discount.points}</p>
+              </MenuItem>
+            ))
+          }
         </Select>
 
         <FormControlLabel
