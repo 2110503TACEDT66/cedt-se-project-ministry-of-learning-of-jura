@@ -20,13 +20,21 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
-import { DeepPartial, Discount, Period, Reservation, Restaurant } from "../../interface";
+import { DeepPartial, Discount, Period, Reservation, Restaurant, Session } from "../../interface";
 import { useSearchParams } from "next/navigation";
 import { Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import useSession from "@/hooks/useSession";
 
-export default function ({ token }: { token: string }) {
+export default function ({
+  session,
+  restaurantName,
+  reservationPeriod
+}: {
+  session: Session,
+  restaurantName: string | undefined,
+  reservationPeriod: string | undefined
+}) {
   function parsePeriod(periodString: string|null|undefined): Period|undefined{
     if(periodString==undefined){
       return undefined;
@@ -37,8 +45,6 @@ export default function ({ token }: { token: string }) {
       end
     }
   }
-  const { session } = useSession();
-  const searchParams = useSearchParams();
   const [restaurantsList, setRestaurantsList] = useState<string[]>([]);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
   const [alertMessages, setAlertMessage] = useState<{
@@ -55,10 +61,10 @@ export default function ({ token }: { token: string }) {
     reservationDate?: Dayjs
   }>({
     initialValues: {
-      restaurantName: searchParams.get("restaurantName") || "",
+      restaurantName: restaurantName || "",
       reservationDate: undefined,
       discountIndex: undefined,
-      reservationPeriod: parsePeriod(searchParams.get("reservationPeriod")) || undefined,
+      reservationPeriod: parsePeriod(reservationPeriod) || undefined,
       welcomeDrink: false,
     },
     async onSubmit(values) {
@@ -68,7 +74,7 @@ export default function ({ token }: { token: string }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.token}`,
         },
         body: JSON.stringify(data),
       });

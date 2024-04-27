@@ -1,8 +1,15 @@
 import CreateReservationForm from "@/components/CreateReservationForm";
 import useServerSession from "@/hooks/useServerSession";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
-export default async function(){
+export default async function({
+  searchParams
+}:{
+  searchParams:{
+    restaurantName?: string,
+    restaurantPeriod?: string
+  }
+}){
   const session = await useServerSession();
   if(session==undefined){
     redirect("/login")
@@ -12,7 +19,11 @@ export default async function(){
   }
   return (
     <main>
-      <CreateReservationForm token={session.token}></CreateReservationForm>
+      <CreateReservationForm 
+        session={session}
+        restaurantName={searchParams.restaurantName}
+        reservationPeriod={searchParams.restaurantPeriod}
+      ></CreateReservationForm>
     </main>
   )
 }
