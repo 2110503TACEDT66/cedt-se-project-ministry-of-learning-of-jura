@@ -1,5 +1,5 @@
 "use server"
-import { RestaurantResponse, DiscountWithEdit } from "@/../interface"
+import { Discount, RestaurantResponse } from "@/../interface"
 import EditRestaurantForm from "@/components/EditRestaurantForm"
 import getRestaurant from "@/utils/getRestaurant"
 
@@ -12,7 +12,7 @@ export default async function ({
   }
 }) {
   let restaurantInformation: RestaurantResponse = await getRestaurant(params.restaurantId+"?time="+new Date());
-  restaurantInformation.data.discounts.forEach((discount:DiscountWithEdit)=>{
+  restaurantInformation.data.discounts.forEach((discount)=>{
     discount.canEdit=discount.isValid;
   })
   return (

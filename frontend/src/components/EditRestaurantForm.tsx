@@ -114,7 +114,7 @@ export default function ({
 
   let restaurant: Restaurant & Record<string, any> = restaurantInformation.data;
   for (let field in restaurant) {
-    console.log("field " , field , restaurant[field])
+    // console.log("field " , field , restaurant[field])
     initialValues[field] = restaurant[field];
   }
 

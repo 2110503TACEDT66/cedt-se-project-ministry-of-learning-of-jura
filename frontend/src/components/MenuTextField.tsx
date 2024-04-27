@@ -15,7 +15,7 @@ export default function({
     helperText?: any,
     value: DeepPartial<Menu>|undefined
 }){
-    // console.log("init value menu ",value)
+    console.log("init value menu ",value)
     const invalidNameMessage = "name can't be left empty"
     const invalidPriceMessage = "price is invalid"
     const ValidationSchema=yup.object().shape({
@@ -24,8 +24,8 @@ export default function({
     })
     const formik = useFormik<DeepPartial<Menu>>({
         initialValues: value || {
-            name: undefined,
-            price: undefined
+            name: "",
+            price: 0
         },
         validationSchema:ValidationSchema,
         async onSubmit(){
@@ -34,7 +34,7 @@ export default function({
     })
     useEffect(()=>{
         let {name,price} = formik.values;
-        if(name==undefined || price==undefined){
+        if(name=="" || price==0){
             return;
         }
         onChange({

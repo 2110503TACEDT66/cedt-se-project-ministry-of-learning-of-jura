@@ -10,16 +10,12 @@ export default async function({
     function makeFirstCharUppercase(str: string){
         return str.charAt(0).toUpperCase()+str.slice(1)
     }
-    // const backendURL = new URL(`/api/v1/restaurants/`,process.env.BACKEND_URL)
-    // console.log(backendURL.href)
-    // const restaurants: RestaurantsResponse = await fetch(process.env.BACKEND_URL+`/api/v1/restaurants/`,{
     const restaurants: RestaurantsResponse = await fetch(process.env.BACKEND_URL+`/api/v1/restaurants/?tags[in]=${tag}`,{
         cache:"no-cache"
     })
     .then(
         (response)=>response.json()
     );
-    // console.log(restaurants)
     return (
         <div className="flex flex-col">
             <Typography variant="h3" className="m-2">{makeFirstCharUppercase(tag)} Restaurant</Typography>

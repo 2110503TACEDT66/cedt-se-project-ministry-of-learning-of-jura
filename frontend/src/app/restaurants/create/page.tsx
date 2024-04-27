@@ -10,8 +10,12 @@ import { useEffect, useState } from "react"
 import MenuTextField from "@/components/MenuTextField"
 import TimePeriodTextField from "@/components/TimePeriodTextField"
 import DiscountTextField from "@/components/DiscountTextField"
+import { redirect } from "next/navigation"
 export default function(){
     const {session} = useSession();
+    if(session?.user?.role || session?.user?.role=="restaurantOwner"){
+        redirect("/")
+    }
     const [isSubmitting,setIsSubmitting] = useState(false);
     const [isAlerting,setIsAlerting] = useState<boolean>(false);
     const [alertMessages,setAlertMessage] = useState<{
@@ -76,32 +80,30 @@ export default function(){
         },
         validationSchema:ValidationSchema,
         async onSubmit(values){
-            console.log("on submit")
-            console.log(values)
-            // const response = await fetch("/api/restaurants/",{
-            //     method:"POST",
-            //     headers:{
-            //         "Content-Type":"application/json",
-            //         "Authorization":`Bearer ${session?.token}`
-            //     },
-            //     body: JSON.stringify(values)
-            // })
-            // const responseJson = await response.json();
-            // console.log(responseJson) ;
-            // if(!responseJson.success){
-            //     setIsAlerting(true);
-            //     setAlertMessage({
-            //         title:"Error",
-            //         description:"Restaurant might be duplicated, and we don't allow it"
-            //     })
-            //     return
-            // }
-            // setIsAlerting(true)
-            // setAlertMessage({
-            //     title:"Success!",
-            //     description:"Successfully create a restaurant"
-            // })
-            // setIsSubmitting(false);
+            const response = await fetch("/api/restaurants/",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":`Bearer ${session?.token}`
+                },
+                body: JSON.stringify(values)
+            })
+            const responseJson = await response.json();
+            console.log(responseJson) ;
+            if(!responseJson.success){
+                setIsAlerting(true);
+                setAlertMessage({
+                    title:"Error",
+                    description:"Restaurant might be duplicated, and we don't allow it"
+                })
+                return
+            }
+            setIsAlerting(true)
+            setAlertMessage({
+                title:"Success!",
+                description:"Successfully create a restaurant"
+            })
+            setIsSubmitting(false);
         }
     })
     return (

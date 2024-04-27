@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import removeFromArrayByIndex from "@/utils/removeFromArrayByIndex";
 import { ResizableMultiInputEvent } from "../../interface";
+import { IdGenerator } from "@/utils/IdGenerator";
 
 export default function <T>({
     label,
@@ -26,26 +27,48 @@ export default function <T>({
     helperTexts?: string[],
     values: (T | undefined)[]
 }) {
+    let idGenerator = new IdGenerator();
+
+    type TWithId<T> = {
+        value: T | undefined,
+        id?: number
+    }
     InnerProps = InnerProps || TextField;
 
+    const [state,setState] = useState<TWithId<T>[]>(
+        values.map(
+            (value)=>{
+                return {
+                    value,
+                    id: idGenerator.next()
+                }
+            }
+        )
+    );
+
     function onAdd() {
-        values.push(undefined)
-        onChange(values);
+        setState([...structuredClone(state),{
+            value: undefined,
+            id: idGenerator.next()
+        }])
     }
 
     function onDelete(index: number) {
-        let newValues = removeFromArrayByIndex(values, index);
-        onChange(newValues);
+        setState(removeFromArrayByIndex<TWithId<T>>(state, index));
     }
 
     function onTextChange(event: ResizableMultiInputEvent, index: number) {
-        values[index] = event.currentTarget.value
-        onChange(values);
+        let newState = structuredClone(state);
+        newState[index] = {
+            value:event.currentTarget.value,
+            id: newState[index].id
+        }
+        setState(newState)
     }
 
-    // useEffect(()=>{
-    //     console.log("values",values)
-    // },[values])
+    useEffect(()=>{
+        onChange(state)
+    },[state])
 
     return (
         <div>
@@ -55,14 +78,19 @@ export default function <T>({
             </div>
             <div className="flex flex-col w-full gap-2">
                 {
-                    values.map((textValue, index) => {
+                    state.map((value, index) => {
+                        console.log("index ",index,"value",value)
+                        let key = value?.id ?? idGenerator.next();
+                        value.id=key;
                         return (
-                            <div key={index} className="pl-10 w-full flex flex-row items-center justify-center gap-2">
+                            <div key={key} className="pl-10 w-full flex flex-row items-center justify-center gap-2">
                                 <InnerProps
-                                    key={JSON.stringify(textValue)}
+                                    key={key}
                                     className="flex-1"
-                                    value={textValue}
-                                    onChange={(e) => { onTextChange(e, index) }}
+                                    value={value?.value}
+                                    onChange={(e) => {
+                                        onTextChange(e, index)
+                                    }}
                                     label={`${label} ${index + 1}`}
                                     error={helperTexts == undefined ? false : Boolean(helperTexts[index])}
                                     helperText={helperTexts == undefined ? undefined : helperTexts[index]}
