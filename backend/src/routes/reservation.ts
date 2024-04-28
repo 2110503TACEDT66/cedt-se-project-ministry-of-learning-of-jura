@@ -14,7 +14,7 @@ router.route("/")
     .post(checkToken, checkRole(UserType.User), addReservation)
 router.route("/:id")
     .get(checkToken, getReservation)
-    .delete(checkToken, checkRole(UserType.User, UserType.RestaurantOwner), deleteReservation)
+    .delete(checkToken, checkRole(UserType.User), deleteReservation)
 router.route("/:id/confirm")
     .post(checkToken,checkRole(UserType.RestaurantOwner),confirmReservation)
 export default router
