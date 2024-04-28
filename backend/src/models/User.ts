@@ -89,6 +89,7 @@ export class User {
   }
 
   isOwner(restaurant: Restaurant) {
+    // console.log("user",this._id)
     return restaurant.restaurantOwner._id.equals(this._id);
   }
 }

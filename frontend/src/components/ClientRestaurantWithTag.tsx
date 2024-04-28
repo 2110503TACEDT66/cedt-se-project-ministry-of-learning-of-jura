@@ -5,6 +5,7 @@ import RestaurantCardsGroup from "./RestaurantCardsGroup"
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import useSession from "@/hooks/useSession";
 
 export default function({
     restaurantsResponse,
@@ -16,6 +17,8 @@ export default function({
     const [carouselIndex, setCarouselIndex] = useState(0);
     let initialRestaurantsGroup: (Restaurant[]|undefined)[] = []
     const totalPage = Math.ceil(restaurantsResponse.pagination.total/3);
+
+    const {session} = useSession();
 
     for(let i=0;i<totalPage;i++){
         initialRestaurantsGroup.push(undefined)
@@ -32,7 +35,11 @@ export default function({
         if(restaurantsGroup[newIndex]==undefined){
             let oldRestaurantsGroup = Array.from(restaurantsGroup);
             // let restaurantsResponse: RestaurantsResponse = await fetch(`/api/restaurants/?tag=${tag}&page=${index}`)
-            let newRestaurantsResponse: RestaurantsResponse = await fetch(`/api/restaurants/?tags[in]=${tag}&page=${indexToPage(newIndex)}`)
+            let newRestaurantsResponse: RestaurantsResponse = await fetch(`/api/restaurants/?tags[in]=${tag}&page=${indexToPage(newIndex)}`,{
+                headers:{
+                    Authorization: `Bearer ${session?.token}`
+                }
+            })
             // let newRestaurantsResponse: RestaurantsResponse = await fetch(`/api/restaurants/?page=${indexToPage(currentIndex+1)}`)
             .then((res)=>res.json())
             oldRestaurantsGroup[newIndex]=newRestaurantsResponse.data;

@@ -33,7 +33,8 @@ export interface Restaurant{
     reservation : string[],
     discounts : DiscountWithEdit[],
     tags: string[],
-    _id: string
+    _id: string,
+    isOwner?: boolean
 }
 export interface DiscountWithEdit extends Discount{
     canEdit?: boolean

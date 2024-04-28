@@ -11,6 +11,7 @@ export default function(){
         })
         deleteSession();
         router.back();
+        router.refresh();
     }
     return (
         <main className="flex w-full align-center justify-center absolute top-1/2 transform -translate-y-1/2">

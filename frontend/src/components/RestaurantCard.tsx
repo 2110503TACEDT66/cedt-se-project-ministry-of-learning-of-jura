@@ -19,12 +19,11 @@ export default function({
     restaurant,
     className
 }:{
-    restaurant:Restaurant
+    restaurant:Restaurant,
     className?: string
 }){
     const [imageLoaded,setImageLoaded] = useState(false);
     const {session} = useSession();
-    const isRestaurantOwner = session?.user.role=="restaurantOwner";
     
     const router = useRouter();
 
@@ -45,7 +44,6 @@ export default function({
         stroke: "white",
         strokeWidth: 1
     };
-
 
     return (
         <div
@@ -93,7 +91,7 @@ export default function({
                 </p>
             </Link>
             {
-                isRestaurantOwner &&
+                restaurant.isOwner &&
                 <div>
                     <Link
                         href={`/restaurants/edit/${restaurant._id}`}
