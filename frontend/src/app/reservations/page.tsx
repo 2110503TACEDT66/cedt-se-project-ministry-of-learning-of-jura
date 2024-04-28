@@ -18,6 +18,7 @@ import {
 } from "../../../interface";
 import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
 import ConfirmReservationButton from "@/components/ConfirmReservationButton";
+import ReservationInformation from "@/components/ReservationInformation";
 
 export default async function () {
   const session = await useServerSession();
@@ -28,17 +29,10 @@ export default async function () {
 
   const user = session.user;
 
-  const reservationsResponse: ReservationsResponse = await getReservations(
-    session?.token
-  ).then((res: Response | null) => {
-    if (res == null || !res.ok) {
-      notFound();
-    }
-    return res.json();
-  });
-
-  const isRestaurantOwner = session.user.role == "restaurantOwner";
-
+  const reservationsResponse: ReservationsResponse = await getReservations(session?.token)
+  .catch(()=>{
+    notFound();
+  }) as ReservationsResponse
   const reservations: (Reservation & {
     restaurant?: Restaurant;
   })[] = reservationsResponse.data;
@@ -88,40 +82,7 @@ export default async function () {
                   className="w-full h-full object-cover rounded-2xl"
                 />
               </Link>
-              <div className="">
-                <Typography>
-                  Restaurant: {reservation.restaurant?.name}
-                </Typography>
-                <Typography>
-                  Reservation Date:{" "}
-                  {new Date(
-                    Date.parse(reservation.reservationDate)
-                  ).toLocaleDateString("en-UK")}
-                </Typography>
-                <Typography>
-                  Welcome Drink:{reservation.welcomeDrink ? " Yes" : " No"}
-                </Typography>
-                <Typography>
-                  By:{" "}
-                  {reservation.reservorId == session.user._id
-                    ? "you"
-                    : reservation.reservorId}
-                </Typography>
-                {
-                  <Typography>
-                    room: {reservation.room ?? "no room"}
-                  </Typography>
-                }
-                {
-                  reservation.isConfirmed ? (
-                    <Typography>confirmed</Typography>
-                  ) : (
-                    isRestaurantOwner && (
-                      <ConfirmReservationButton reservation={reservation} />
-                    )
-                  )
-                }
-              </div>
+              
               <div className="flex flex-col self-stretch justify-between">
                 {
                   !reservation.isConfirmed && <DeleteReservationButton
@@ -130,6 +91,10 @@ export default async function () {
                   />
                 }
               </div>
+              <ReservationInformation
+                session={session}
+                reservation={reservation!}
+              ></ReservationInformation>
             </div>
           );
         })}

@@ -1,6 +1,5 @@
 "use server";
-
-import { Restaurant, RestaurantResponse } from "@/../interface";
+import { Reservation, ReservationsResponse, Restaurant, RestaurantResponse } from "@/../interface";
 import { notFound } from "next/navigation";
 import {
   List,
@@ -14,19 +13,40 @@ import RestaurantImage from "@/components/RestaurantImage";
 import { Menu } from "@/../interface";
 import getRestaurantImageUrl from "@/utils/getRestaurantImageUrl";
 import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
+import getReservations from "@/utils/getReservations";
+import useServerSession from "@/hooks/useServerSession";
+import ReservationInformation from "@/components/ReservationInformation";
+
 export default async function ({
   params,
 }: {
   params: {
     restaurantId: string;
+    reservationId: string;
   };
 }) {
   const restaurantResponse: RestaurantResponse = await getRestaurant(params.restaurantId)
-  .catch(()=>{
-    notFound();
-  })
-
+    .catch(() => {
+      notFound();
+    })
+  const session = await useServerSession();
   const restaurant: Restaurant = restaurantResponse.data;
+  const isRestaurantOwner = session?.user.role == "restaurantOwner"
+
+  let reservations: Reservation[] | undefined;
+  if (session) {
+    const reservationsResponse: ReservationsResponse | undefined = await getReservations(
+      session?.token,
+      restaurant._id
+    ).catch(() => {
+      notFound();
+    }) ?? undefined;
+    reservations = reservationsResponse?.data.filter(
+      (reservation) => reservation.restaurantId === restaurant._id
+    );
+  } else {
+    reservations = [];
+  }
 
   return (
     <main className=" flex  justify-center">
@@ -77,41 +97,45 @@ export default async function ({
           <Typography variant="h5" className="font-semibold">
             Available Reservation Periods
           </Typography>
-          {restaurant.reservationPeriods && (
-            <List>
-              {restaurant.reservationPeriods.map(({ start, end }, index) => {
-                const periodString = `${start}-${end}`;
-                const searchParams = new URLSearchParams({
-                  restaurantName: restaurant.name,
-                  reservationPeriod: periodString,
-                });
-                return (
-                  <ListItemButton
-                    key={index}
-                    component="a"
-                    href={`/reservations/create?${searchParams.toString()}`}
-                  >
-                    <ListItemText key={index} primary={periodString} />
-                  </ListItemButton>
-                );
-              })}
-            </List>
-          )}
+          {
+            restaurant.reservationPeriods && (
+              <List>
+                {
+                  restaurant.reservationPeriods.map(({ start, end }, index) => {
+                    const periodString = `${start}-${end}`;
+                    const searchParams = new URLSearchParams({
+                      restaurantName: restaurant.name,
+                      reservationPeriod: periodString,
+                    });
+                    return (
+                      <ListItemButton
+                        key={index}
+                        component="a"
+                        href={`/reservations/create?${searchParams.toString()}`}
+                      >
+                        <ListItemText key={index} primary={periodString} />
+                      </ListItemButton>
+                    );
+                  })
+                }
+              </List>
+            )
+          }
           <Typography variant="h5" className="font-semibold">
             Discount List
           </Typography>
           {restaurant.discounts && (
             <List>
               {restaurant.discounts.map(
-                ({ name, description, points,isValid }, index) => {
+                ({ name, description, points, isValid }, index) => {
                   return (
                     <div key={index} className="flex flex-row items-start">
-                      <p>{index+1}.</p>
+                      <p>{index + 1}.</p>
                       <ListItem className="flex flex-col items-start pt-0 pl-0 pr-0">
-                        <ListItemText primary={"name: "+name} className="ml-2"></ListItemText>
-                        <ListItemText primary={"description: "+description}  className="ml-2"></ListItemText>
-                        <ListItemText primary={"points: "+points}  className="ml-2"></ListItemText>
-                        <ListItemText primary={"can be used: "+(isValid? "yes":"no")}  className="ml-2"></ListItemText>
+                        <ListItemText primary={"name: " + name} className="ml-2"></ListItemText>
+                        <ListItemText primary={"description: " + description} className="ml-2"></ListItemText>
+                        <ListItemText primary={"points: " + points} className="ml-2"></ListItemText>
+                        <ListItemText primary={"can be used: " + (isValid ? "yes" : "no")} className="ml-2"></ListItemText>
                       </ListItem>
                     </div>
                   );
@@ -119,6 +143,23 @@ export default async function ({
               )}
             </List>
           )}
+
+          {
+            isRestaurantOwner &&
+            <>
+              <Typography variant="h5" className="font-semibold">All Reservations</Typography>
+              {
+                reservations?.map(reservation => (
+                  <ReservationInformation
+                    key={reservation._id}
+                    session={session}
+                    reservation={reservation}
+                    className={"ml-2"}
+                  ></ReservationInformation>
+                ))
+              }
+            </>
+          }
         </div>
       </div>
     </main>
