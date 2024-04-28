@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ReservationModel } from "../models/Reservation";
 import { Restaurant, RestaurantModel } from "../models/Restaurant";
-import { User, UserModel, UserType } from "../models/User";
+import { UserModel, UserType } from "../models/User";
 import { ObjectId, Document } from "mongoose";
 import { KARMA_DEDUCTED_FOR_CANCELLATION, POINTS_DEDUCTED_FOR_CANCELLATION } from "../config/constants";
 
@@ -77,7 +77,7 @@ export async function addReservation(
       room
     } = req.body;
     const reservationDate = new Date(reservationDateISOString)
-    reservationDate.setUTCHours(0,0,0,0)
+    reservationDate.setUTCHours(0, 0, 0, 0)
     const reservorId = req.user!._id;
     let existingReservations = ReservationModel.find({ reservorId, isConfirmed: false });
     const existingReservationsCount = await existingReservations.countDocuments(
@@ -167,40 +167,58 @@ export async function addReservation(
     });
   }
 }
-export async function deleteReservation(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export async function updateReservation(req: Request, res: Response, next: NextFunction) {
+  try {
+    delete req.body.reservorId;
+    let filterQuery: any = {
+      _id: req.params.id
+    };
+    if (req.user!.role != UserType.RestaurantOwner) {
+      filterQuery.reservorId = req.user!.id;
+    }
+    const reservation = await ReservationModel.findOneAndUpdate(
+      filterQuery,
+      req.body,
+      {
+        new: true,
+      })
+    if (!reservation) {
+      return res.status(400).json({
+        success: false,
+        message: "reservation not found"
+      })
+    }
+    res.status(200).json({
+      success: true,
+      data: reservation
+    })
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).json({
+      success: false
+    })
+  }
+}
+export async function deleteReservation(req: Request, res: Response, next: NextFunction) {
   try {
     const reservation = await ReservationModel.findById(req.params.id);
     if (!reservation) {
       return res.status(404).json({
-        success: false,
-      });
-    }
-    if (reservation.isConfirmed) {
-      return res.status(400).json({ success: false, message: "cannot delete this reservation" })
-    }
-    await Promise.all([
-      reservation.deleteOne(),
-      UserModel.findByIdAndUpdate(req.user!._id, {
-        $inc:
-          {
-            point: POINTS_DEDUCTED_FOR_CANCELLATION, 
-            karma: KARMA_DEDUCTED_FOR_CANCELLATION 
-          }
+        success: false
       })
-    ])
+    }
+    await reservation.deleteOne();
     return res.status(200).json({
       success: true,
-      data: {},
-    });
-  } catch (err) {
-    console.log(err);
+      data: {}
+    })
+  }
+  catch (err) {
+    console.log(err)
     res.status(400).json({
-      success: false,
-    });
+      success: false
+    })
   }
 }
 
@@ -229,12 +247,40 @@ export async function confirmReservation(req: Request, res: Response, next: Next
         message: "reservation already confirmed"
       })
     }
+    const reserver = await UserModel.findById(reservation.reservorId);
+    if (!reserver) {
+      return res.status(404).json({ success: false, message: "Cannot find user with id " + reservation.reservorId })
+    }
+
     reservation.isConfirmed = true;
-    await reservation.save();
-    return res.status(200).json({
-      success: true,
-      data: reservation
-    })
+    reserver.reservationHistory.push(reservation);
+    if (reserver.reservationHistory.length > 10) {
+      reserver.reservationHistory.shift();
+    }
+
+    console.log(reserver);
+
+    const session = await ReservationModel.startSession();
+    session.startTransaction();
+    try {
+      await reservation.save({ session });
+      await reserver.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+      await ReservationModel.findByIdAndDelete(reservation._id);
+      return res.status(200).json({
+        success: true,
+        data: reservation
+      });
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      console.log(err);
+      return res.status(400).json({
+        success: false,
+        message: "An error occurred while confirming the reservation."
+      });
+    }
   }
   catch (err) {
     console.log(err)

@@ -4,8 +4,6 @@ import useServerSession from "@/hooks/useServerSession";
 import getReservations from "@/utils/getReservations";
 import getRestaurant from "@/utils/getRestaurant";
 import getRestaurantUrl from "@/utils/getRestaurantUrl";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import getMe from "@/utils/getMe";
 import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -14,10 +12,8 @@ import {
   ReservationsResponse,
   Restaurant,
   RestaurantResponse,
-  User,
 } from "../../../interface";
 import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
-import ConfirmReservationButton from "@/components/ConfirmReservationButton";
 import ReservationInformation from "@/components/ReservationInformation";
 
 export default async function () {
@@ -30,9 +26,9 @@ export default async function () {
   const user = session.user;
 
   const reservationsResponse: ReservationsResponse = await getReservations(session?.token)
-  .catch(()=>{
-    notFound();
-  }) as ReservationsResponse
+    .catch(() => {
+      notFound();
+    }) as ReservationsResponse
   const reservations: (Reservation & {
     restaurant?: Restaurant;
   })[] = reservationsResponse.data;
@@ -82,7 +78,7 @@ export default async function () {
                   className="w-full h-full object-cover rounded-2xl"
                 />
               </Link>
-              
+
               <div className="flex flex-col self-stretch justify-between">
                 {
                   !reservation.isConfirmed && <DeleteReservationButton

@@ -3,8 +3,8 @@ import type { InferSchemaType, ObjectId } from "mongoose";
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
 import validator from "email-validator"
-import {ReservationModel} from "./Reservation"
-import { buildSchema, getModelForClass, pre, prop, queryMethod } from "@typegoose/typegoose";
+import {Reservation, ReservationModel} from "./Reservation"
+import { getModelForClass, pre, prop, Ref } from "@typegoose/typegoose";
 import { Restaurant } from "./Restaurant";
 
 export enum UserType{
@@ -13,8 +13,10 @@ export enum UserType{
 }
 
 @pre<User>("save",async function (next) {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.password) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 })
 
@@ -68,6 +70,14 @@ export class User {
   })
   public phone!: [string]
 
+  public _id!: mongoose.Types.ObjectId;
+
+  @prop({
+    ref:()=>Reservation,
+    default: [],
+  })
+  public reservationHistory!: Ref<Reservation>[]
+
   @prop({
     default: 0
   })
@@ -79,9 +89,9 @@ export class User {
   public point!: number
 
   @prop({
-    required: true
+    default: undefined
   })
-  public _id!: mongoose.Types.ObjectId
+  public lastestChurnDate?: Date
 
   async matchPassword(inputPassword:string) {
     // console.log(inputPassword,this.password)
@@ -93,60 +103,4 @@ export class User {
   }
 }
 
-// const UserSchema = new mongoose.Schema({
-//   username: {
-//     type: String,
-//     required: [true, "no username provided"],
-//     match: [/^[a-zA-Z0-9]+$/, "this username isn't allowed, username must be composed of only alphabets or numbers"],
-//     unique: true
-//   },
-//   email: {
-//     type: String,
-//     required: [true, "no email provided"],
-//     validate: [validator.validate, "not a valid email"],
-//     unique: true
-//   },
-//   role: {
-//     type: String,
-//     enum: ['user', 'restaurantOwner'],
-//     default: "user",
-//     required: true
-//   },
-//   password: {
-//     type: String,
-//     required: [true, "no password provided"],
-//     minLength: 7,
-//     select: false
-//   },
-//   joinedAt: {
-//     type: Date,
-//     default: Date.now,
-//     required: true
-//   },
-//   phone: {
-//     type: [String]
-//   }
-// },{_id:false})
-// UserSchema.pre("save", async function (next) {
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-//   next();
-// })
-// UserSchema.methods.matchPassword = async function (inputPassword:string) {
-//   // console.log(inputPassword,this.password)
-//   return await bcrypt.compare(inputPassword, this.password);
-// }
-// UserSchema.pre("deleteOne", {
-//   document: true,
-//   query: false
-// }, async function (next) {
-//   await Reservation.deleteMany({
-//     reservorId: this._id
-//   });
-//   next()
-// })
-// export type User = InferSchemaType<typeof UserSchema> & {_id:mongoose.ObjectId};
-// let UserSchema = buildSchema(User);
-// export default mongoose.model('User', UserSchema);
-// export default getModelForClass(User);
 export const UserModel = getModelForClass(User);

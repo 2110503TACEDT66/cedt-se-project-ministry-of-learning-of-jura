@@ -11,7 +11,9 @@ const env = cleanEnv(process.env,{
     PORT: num(),
     JWT_SECRET: str(),
     SUPERUSER_PASSWORD: str(),
-    MAX_IMAGE_MB_SIZE: num()
+    MAX_IMAGE_MB_SIZE: num(),
+    CHURN_DURATION: num(), //days
+    CHURN_POINTS: num()
 })
 
 export default env;

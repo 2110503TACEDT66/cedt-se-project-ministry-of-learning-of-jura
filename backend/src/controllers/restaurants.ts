@@ -51,8 +51,6 @@ export async function getRestaurants(req: Request, res: Response, next: NextFunc
   }
   query = query.select("+restaurantOwner");
 
-  query = query.select("+restaurantOwner");
-
   if (req.query.sort) {
     req.query.sort = req.query.select as string;
     const sortBy = req.query.sort.split(",").join(" ");
@@ -82,7 +80,6 @@ export async function getRestaurants(req: Request, res: Response, next: NextFunc
       
       return {
         ...restaurantJson,
-        ...((req.query.select as string[])?.includes("restaurantOwner") && {restaurantOwner}),
         isOwner: req.user?.isOwner(restaurant),
       };
     
