@@ -29,7 +29,8 @@ export class Reservation {
     public discountIndex?: number
 
     @prop({
-        required: true
+        required: true,
+        default: false
     })
     public welcomeDrink?: Boolean
 
@@ -38,6 +39,12 @@ export class Reservation {
         _id: false
     })
     public reservationPeriod!: ReservationPeriod
+
+    @prop({
+        required: true,
+        default: false
+    })
+    public isConfirmed?: Boolean
 }
 
 // const ReservationSchema = new mongoose.Schema({

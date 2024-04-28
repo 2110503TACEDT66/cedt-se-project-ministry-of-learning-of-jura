@@ -4,7 +4,7 @@ import {
     getReservations,
     getReservation,
     addReservation,
-    deleteReservation
+    deleteReservation, confirmReservation
 } from "../controllers/reservation"
 import { UserType } from "../models/User";
 const router = express.Router();
@@ -15,4 +15,6 @@ router.route("/")
 router.route("/:id")
     .get(checkToken, getReservation)
     .delete(checkToken, checkRole(UserType.User, UserType.RestaurantOwner), deleteReservation)
+router.route("/:id/confirm")
+    .post(checkToken,checkRole(UserType.RestaurantOwner),confirmReservation)
 export default router

@@ -6,7 +6,7 @@ import getRestaurant from "@/utils/getRestaurant";
 import getRestaurantUrl from "@/utils/getRestaurantUrl";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import getMe from "@/utils/getMe";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
@@ -17,6 +17,7 @@ import {
   User,
 } from "../../../interface";
 import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
+import ConfirmReservationButton from "@/components/ConfirmReservationButton";
 
 export default async function () {
   const session = await useServerSession();
@@ -108,7 +109,8 @@ export default async function () {
                         ? "you"
                         : reservation.reservorId}
                     </Typography>
-                  )}
+                                            <ConfirmReservationButton reservation={reservation}/>
+      )}
                 </div>
                 {
                   !isRestaurantOwner && <div className="flex flex-col self-stretch justify-between">

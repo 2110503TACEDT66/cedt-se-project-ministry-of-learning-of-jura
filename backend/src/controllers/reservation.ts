@@ -187,3 +187,44 @@ export async function deleteReservation(
         });
     }
 }
+
+export async function confirmReservation(req: Request,res: Response,next: NextFunction){
+    try{
+        console.log(req.params)
+        const reservation = await ReservationModel.findById(req.params.id);
+        if(!reservation){
+            return res.status(404).json({
+                success:false
+            })
+        }
+        const restaurant = await RestaurantModel.findById(reservation.restaurantId).select("restaurantOwner");
+        if (restaurant == undefined) {
+          return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
+        }
+        if (!req.user!.isOwner(restaurant)){
+            return res.status(401).json({
+                success:false,
+                message:"User is not the owner of this restaurant"
+            })
+        }
+        if (reservation.isConfirmed){
+            return res.status(400).json({
+                success:false,
+                message:"reservation already confirmed"
+            })
+        }
+        reservation.isConfirmed=true;
+        await reservation.save();
+        return res.status(200).json({
+            success:true,
+            data:reservation
+        })
+    }
+    catch(err){
+        console.log(err)
+        res.status(400).json({
+            success:false,
+            message: "An error occurred while confirming the reservation."
+        })
+    }
+}
