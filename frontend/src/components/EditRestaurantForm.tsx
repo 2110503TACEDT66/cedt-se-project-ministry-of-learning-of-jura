@@ -236,7 +236,7 @@ export default function ({
           InnerProps={MenuTextField}
           label="menu"
           onChange={(newValue) => {
-            console.log("triggered: menus",newValue)
+            console.log("triggered: menus", newValue)
             formik.setFieldValue("menus", structuredClone(newValue));
           }}
           helperTexts={formik.errors.menus as string[] | undefined}
@@ -308,6 +308,13 @@ export default function ({
             // console.log("tags newValue", newValue)
             let result = await formik.setFieldValue("tags", structuredClone(newValue));
           }}
+          helperTexts={formik.errors.tags as string[] | undefined}
+        />
+
+        <ResizableMultiInput
+          values={formik.values.rooms!}
+          label="private rooms"
+          onChange={(newValue) => { formik.setFieldValue("rooms", newValue) }}
           helperTexts={formik.errors.tags as string[] | undefined}
         />
 

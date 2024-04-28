@@ -207,7 +207,7 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
       return res.status(401).json({ success: false, message: "Not Authorized" })
     }
 
-    const { name, discounts: requestDiscounts, address, menus, openingHours, closingHours, tags, reserverCapacity, reservationPeriods } = req.body;
+    const { name, discounts: requestDiscounts, address, menus, openingHours, closingHours, tags, reserverCapacity, reservationPeriods, rooms } = req.body;
     let updateDiscounts: any = {};
     if (requestDiscounts != undefined) {
       for (let indexStr in requestDiscounts) {
@@ -226,7 +226,6 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
     if (!validUpdateDiscounts(updateDiscounts, restaurant.discounts.length)) {
       return res.status(400).json({ success: false, message: "invalid discounts" })
     }
-    // console.log(updateDiscounts);
     const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(req.params.id, {
       name,
       address,
@@ -236,6 +235,7 @@ export async function updateRestaurant(req: Request, res: Response, next: NextFu
       tags,
       reserverCapacity,
       reservationPeriods,
+      rooms,
       "$set": updateDiscounts
     }, { new: true,runValidators: true });
     res.status(200).json({ success: true, data: updatedRestaurant });
