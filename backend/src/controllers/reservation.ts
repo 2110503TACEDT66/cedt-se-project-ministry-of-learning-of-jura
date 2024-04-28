@@ -77,7 +77,7 @@ export async function addReservation(
             room
         } = req.body;
         const reservorId = req.user!._id;
-        let existingReservations = ReservationModel.find({ reservorId });
+        let existingReservations = ReservationModel.find({ reservorId, isConfirmed: false });
         const existingReservationsCount = await existingReservations.countDocuments(
             existingReservations
         );
@@ -176,6 +176,9 @@ export async function deleteReservation(
             return res.status(404).json({
                 success: false,
             });
+        }
+        if(reservation.isConfirmed){
+          return res.status(400).json({success:false,message:"cannot delete this reservation"})
         }
         await reservation.deleteOne();
         return res.status(200).json({

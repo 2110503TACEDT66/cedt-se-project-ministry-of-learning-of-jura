@@ -84,7 +84,7 @@ export interface Reservation{
     discountIndex: number,
     reservationPeriod: Period,
     isConfirmed: boolean,
-    room: string
+    room?: string
 }
 
 export interface ReservationsResponse{

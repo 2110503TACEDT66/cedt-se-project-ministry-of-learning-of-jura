@@ -101,26 +101,39 @@ export default async function () {
                 <Typography>
                   Welcome Drink:{reservation.welcomeDrink ? " Yes" : " No"}
                 </Typography>
+                <Typography>
+                  By:{" "}
+                  {reservation.reservorId == session.user._id
+                    ? "you"
+                    : reservation.reservorId}
+                </Typography>
                 {
                   <Typography>
-                    By:{" "}
-                    {reservation.reservorId == session.user._id
-                      ? "you"
-                      : reservation.reservorId}
+                    room: {reservation.room ?? "no room"}
                   </Typography>
                 }
-                {reservation.isConfirmed ? (
-                  <Typography>confirmed</Typography>
-                ) : (
-                  isRestaurantOwner && (
-                    <ConfirmReservationButton reservation={reservation} />
+                {
+                  reservation.isConfirmed ? (
+                    <Typography>confirmed</Typography>
+                  ) : (
+                    isRestaurantOwner && (
+                      <ConfirmReservationButton reservation={reservation} />
+                    )
                   )
-                )}
+                }
+              </div>
+              <div className="flex flex-col self-stretch justify-between">
+                {
+                  !reservation.isConfirmed && <DeleteReservationButton
+                    token={session.token}
+                    reservationId={reservation._id!}
+                  />
+                }
               </div>
             </div>
           );
         })}
-        {user.role != "restaurantOwner" && reservations.filter((reservation)=>!reservation.isConfirmed).length < 3 && (
+        {user.role != "restaurantOwner" && reservations.filter((reservation) => !reservation.isConfirmed).length < 3 && (
           <Link
             href="/reservations/create"
             className="bg-white hover:bg-[lightblue] text-black hover:text-black p-2 rounded-2xl border-solid border-2 border-gray"
