@@ -81,7 +81,8 @@ export interface Reservation{
     // restaurant?: Restaurant,
     welcomeDrink: boolean,
     discountIndex: number,
-    reservationPeriod: Period
+    reservationPeriod: Period,
+    isConfirmed: boolean
 }
 
 export interface ReservationsResponse{

@@ -17,7 +17,6 @@ export default async function(): Promise<Session|undefined>{
     if(response.ok){
         user = await response.json()
     }
-    console.log("user",user)
     let session: Session|undefined=undefined;
     if(user&&token){
         session={

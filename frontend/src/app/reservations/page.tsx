@@ -41,7 +41,7 @@ export default async function () {
 
   const reservations: (Reservation & {
     restaurant?: Restaurant;
-  })[] = reservationsResponse.data
+  })[] = reservationsResponse.data;
 
   for (let reservation of reservations) {
     const restaurantResponse: RestaurantResponse = await getRestaurant(
@@ -68,65 +68,59 @@ export default async function () {
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 flex-col">
-        {
-          reservations.map((reservation, index) => {
-            return (
-              <div
-                key={reservation._id}
-                className="flex h-fit items-center justify-center gap-3 p-2 rounded-2xl bg-white border-gray border-2 border-solid"
+        {reservations.map((reservation, index) => {
+          return (
+            <div
+              key={reservation._id}
+              className="flex h-fit items-center justify-center gap-3 p-2 rounded-2xl bg-white border-gray border-2 border-solid"
+            >
+              <Link
+                href={getRestaurantUrl(reservation.restaurantId)}
+                className="h-[30vw] md:h-[275px] aspect-square"
               >
-                <Link
-                  href={getRestaurantUrl(reservation.restaurantId)}
-                  className="h-[30vw] md:h-[275px] aspect-square"
-                >
-                  <RestaurantImage
-                    alt={reservation.restaurant?.name || ""}
-                    src={getServerRestaurantImageUrl(reservation.restaurantId)}
-                    width={10}
-                    height={10}
-                    sizes="25vw"
-                    // layout={'fill'}
-                    className="w-full h-full object-cover rounded-2xl"
-                  />
-                </Link>
-                <div className="">
-                  <Typography>
-                    Restaurant: {reservation.restaurant?.name}
-                  </Typography>
-                  <Typography>
-                    Reservation Date:{" "}
-                    {new Date(
-                      Date.parse(reservation.reservationDate)
-                    ).toLocaleDateString("en-UK")}
-                  </Typography>
-                  <Typography>
-                    Welcome Drink:{reservation.welcomeDrink ? " Yes" : " No"}
-                  </Typography>
-                  {isRestaurantOwner && (
-                    <Typography>
-                      By:{" "}
-                      {reservation.reservorId == session.user._id
-                        ? "you"
-                        : reservation.reservorId}
-                    </Typography>
-                                            <ConfirmReservationButton reservation={reservation}/>
-      )}
-                </div>
+                <RestaurantImage
+                  alt={reservation.restaurant?.name || ""}
+                  src={getServerRestaurantImageUrl(reservation.restaurantId)}
+                  width={10}
+                  height={10}
+                  sizes="25vw"
+                  // layout={'fill'}
+                  className="w-full h-full object-cover rounded-2xl"
+                />
+              </Link>
+              <div className="">
+                <Typography>
+                  Restaurant: {reservation.restaurant?.name}
+                </Typography>
+                <Typography>
+                  Reservation Date:{" "}
+                  {new Date(
+                    Date.parse(reservation.reservationDate)
+                  ).toLocaleDateString("en-UK")}
+                </Typography>
+                <Typography>
+                  Welcome Drink:{reservation.welcomeDrink ? " Yes" : " No"}
+                </Typography>
                 {
-                  !isRestaurantOwner && <div className="flex flex-col self-stretch justify-between">
-                    <Link href={`/reservations/edit/${reservation._id}`}>
-                      <ModeEditIcon></ModeEditIcon>
-                    </Link>
-                    <DeleteReservationButton
-                      token={session.token}
-                      reservationId={reservation._id!}
-                    />
-                  </div>
+                  <Typography>
+                    By:{" "}
+                    {reservation.reservorId == session.user._id
+                      ? "you"
+                      : reservation.reservorId}
+                  </Typography>
                 }
+                {reservation.isConfirmed ? (
+                  <Typography>confirmed</Typography>
+                ) : (
+                  isRestaurantOwner && (
+                    <ConfirmReservationButton reservation={reservation} />
+                  )
+                )}
               </div>
-            );
-          })}
-        {reservations.length < 3 && (
+            </div>
+          );
+        })}
+        {user.role != "restaurantOwner" && reservations.filter((reservation)=>!reservation.isConfirmed).length < 3 && (
           <Link
             href="/reservations/create"
             className="bg-white hover:bg-[lightblue] text-black hover:text-black p-2 rounded-2xl border-solid border-2 border-gray"

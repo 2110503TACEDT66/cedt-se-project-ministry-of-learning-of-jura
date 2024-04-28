@@ -34,7 +34,7 @@ export default async function ({
         <div>
           <RestaurantImage
             alt={restaurant.name}
-            src={await getServerRestaurantImageUrl(params.restaurantId)}
+            src={getServerRestaurantImageUrl(params.restaurantId)}
             width={400}
             height={400}
             sizes={"100vw"}
@@ -100,7 +100,7 @@ export default async function ({
           <Typography variant="h5" className="font-semibold">
             Discount List
           </Typography>
-          {restaurant.discounts ? (
+          {restaurant.discounts && (
             <List>
               {restaurant.discounts.map(
                 ({ name, description, points,isValid }, index) => {
@@ -118,7 +118,7 @@ export default async function ({
                 }
               )}
             </List>
-          ) : null}{" "}
+          )}
         </div>
       </div>
     </main>
