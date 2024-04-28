@@ -4,10 +4,14 @@ import restaurantRoute from "./routes/restaurant"
 import authRoute from "./routes/auth"
 import { connectDB } from "./config/connectDB";
 import reservationRouter from "./routes/reservation";
+import reservationScheduler from "./utils/reservationScheduler"; 
 import cors from 'cors'
 const app = express();
 
-connectDB();
+connectDB()
+.then(()=>{
+  reservationScheduler.start()
+})
 
 app.use(cors({
     origin: 'http://localhost:3000' // Replace with your frontend's origin

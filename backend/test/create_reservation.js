@@ -2,9 +2,9 @@ module.exports=async function(env){
     const body = {
         // restaurantId:env.RESTAURANT_ID,
         restaurantName:"som ting wong",
-        reservationDate: new Date(),
+        reservationDate: new Date(new Date().setDate(new Date().getDate()-1)).toISOString(),
         reservationPeriod: {
-            start: "10:00",
+            start: "11:00",
             end: "12:00"
         },
         // discountIndex:0,

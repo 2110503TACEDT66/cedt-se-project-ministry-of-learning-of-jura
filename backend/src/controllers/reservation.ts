@@ -69,13 +69,15 @@ export async function addReservation(
   try {
     let {
       restaurantId,
-      reservationDate,
+      reservationDate: reservationDateISOString,
       restaurantName,
       discountIndex,
       welcomeDrink,
       reservationPeriod,
       room
     } = req.body;
+    const reservationDate = new Date(reservationDateISOString)
+    reservationDate.setUTCHours(0,0,0,0)
     const reservorId = req.user!._id;
     let existingReservations = ReservationModel.find({ reservorId, isConfirmed: false });
     const existingReservationsCount = await existingReservations.countDocuments(
