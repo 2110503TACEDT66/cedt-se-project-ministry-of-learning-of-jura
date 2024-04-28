@@ -2,6 +2,7 @@
 import useSession from "@/hooks/useSession";
 import { Button, TextField } from "@mui/material";
 import { Formik } from "formik";
+import { useRouter } from "next/navigation";
 import * as yup from "yup";
 
 const validationSchema = yup.object({
@@ -16,6 +17,7 @@ const validationSchema = yup.object({
   });
 
 export default function(){
+    const router = useRouter();
     const {session, updateSession} = useSession();
     return (
       <main>
@@ -45,7 +47,8 @@ export default function(){
                     }
                     await updateSession(token)
                     setSubmitting(false)
-                    return;
+                    router.push("/")
+                    router.refresh();
                 }}
             >
                 {({
