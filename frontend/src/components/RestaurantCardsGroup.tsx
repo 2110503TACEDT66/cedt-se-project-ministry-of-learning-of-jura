@@ -13,7 +13,7 @@ export default function({
     tag: string,
     currentIndex: number
 }){
-    console.log("restaurants",currentIndex,restaurants)
+    // console.log("restaurants",currentIndex,restaurants)
     return (
         <div className="flex justify-evenly align-center md:gap-1 sm:gap-0">
             {

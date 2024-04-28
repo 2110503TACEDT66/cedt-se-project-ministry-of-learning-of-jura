@@ -6,36 +6,32 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface Props extends Omit<React.ComponentProps<typeof Image>,"src">{
-    restaurantId: string,
-    onLoad: ()=>void
+    restaurantId?: string,
+    src?: string,
+    onLoad?: ()=>void
 }
 
 export default function({
     restaurantId,
+    src,
     ...rest
 }:Props){
-    const initialImage = getClientRestaurantImageUrl(restaurantId);
+    if(restaurantId==undefined&&src==undefined){
+        throw new Error("restaurantId or src must be specified")
+    }
+    const initialImage = src ?? getClientRestaurantImageUrl(restaurantId!);
+    // console.log("initialImage",initialImage)
     const [imgSrc, setImgSrc] = useState<string>(initialImage);
-
-    useEffect(() => {
-        const fetchImage = async () => {
-            try {
-                const imageData = await getRestaurantImageData(imgSrc);
-                setImgSrc(imageData);
-            } catch (error) {
-                console.error("Error fetching image:", error);
-            }
-        };
-        fetchImage();
-    }, []);
 
     return (
         <Image
             {...rest}
             src={imgSrc}
-            onError={() => {
+            onError={(e) => {
+                e.stopPropagation();
                 setImgSrc(`/img/pure_logo.jpg`);
             }}
+            priority={true}
         ></Image>
     )
 }

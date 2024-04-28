@@ -55,9 +55,12 @@ export default function({
                 imageLoaded? "" : `overflow-hidden h-[280px]`
             } relative md:w-[250px] sm:w-1/3 rounded-2xl p-2 border-solid border-2 border-grey text-black bg-white`}
         >
-            <Link href={`/restaurants/${restaurant._id}`} className="relative">
-                {!imageLoaded && (
-                    <div className="w-full">
+            <Link href={`/restaurants/${restaurant._id}`} className="relative w-full block">
+                {
+                (
+                    <div className={`w-full absolute ${
+                        imageLoaded? "opacity-0":"opacity-1"
+                    }`}>
                         <div className="w-full rounded-2xl overflow-hidden aspect-square">
                             <Skeleton className="w-full rounded-2xl aspect-square"></Skeleton>
                         </div>

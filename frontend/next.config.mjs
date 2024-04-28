@@ -2,7 +2,12 @@
 
 const nextConfig = {
     images: {
-        domains: ["localhost",`${process.env.BACKEND_URL}`],
+        remotePatterns: [
+            {
+                hostname: 'localhost'
+            }
+        ],
+
     },
 };
 

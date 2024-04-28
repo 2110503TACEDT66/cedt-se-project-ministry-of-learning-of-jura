@@ -16,6 +16,7 @@ import {
   RestaurantResponse,
   User,
 } from "../../../interface";
+import getServerRestaurantImageUrl from "@/utils/getServerRestaurantImageUrl";
 
 export default async function () {
   const session = await useServerSession();
@@ -79,7 +80,7 @@ export default async function () {
                 >
                   <RestaurantImage
                     alt={reservation.restaurant?.name || ""}
-                    src={"/img/pure_logo.jpg"}
+                    src={getServerRestaurantImageUrl(reservation.restaurantId)}
                     width={10}
                     height={10}
                     sizes="25vw"
