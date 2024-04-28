@@ -45,6 +45,12 @@ export class Reservation {
         default: false
     })
     public isConfirmed?: Boolean
+
+    @prop({
+        type: String,
+        required: false,
+    })
+    public room?: string
 }
 
 // const ReservationSchema = new mongoose.Schema({

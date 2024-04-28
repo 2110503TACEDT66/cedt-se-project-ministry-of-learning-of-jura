@@ -34,7 +34,8 @@ export interface Restaurant{
     discounts : DiscountWithEdit[],
     tags: string[],
     _id: string,
-    isOwner?: boolean
+    isOwner?: boolean,
+    rooms?: string[]
 }
 export interface DiscountWithEdit extends Discount{
     canEdit?: boolean
@@ -82,7 +83,8 @@ export interface Reservation{
     welcomeDrink: boolean,
     discountIndex: number,
     reservationPeriod: Period,
-    isConfirmed: boolean
+    isConfirmed: boolean,
+    room: string
 }
 
 export interface ReservationsResponse{

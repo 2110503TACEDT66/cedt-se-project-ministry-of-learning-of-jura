@@ -13,9 +13,10 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  InputLabel
 } from "@mui/material";
 import { useFormik } from "formik";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, SyntheticEvent, useEffect, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -51,6 +52,7 @@ export default function ({
   const [restaurantsList, setRestaurantsList] = useState<string[]>([]);
   const [periodsList, setPeriodsList] = useState<Period[][]>([]);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
+  const [roomList, setRoomList] = useState<string[]>([]);
   const [alertMessages, setAlertMessage] = useState<{
     title: string | null,
     description: string | null
@@ -67,7 +69,8 @@ export default function ({
       reservationDate: undefined,
       discountIndex: undefined,
       reservationPeriod: parsePeriod(reservationPeriod),
-      welcomeDrink: false
+      welcomeDrink: false,
+      room: undefined
     },
     async onSubmit(_values) {
       let discount = discountsList[0][0]
@@ -106,7 +109,7 @@ export default function ({
       return
     }
     value = value.trim();
-    const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts,reservationPeriods`)
+    const restaurantsResponse = await fetch(`/api/restaurants?name[regex]=${value}&select=name,discounts,reservationPeriods,rooms`)
       .then((res) => {
         return res.json()
       })
@@ -126,12 +129,22 @@ export default function ({
       }
     )
     setPeriodsList(newPeriodsList)
+
+    const newRoomList = restaurantsResponse.data.map((restaurant: Restaurant) => {
+      return restaurant.rooms;
+    }).flat();
+    setRoomList(newRoomList);
   }
 
-  async function onDiscountChange(e: SelectChangeEvent<unknown>) {
+  async function onDiscountChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     console.log(e.target);
     formik.setFieldValue("discountIndex", e.target.value);
     console.log(formik.values.discountIndex);
+  }
+  async function onRoomChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    console.log(e.target);
+    formik.setFieldValue("room", e.target.value);
+    console.log(formik.values.room);
   }
 
   return (
@@ -191,11 +204,13 @@ export default function ({
           ></DatePicker>
         </LocalizationProvider>
 
-        <Select
+        <TextField
+          select
           value={JSON.stringify(formik.values.reservationPeriod)}
-          onChange={(e)=>{
-            formik.setFieldValue("reservationPeriod",JSON.parse(e.target.value))
+          onChange={(e) => {
+            formik.setFieldValue("reservationPeriod", JSON.parse(e.target.value))
           }}
+          label="Reservation Period"
         >
           {
             restaurantsList[0] == formik.values.restaurantName &&
@@ -214,10 +229,13 @@ export default function ({
                 );
               })
           }
-        </Select>
-        <Select
+        </TextField>
+        
+        <TextField
+          select
           onChange={onDiscountChange}
           value={formik.values.discountIndex ?? ""}
+          label={"Discount"}
         >
           {
             restaurantsList.length === 1 &&
@@ -229,7 +247,22 @@ export default function ({
               </MenuItem>
             ))
           }
-        </Select>
+        </TextField>
+
+        <TextField
+          select
+          onChange={onRoomChange}
+          value={formik.values.room}
+          label="Room"
+        >
+          {
+            roomList.map((room, index) => (
+              <MenuItem key={index} value={room}>
+                {room}
+              </MenuItem>
+            ))
+          }
+        </TextField>
 
         <FormControlLabel
           control={

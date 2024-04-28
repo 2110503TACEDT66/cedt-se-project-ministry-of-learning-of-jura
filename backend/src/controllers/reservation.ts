@@ -73,7 +73,8 @@ export async function addReservation(
             restaurantName,
             discountIndex,
             welcomeDrink,
-            reservationPeriod
+            reservationPeriod,
+            room
         } = req.body;
         const reservorId = req.user!._id;
         let existingReservations = ReservationModel.find({ reservorId });
@@ -87,11 +88,11 @@ export async function addReservation(
             });
         }
 
-        if(restaurantId==undefined && restaurantName!=undefined){
-            let restaurantResponse:(Restaurant&Document) |null = await RestaurantModel.findOne({
-                name:restaurantName
+        if (restaurantId == undefined && restaurantName != undefined) {
+            let restaurantResponse: (Restaurant & Document) | null = await RestaurantModel.findOne({
+                name: restaurantName
             });
-            restaurantId=restaurantResponse?._id;
+            restaurantId = restaurantResponse?._id;
         }
 
         //Implement checking capacity when making a reservation
@@ -100,13 +101,13 @@ export async function addReservation(
                 restaurantId,
                 reservationPeriod
             }),
-            RestaurantModel.findOne({_id:restaurantId}),
+            RestaurantModel.findOne({ _id: restaurantId }),
         ]);
-        if(restaurant==undefined){
-            return res.status(404).json({success:false});
+        if (restaurant == undefined) {
+            return res.status(404).json({ success: false });
         }
-        restaurantId=restaurant?._id;
-        restaurantName=restaurant?.name;
+        restaurantId = restaurant?._id;
+        restaurantName = restaurant?.name;
         const capacity = restaurant?.reserverCapacity;
 
         if (reservationCount >= capacity!) {
@@ -116,8 +117,8 @@ export async function addReservation(
             });
         }
 
-        if (!restaurant?.reservationPeriods.some((period)=>period.equals(reservationPeriod))){
-            return res.status(400).json({success:false,message:"wrong period"})
+        if (!restaurant?.reservationPeriods.some((period) => period.equals(reservationPeriod))) {
+            return res.status(400).json({ success: false, message: "wrong period" })
         }
 
         let pointsToDeduct = 0;
@@ -150,7 +151,8 @@ export async function addReservation(
             reservationDate,
             welcomeDrink,
             discountIndex,
-            reservationPeriod
+            reservationPeriod,
+            room
         });
         res.status(201).json({
             success: true,
@@ -188,42 +190,42 @@ export async function deleteReservation(
     }
 }
 
-export async function confirmReservation(req: Request,res: Response,next: NextFunction){
-    try{
+export async function confirmReservation(req: Request, res: Response, next: NextFunction) {
+    try {
         console.log(req.params)
         const reservation = await ReservationModel.findById(req.params.id);
-        if(!reservation){
+        if (!reservation) {
             return res.status(404).json({
-                success:false
+                success: false
             })
         }
         const restaurant = await RestaurantModel.findById(reservation.restaurantId).select("restaurantOwner");
         if (restaurant == undefined) {
-          return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
+            return res.status(404).json({ success: false, message: "cannot find restaurant with id " + req.params.id })
         }
-        if (!req.user!.isOwner(restaurant)){
+        if (!req.user!.isOwner(restaurant)) {
             return res.status(401).json({
-                success:false,
-                message:"User is not the owner of this restaurant"
+                success: false,
+                message: "User is not the owner of this restaurant"
             })
         }
-        if (reservation.isConfirmed){
+        if (reservation.isConfirmed) {
             return res.status(400).json({
-                success:false,
-                message:"reservation already confirmed"
+                success: false,
+                message: "reservation already confirmed"
             })
         }
-        reservation.isConfirmed=true;
+        reservation.isConfirmed = true;
         await reservation.save();
         return res.status(200).json({
-            success:true,
-            data:reservation
+            success: true,
+            data: reservation
         })
     }
-    catch(err){
+    catch (err) {
         console.log(err)
         res.status(400).json({
-            success:false,
+            success: false,
             message: "An error occurred while confirming the reservation."
         })
     }

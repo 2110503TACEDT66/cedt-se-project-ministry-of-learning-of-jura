@@ -166,7 +166,7 @@ export async function getRestaurant(req: Request, res: Response, next: NextFunct
 export async function createRestaurant(req: Request, res: Response, next: NextFunction) {
   try {
     const restaurantOwner = req.user!._id;
-    const { name, address, menus, openingHours, closingHours, discounts, tags, reserverCapacity, reservationPeriods } = req.body;
+    const { name, address, menus, openingHours, closingHours, discounts, tags, reserverCapacity, reservationPeriods, rooms } = req.body;
     const requestRestaurant: Omit<Restaurant,"_id"> = {
       name, 
       address, 
@@ -177,7 +177,8 @@ export async function createRestaurant(req: Request, res: Response, next: NextFu
       tags, 
       reserverCapacity, 
       reservationPeriods,
-      restaurantOwner
+      restaurantOwner,
+      rooms
     }
     const restaurant = await RestaurantModel.create(requestRestaurant);
     res.status(201).json({ success: true, data: restaurant });
