@@ -79,6 +79,12 @@ export default async function () {
                 />
               </Link>
 
+              <ReservationInformation
+                session={session}
+                reservation={reservation!}
+              ></ReservationInformation>
+
+
               <div className="flex flex-col self-stretch justify-between">
                 {
                   !reservation.isConfirmed && <DeleteReservationButton
@@ -87,10 +93,6 @@ export default async function () {
                   />
                 }
               </div>
-              <ReservationInformation
-                session={session}
-                reservation={reservation!}
-              ></ReservationInformation>
             </div>
           );
         })}
