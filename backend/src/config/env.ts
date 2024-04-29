@@ -6,6 +6,8 @@ dotenv.config({
 });
 const env = cleanEnv(process.env, {
   MONGO_URI: str(),
+  HOST: str(),
+  FRONTEND: str(),
   DEPLOY_MODE: str(),
   JWT_EXPIRING_DAYS: num(),
   PORT: num(),

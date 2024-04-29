@@ -1,11 +1,12 @@
 import swaggerAutogen from "swagger-autogen";
+import env from "./config/env";
 
 const doc = {
   info: {
     title: "Bing Resy",
     description: "Restaurant Reservation Service",
   },
-  host: "localhost:6969",
+  host: env.HOST,
 };
 
 const outputFile = "../swagger/output.json";

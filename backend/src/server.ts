@@ -18,7 +18,7 @@ connectDB().then(() => {
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: env.FRONTEND,
   }),
 );
 app.use(express.json());
