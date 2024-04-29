@@ -48,6 +48,42 @@ describe("TC1-1", () => {
     expect(result.body.success).toBe(false);
   })
 
+  test("TC1-1-3",async () => {
+    const result = await request(app)
+      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .set('Accept', 'application/json')
+      .set("Authorization",`Bearer ${token}`)
+    expect(result.body.success).toBe(false);
+  })
+  
+  test("TC1-1-4",async () => {
+    const emailAndPass = {
+      email:"restaurantOwner2@gmail.com",
+      password:"12345678"
+    }
+    let loginResult = await request(app)
+      .post("/api/v1/auth/login")
+      .send(emailAndPass)
+      .set("Content-Type","application/json")
+      .set('Accept', 'application/json')
+    let otherUserToken = loginResult.body.token
+    const result = await request(app)
+      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .set('Accept', 'application/json')
+      .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
+      .set("Authorization",`Bearer ${otherUserToken}`)
+    expect(result.body.success).toBe(false);
+  })
+  
+  test("TC1-1-5",async () => {
+    const result = await request(app)
+      .post("/api/v1/restaurants/gfgdgdgf/image")
+      .set('Accept', 'application/json')
+      .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
+      .set("Authorization",`Bearer ${token}`)
+    expect(result.body.success).toBe(false);
+  })
+
   afterAll((done)=>{
     cronTask.stop();
     mongoose.connection.close();
