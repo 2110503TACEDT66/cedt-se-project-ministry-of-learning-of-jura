@@ -5,15 +5,15 @@ export const config = {
 };
 
 export function middleware(request: NextRequest) {
-  const matches=request.nextUrl.pathname.match(/api\/(.*)?/);
-  if(matches==undefined || matches.length<=1){
-    throw new Error("invalid path "+request.nextUrl.pathname)
+  const matches = request.nextUrl.pathname.match(/api\/(.*)?/);
+  if (matches == undefined || matches.length <= 1) {
+    throw new Error("invalid path " + request.nextUrl.pathname);
   }
   const path = matches[1];
   return NextResponse.rewrite(
     new URL(
-      `${process.env.BACKEND_URL}/api/v1/${path}${request.nextUrl.search}`
+      `${process.env.BACKEND_URL}/api/v1/${path}${request.nextUrl.search}`,
     ),
-    { request }
+    { request },
   );
 }

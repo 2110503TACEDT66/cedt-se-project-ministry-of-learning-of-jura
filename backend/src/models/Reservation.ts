@@ -1,56 +1,56 @@
 import mongoose, { ObjectId } from "mongoose";
-import Discount from "./Discount"
+import Discount from "./Discount";
 import { Ref, buildSchema, getModelForClass, prop } from "@typegoose/typegoose";
 import { User } from "./User";
-import {Restaurant} from "./Restaurant"
+import { Restaurant } from "./Restaurant";
 import ReservationPeriod from "./ReservationPeriod";
 
 export class Reservation {
-    @prop({
-        ref:"User",
-        required:true
-    })
-    public reservorId!: Ref<User>
+  @prop({
+    ref: "User",
+    required: true,
+  })
+  public reservorId!: Ref<User>;
 
-    @prop({
-        ref:"Restaurant",
-        required:true
-    })
-    public restaurantId!: Ref<Restaurant>;
+  @prop({
+    ref: "Restaurant",
+    required: true,
+  })
+  public restaurantId!: Ref<Restaurant>;
 
-    @prop({
-        required:true
-    })
-    public reservationDate!: Date
+  @prop({
+    required: true,
+  })
+  public reservationDate!: Date;
 
-    @prop({
-        required: false,
-    })
-    public discountIndex?: number
+  @prop({
+    required: false,
+  })
+  public discountIndex?: number;
 
-    @prop({
-        required: true,
-        default: false
-    })
-    public welcomeDrink?: Boolean
+  @prop({
+    required: true,
+    default: false,
+  })
+  public welcomeDrink?: Boolean;
 
-    @prop({
-        required: true,
-        _id: false
-    })
-    public reservationPeriod!: ReservationPeriod
+  @prop({
+    required: true,
+    _id: false,
+  })
+  public reservationPeriod!: ReservationPeriod;
 
-    @prop({
-        required: true,
-        default: false
-    })
-    public isConfirmed?: Boolean
+  @prop({
+    required: true,
+    default: false,
+  })
+  public isConfirmed?: Boolean;
 
-    @prop({
-        type: String,
-        required: false,
-    })
-    public room?: string
+  @prop({
+    type: String,
+    required: false,
+  })
+  public room?: string;
 }
 
 // const ReservationSchema = new mongoose.Schema({

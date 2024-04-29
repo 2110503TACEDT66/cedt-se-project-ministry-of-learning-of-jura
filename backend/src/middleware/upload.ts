@@ -4,7 +4,11 @@ import mbToBytes from "../utils/mbToBytes";
 import multer from "multer";
 import { NextFunction, Request, Response, response } from "express";
 export default function upload(maxSize: number, allowedMimeTypes: string[]) {
-  function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
+  function fileFilter(
+    req: Request,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback,
+  ) {
     if (allowedMimeTypes.includes(file.mimetype)) {
       return cb(null, true);
     }
@@ -33,4 +37,4 @@ export default function upload(maxSize: number, allowedMimeTypes: string[]) {
       res.status(500).json({ success: false });
     });
   };
-};
+}

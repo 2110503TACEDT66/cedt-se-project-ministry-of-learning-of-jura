@@ -14,7 +14,7 @@
 //     token:string,
 //     reservationId:string
 // }){
-    
+
 //     const [restaurantsList,setRestaurantsList] = useState<string[]>([]);
 //     const [isAlerting,setIsAlerting] = useState<boolean>(false);
 //     const [alertMessages,setAlertMessage] = useState<{
@@ -31,7 +31,7 @@
 //         },
 //         async onSubmit(values,{setSubmitting, setErrors}){
 //             const {restaurantName,reservationDate} = formik.values
-            
+
 //             const restaurantResponse: RestaurantsResponse = await fetch(`/api/restaurants/?name=${restaurantName}`,{
 //                 method:"GET",
 //                 headers:{
@@ -113,9 +113,9 @@
 //                     options={restaurantsList}
 //                     filterOptions={(options, state) => options}
 //                     // sx={{ width: 300 }}
-//                     renderInput={(params) => <TextField 
-//                         {...params} 
-//                         label="Restaurant Name" 
+//                     renderInput={(params) => <TextField
+//                         {...params}
+//                         label="Restaurant Name"
 //                         InputProps={{
 //                             ...params.InputProps,
 //                             // type: 'search',
@@ -138,7 +138,7 @@
 //                         }}
 //                     ></DatePicker>
 //                 </LocalizationProvider>
-//                 <Button 
+//                 <Button
 //                     type="submit"
 //                     disabled={formik.isSubmitting}
 //                 >

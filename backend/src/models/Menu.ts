@@ -1,14 +1,14 @@
-import { prop } from "@typegoose/typegoose"
+import { prop } from "@typegoose/typegoose";
 
-export default class Menu{
+export default class Menu {
   @prop({
-    required:true
+    required: true,
   })
-  public name!: string
+  public name!: string;
 
   @prop({
-    required:true,
-    min:1
+    required: true,
+    min: 1,
   })
-  public price!: number
+  public price!: number;
 }

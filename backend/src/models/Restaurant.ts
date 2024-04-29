@@ -1,9 +1,15 @@
-import File from "./File"
+import File from "./File";
 import { timeRegex, invalidTimeMsg } from "../config/constants";
-import {ReservationModel, Reservation} from "./Reservation";
-import Discount from "./Discount"
-import { Ref, getModelForClass, mongoose, pre, prop } from "@typegoose/typegoose";
-import {User} from "./User";
+import { ReservationModel, Reservation } from "./Reservation";
+import Discount from "./Discount";
+import {
+  Ref,
+  getModelForClass,
+  mongoose,
+  pre,
+  prop,
+} from "@typegoose/typegoose";
+import { User } from "./User";
 import Menu from "./Menu";
 import ReservationPeriod from "./ReservationPeriod";
 
@@ -18,78 +24,76 @@ import ReservationPeriod from "./ReservationPeriod";
     });
     next();
   },
-  { document: true, query: false }
+  { document: true, query: false },
 )
 export class Restaurant {
   @prop({
     required: true,
     unique: true,
     index: true,
-    minlength: 1
+    minlength: 1,
   })
-  public name!: string
+  public name!: string;
 
   @prop({
     unique: true,
     required: true,
-    minlength: 1
+    minlength: 1,
   })
-  public address!: string
+  public address!: string;
 
   @prop({
     type: [Menu],
     _id: false,
-    default: []
+    default: [],
   })
-  public menus!: [Menu]
+  public menus!: [Menu];
 
   @prop({
     required: true,
-    match: [timeRegex, invalidTimeMsg]
+    match: [timeRegex, invalidTimeMsg],
   })
-  public openingHours!: string
+  public openingHours!: string;
 
   @prop({
     required: true,
-    match: [timeRegex, invalidTimeMsg]
+    match: [timeRegex, invalidTimeMsg],
   })
-  public closingHours!: string
+  public closingHours!: string;
 
-  
   @prop({
     required: true,
-    ref: ()=>User,
+    ref: () => User,
     select: false,
-
   })
-  public restaurantOwner!: Ref<User>
+  public restaurantOwner!: Ref<User>;
 
   @prop({
     type: [Discount],
     default: [],
-    _id: true
+    _id: true,
   })
-  public discounts!: [Discount]
-  
+  public discounts!: [Discount];
+
   @prop({
     type: [String],
     required: true,
   })
-  public tags!: [string]
+  public tags!: [string];
 
   @prop({
     required: true,
     min: 1,
   })
-  public reserverCapacity!: number
+  public reserverCapacity!: number;
 
   @prop({
     _id: false,
     validate: (array: any) => array.length >= 1,
     type: [ReservationPeriod],
-    required: true
+    required: true,
   })
-  public reservationPeriods!: [ReservationPeriod]
+  public reservationPeriods!: [ReservationPeriod];
 
   @prop({
     ref: "Reservation",
@@ -98,13 +102,13 @@ export class Restaurant {
     justOne: false,
   })
   public reservations?: Ref<Reservation>;
-  
+
   @prop({
     type: [String],
     required: true,
-    default: []
+    default: [],
   })
-  public rooms!: [string]
+  public rooms!: [string];
 
   public _id!: mongoose.Types.ObjectId;
 }

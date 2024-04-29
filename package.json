@@ -30,6 +30,9 @@
     "setup:frontend": "cd frontend && bun install",
     "npm:setup": "npm install && npm run npm:setup:backend && npm run npm:setup:frontend",
     "npm:setup:backend": "cd backend && npm install",
-    "npm:setup:frontend": "cd frontend && npm install"
+    "npm:setup:frontend": "cd frontend && npm install",
+    "format": "concurrently \"npm:format:*\"",
+    "format:backend": "cd backend && npm run format",
+    "format:frontend": "cd frontend && npm run format"
   }
 }

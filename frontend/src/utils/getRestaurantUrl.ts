@@ -1,3 +1,3 @@
-export default function(restaurantId: string){
-    return `/restaurants/${restaurantId}`
+export default function (restaurantId: string) {
+  return `/restaurants/${restaurantId}`;
 }

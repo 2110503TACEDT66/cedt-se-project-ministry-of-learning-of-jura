@@ -10,10 +10,10 @@ import { buildSchema, modelOptions, pre, prop } from "@typegoose/typegoose";
   },
   {
     document: true,
-    query: false
-  }
+    query: false,
+  },
 )
-@modelOptions({ schemaOptions: { collection: 'fs.files' } })
+@modelOptions({ schemaOptions: { collection: "fs.files" } })
 class File {
   @prop({
     required: true,
@@ -21,8 +21,7 @@ class File {
     unique: true,
   })
   public filename!: string;
-};
-
+}
 
 // const FilesSchema = new mongoose.Schema(
 //   {

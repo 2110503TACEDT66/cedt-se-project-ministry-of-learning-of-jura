@@ -25,17 +25,18 @@ export default async function () {
 
   const user = session.user;
 
-  const reservationsResponse: ReservationsResponse = await getReservations(session?.token)
-    .catch(() => {
-      notFound();
-    }) as ReservationsResponse
+  const reservationsResponse: ReservationsResponse = (await getReservations(
+    session?.token,
+  ).catch(() => {
+    notFound();
+  })) as ReservationsResponse;
   const reservations: (Reservation & {
     restaurant?: Restaurant;
   })[] = reservationsResponse.data;
 
   for (let reservation of reservations) {
     const restaurantResponse: RestaurantResponse = await getRestaurant(
-      reservation.restaurantId
+      reservation.restaurantId,
     );
     const restaurant = restaurantResponse.data;
     reservation.restaurant = restaurant;
@@ -84,26 +85,27 @@ export default async function () {
                 reservation={reservation!}
               ></ReservationInformation>
 
-
               <div className="flex flex-col self-stretch justify-between">
-                {
-                  !reservation.isConfirmed && <DeleteReservationButton
+                {!reservation.isConfirmed && (
+                  <DeleteReservationButton
                     token={session.token}
                     reservationId={reservation._id!}
                   />
-                }
+                )}
               </div>
             </div>
           );
         })}
-        {user.role != "restaurantOwner" && reservations.filter((reservation) => !reservation.isConfirmed).length < 3 && (
-          <Link
-            href="/reservations/create"
-            className="bg-white hover:bg-[lightblue] text-black hover:text-black p-2 rounded-2xl border-solid border-2 border-gray"
-          >
-            reserve now!
-          </Link>
-        )}
+        {user.role != "restaurantOwner" &&
+          reservations.filter((reservation) => !reservation.isConfirmed)
+            .length < 3 && (
+            <Link
+              href="/reservations/create"
+              className="bg-white hover:bg-[lightblue] text-black hover:text-black p-2 rounded-2xl border-solid border-2 border-gray"
+            >
+              reserve now!
+            </Link>
+          )}
       </div>
     </div>
   );

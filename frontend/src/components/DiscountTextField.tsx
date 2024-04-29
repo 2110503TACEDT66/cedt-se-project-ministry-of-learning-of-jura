@@ -6,7 +6,12 @@ import {
 } from "@mui/material";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { DeepPartial, Discount, DiscountWithEdit, ResizableMultiInputEvent } from "../../interface";
+import {
+  DeepPartial,
+  Discount,
+  DiscountWithEdit,
+  ResizableMultiInputEvent,
+} from "../../interface";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -28,7 +33,7 @@ export default function ({
   };
   value: DeepPartial<DiscountWithEdit> | undefined;
 }) {
-  const initialCanEdit = value?.canEdit ?? true
+  const initialCanEdit = value?.canEdit ?? true;
 
   const nameErrorMessage = "name must be string";
   const descriptionErrorMessage = "description must be string";
@@ -37,7 +42,10 @@ export default function ({
   const ValidationSchema = yup.object({
     name: yup.string().required(nameErrorMessage),
     description: yup.string().required(descriptionErrorMessage),
-    points: yup.number().required(pointsErrorMessage).typeError(pointsErrorMessage),
+    points: yup
+      .number()
+      .required(pointsErrorMessage)
+      .typeError(pointsErrorMessage),
     isValid: yup.boolean().required(isValidErrorMessage),
   });
   const formik = useFormik<{
@@ -67,7 +75,7 @@ export default function ({
           description,
           points,
           isValid,
-          canEdit: initialCanEdit
+          canEdit: initialCanEdit,
         },
       },
     });
@@ -114,11 +122,11 @@ export default function ({
             id="isValid"
             disabled={!initialCanEdit}
             control={
-              <Checkbox 
+              <Checkbox
                 id="isValid"
                 defaultChecked={initialCanEdit}
                 value={formik.values.isValid}
-                onChange={formik.handleChange} 
+                onChange={formik.handleChange}
               />
             }
             label={formik.values.isValid ? "valid" : "invalid"}

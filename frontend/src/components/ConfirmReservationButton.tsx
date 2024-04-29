@@ -1,37 +1,46 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import { Reservation } from "../../interface";
 import useSession from "@/hooks/useSession";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function ConfirmReservationButton({
-  reservation
+  reservation,
 }: {
-  reservation: Reservation
+  reservation: Reservation;
 }) {
   const { session } = useSession();
-  const [isOpen,setIsOpen] = useState(false);
-  const [title,setTitle] = useState("");
-  const [content,setContent] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const router = useRouter();
   const handleConfirmationClick = async () => {
-    const response = await fetch(`/api/reservations/${reservation._id}/confirm`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${session?.token}`
-      }
-    })
+    const response = await fetch(
+      `/api/reservations/${reservation._id}/confirm`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session?.token}`,
+        },
+      },
+    );
     const responseJson = await response.json();
     if (responseJson.success) {
-      setTitle("Confirmed!")
-      setContent("Click ok to refresh")
+      setTitle("Confirmed!");
+      setContent("Click ok to refresh");
       setIsOpen(true);
-      return; 
+      return;
     }
-    setTitle("Error Occured!")
-    setContent("Click ok to refresh")
-    setIsOpen(true)
+    setTitle("Error Occured!");
+    setContent("Click ok to refresh");
+    setIsOpen(true);
   };
 
   async function onOkClick() {
@@ -41,15 +50,11 @@ export default function ConfirmReservationButton({
 
   return (
     <>
-      <Dialog
-        open={isOpen}
-      >
+      <Dialog open={isOpen}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>{content}</DialogContent>
         <DialogActions>
-          <Button onClick={onOkClick}>
-            ok
-          </Button>
+          <Button onClick={onOkClick}>ok</Button>
         </DialogActions>
       </Dialog>
       <button

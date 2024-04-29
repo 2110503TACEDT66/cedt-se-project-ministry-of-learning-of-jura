@@ -1,3 +1,3 @@
-export default function(relativeUrl:string){
-    return process.env.BACKEND_URL+relativeUrl;
+export default function (relativeUrl: string) {
+  return process.env.BACKEND_URL + relativeUrl;
 }

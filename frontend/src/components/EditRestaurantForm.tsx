@@ -1,46 +1,61 @@
-"use client"
-import { useFormik } from "formik"
-import { DeepPartial, Discount, Menu, RestaurantResponse, Restaurant, Period, DiscountWithEdit } from "@/../interface"
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
-import ResizableMultiInput from "@/components/ResizableMultiInput"
-import * as yup from "yup"
-import hourRegex from "@/constants/hourRegex"
-import useSession from "@/hooks/useSession"
-import { ChangeEvent, useEffect, useState } from "react"
-import { IconButton } from "@mui/material"
-import FileUploadIcon from "@mui/icons-material/FileUpload"
-import { Delete } from "@mui/icons-material"
-import { useRouter } from "next/navigation"
-import MenuTextField from "@/components/MenuTextField"
+"use client";
+import { useFormik } from "formik";
+import {
+  DeepPartial,
+  Discount,
+  Menu,
+  RestaurantResponse,
+  Restaurant,
+  Period,
+  DiscountWithEdit,
+} from "@/../interface";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
+import ResizableMultiInput from "@/components/ResizableMultiInput";
+import * as yup from "yup";
+import hourRegex from "@/constants/hourRegex";
+import useSession from "@/hooks/useSession";
+import { ChangeEvent, useEffect, useState } from "react";
+import { IconButton } from "@mui/material";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { Delete } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import MenuTextField from "@/components/MenuTextField";
 import TimePeriodTextField from "@/components/TimePeriodTextField";
 import DiscountTextField from "@/components/DiscountTextField";
 
-
 export default function ({
   restaurantInformation,
-  restaurantId
+  restaurantId,
 }: {
-  restaurantInformation: RestaurantResponse,
-  restaurantId: string
+  restaurantInformation: RestaurantResponse;
+  restaurantId: string;
 }) {
   // console.log("restaurantInformation.data.discounts",restaurantInformation.data.discounts)
   const { session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
   const [alertMessages, setAlertMessage] = useState<{
-    title: string | null,
-    description: string | null
+    title: string | null;
+    description: string | null;
   }>({
     title: null,
-    description: null
+    description: null,
   });
   const router = useRouter();
 
-  const invalidHourMessage = "invalid hour time"
-  const invalidMenuMessage = "menu name can't be empty!"
-  const invalidTagsMessage = "tag name can't be empty!"
-  const invalidAddressMessage = "address can't be empty!"
-  const invalidNameMessage = "restaurant name can't be empty!"
+  const invalidHourMessage = "invalid hour time";
+  const invalidMenuMessage = "menu name can't be empty!";
+  const invalidTagsMessage = "tag name can't be empty!";
+  const invalidAddressMessage = "address can't be empty!";
+  const invalidNameMessage = "restaurant name can't be empty!";
   const invalidCapacityMessage = "capacity must be number!";
   const ValidationSchema = yup.object().shape({
     name: yup.string().required(invalidNameMessage),
@@ -48,8 +63,11 @@ export default function ({
     menus: yup.array().of(
       yup.object().shape({
         name: yup.string().required(invalidMenuMessage),
-        price: yup.number().required(invalidMenuMessage).typeError(invalidMenuMessage)
-      })
+        price: yup
+          .number()
+          .required(invalidMenuMessage)
+          .typeError(invalidMenuMessage),
+      }),
     ),
     openingHours: yup.string().matches(hourRegex, invalidHourMessage),
     closingHours: yup.string().matches(hourRegex, invalidHourMessage),
@@ -57,13 +75,14 @@ export default function ({
       yup.object().shape({
         start: yup.string().matches(hourRegex, invalidHourMessage),
         end: yup.string().matches(hourRegex, invalidHourMessage),
-      })
+      }),
     ),
-    reserverCapacity: yup.number().required(invalidCapacityMessage).typeError(invalidCapacityMessage),
-    tags: yup.array().of(
-      yup.string().required(invalidTagsMessage)
-    )
-  })
+    reserverCapacity: yup
+      .number()
+      .required(invalidCapacityMessage)
+      .typeError(invalidCapacityMessage),
+    tags: yup.array().of(yup.string().required(invalidTagsMessage)),
+  });
 
   const iconSx = {
     stroke: "white",
@@ -76,16 +95,13 @@ export default function ({
     }
     let formData = new FormData();
     formData.append("image", e.currentTarget.files[0]);
-    const response = await fetch(
-      `/api/restaurants/${restaurantId}/image`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session?.token}`,
-        },
-        body: formData,
-      }
-    );
+    const response = await fetch(`/api/restaurants/${restaurantId}/image`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session?.token}`,
+      },
+      body: formData,
+    });
     const responseJson = await response.json();
     if (responseJson.success) {
       window.location.reload();
@@ -93,17 +109,14 @@ export default function ({
   }
 
   async function deleteImage(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) {
-    const response = await fetch(
-      `/api/restaurants/${restaurantId}/image`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.token}`,
-        },
-      }
-    );
+    const response = await fetch(`/api/restaurants/${restaurantId}/image`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session?.token}`,
+      },
+    });
     const responseJson = await response.json();
     if (responseJson.success) {
       router.refresh();
@@ -118,18 +131,27 @@ export default function ({
     initialValues[field] = restaurant[field];
   }
 
-  const formik = useFormik<DeepPartial<Omit<Restaurant, "tags">> & { tags: string[] }>({
+  const formik = useFormik<
+    DeepPartial<Omit<Restaurant, "tags">> & { tags: string[] }
+  >({
     initialValues: initialValues,
     validationSchema: ValidationSchema,
     async onSubmit(values) {
       const { discounts, ...rest } = values;
       let data: any = rest;
-      data.discounts = discounts?.reduce<any>((prev: Partial<Discount> | undefined, cur: Partial<Discount> | undefined, index) => {
-        return {
-          [index]: cur,
-          ...prev
-        }
-      }, {})
+      data.discounts = discounts?.reduce<any>(
+        (
+          prev: Partial<Discount> | undefined,
+          cur: Partial<Discount> | undefined,
+          index,
+        ) => {
+          return {
+            [index]: cur,
+            ...prev,
+          };
+        },
+        {},
+      );
       const response = await fetch(`/api/restaurants/${restaurantId}`, {
         method: "PUT",
         headers: {
@@ -236,7 +258,7 @@ export default function ({
           InnerProps={MenuTextField}
           label="menu"
           onChange={(newValue) => {
-            console.log("triggered: menus", newValue)
+            console.log("triggered: menus", newValue);
             formik.setFieldValue("menus", structuredClone(newValue));
           }}
           helperTexts={formik.errors.menus as string[] | undefined}
@@ -283,7 +305,10 @@ export default function ({
           label="Reservation Periods"
           onChange={(newValue) => {
             // console.log(newValue);
-            formik.setFieldValue("reservationPeriods", structuredClone(newValue));
+            formik.setFieldValue(
+              "reservationPeriods",
+              structuredClone(newValue),
+            );
           }}
           helperTexts={formik.errors.discounts as string[] | undefined}
         />
@@ -306,7 +331,10 @@ export default function ({
           values={formik.values.tags!}
           onChange={async (newValue) => {
             // console.log("tags newValue", newValue)
-            let result = await formik.setFieldValue("tags", structuredClone(newValue));
+            let result = await formik.setFieldValue(
+              "tags",
+              structuredClone(newValue),
+            );
           }}
           helperTexts={formik.errors.tags as string[] | undefined}
         />
@@ -314,7 +342,9 @@ export default function ({
         <ResizableMultiInput
           values={formik.values.rooms!}
           label="private rooms"
-          onChange={(newValue) => { formik.setFieldValue("rooms", newValue) }}
+          onChange={(newValue) => {
+            formik.setFieldValue("rooms", newValue);
+          }}
           helperTexts={formik.errors.tags as string[] | undefined}
         />
 

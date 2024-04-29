@@ -1,6 +1,5 @@
 import RegisterForm from "@/components/RegisterForm";
 
-
 export default function () {
   return (
     <main>
@@ -8,5 +7,5 @@ export default function () {
         <RegisterForm></RegisterForm>
       </div>
     </main>
-  )
+  );
 }

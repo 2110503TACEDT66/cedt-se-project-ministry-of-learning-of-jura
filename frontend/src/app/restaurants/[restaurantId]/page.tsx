@@ -1,5 +1,10 @@
 "use server";
-import { Reservation, ReservationsResponse, Restaurant, RestaurantResponse } from "@/../interface";
+import {
+  Reservation,
+  ReservationsResponse,
+  Restaurant,
+  RestaurantResponse,
+} from "@/../interface";
 import { notFound } from "next/navigation";
 import {
   List,
@@ -25,24 +30,23 @@ export default async function ({
     reservationId: string;
   };
 }) {
-  const restaurantResponse: RestaurantResponse = await getRestaurant(params.restaurantId)
-    .catch(() => {
-      notFound();
-    })
+  const restaurantResponse: RestaurantResponse = await getRestaurant(
+    params.restaurantId,
+  ).catch(() => {
+    notFound();
+  });
   const session = await useServerSession();
   const restaurant: Restaurant = restaurantResponse.data;
-  const isRestaurantOwner = session?.user.role == "restaurantOwner"
+  const isRestaurantOwner = session?.user.role == "restaurantOwner";
 
   let reservations: Reservation[] | undefined;
   if (session) {
-    const reservationsResponse: ReservationsResponse | undefined = await getReservations(
-      session?.token,
-      restaurant._id
-    ).catch(() => {
-      notFound();
-    }) ?? undefined;
+    const reservationsResponse: ReservationsResponse | undefined =
+      (await getReservations(session?.token, restaurant._id).catch(() => {
+        notFound();
+      })) ?? undefined;
     reservations = reservationsResponse?.data.filter(
-      (reservation) => reservation.restaurantId === restaurant._id
+      (reservation) => reservation.restaurantId === restaurant._id,
     );
   } else {
     reservations = [];
@@ -97,30 +101,26 @@ export default async function ({
           <Typography variant="h5" className="font-semibold">
             Available Reservation Periods
           </Typography>
-          {
-            restaurant.reservationPeriods && (
-              <List>
-                {
-                  restaurant.reservationPeriods.map(({ start, end }, index) => {
-                    const periodString = `${start}-${end}`;
-                    const searchParams = new URLSearchParams({
-                      restaurantName: restaurant.name,
-                      reservationPeriod: periodString,
-                    });
-                    return (
-                      <ListItemButton
-                        key={index}
-                        component="a"
-                        href={`/reservations/create?${searchParams.toString()}`}
-                      >
-                        <ListItemText key={index} primary={periodString} />
-                      </ListItemButton>
-                    );
-                  })
-                }
-              </List>
-            )
-          }
+          {restaurant.reservationPeriods && (
+            <List>
+              {restaurant.reservationPeriods.map(({ start, end }, index) => {
+                const periodString = `${start}-${end}`;
+                const searchParams = new URLSearchParams({
+                  restaurantName: restaurant.name,
+                  reservationPeriod: periodString,
+                });
+                return (
+                  <ListItemButton
+                    key={index}
+                    component="a"
+                    href={`/reservations/create?${searchParams.toString()}`}
+                  >
+                    <ListItemText key={index} primary={periodString} />
+                  </ListItemButton>
+                );
+              })}
+            </List>
+          )}
           <Typography variant="h5" className="font-semibold">
             Discount List
           </Typography>
@@ -132,34 +132,45 @@ export default async function ({
                     <div key={index} className="flex flex-row items-start">
                       <p>{index + 1}.</p>
                       <ListItem className="flex flex-col items-start pt-0 pl-0 pr-0">
-                        <ListItemText primary={"name: " + name} className="ml-2"></ListItemText>
-                        <ListItemText primary={"description: " + description} className="ml-2"></ListItemText>
-                        <ListItemText primary={"points: " + points} className="ml-2"></ListItemText>
-                        <ListItemText primary={"can be used: " + (isValid ? "yes" : "no")} className="ml-2"></ListItemText>
+                        <ListItemText
+                          primary={"name: " + name}
+                          className="ml-2"
+                        ></ListItemText>
+                        <ListItemText
+                          primary={"description: " + description}
+                          className="ml-2"
+                        ></ListItemText>
+                        <ListItemText
+                          primary={"points: " + points}
+                          className="ml-2"
+                        ></ListItemText>
+                        <ListItemText
+                          primary={"can be used: " + (isValid ? "yes" : "no")}
+                          className="ml-2"
+                        ></ListItemText>
                       </ListItem>
                     </div>
                   );
-                }
+                },
               )}
             </List>
           )}
 
-          {
-            isRestaurantOwner &&
+          {isRestaurantOwner && (
             <>
-              <Typography variant="h5" className="font-semibold">All Reservations</Typography>
-              {
-                reservations?.map(reservation => (
-                  <ReservationInformation
-                    key={reservation._id}
-                    session={session}
-                    reservation={reservation}
-                    className={"ml-2"}
-                  ></ReservationInformation>
-                ))
-              }
+              <Typography variant="h5" className="font-semibold">
+                All Reservations
+              </Typography>
+              {reservations?.map((reservation) => (
+                <ReservationInformation
+                  key={reservation._id}
+                  session={session}
+                  reservation={reservation}
+                  className={"ml-2"}
+                ></ReservationInformation>
+              ))}
             </>
-          }
+          )}
         </div>
       </div>
     </main>

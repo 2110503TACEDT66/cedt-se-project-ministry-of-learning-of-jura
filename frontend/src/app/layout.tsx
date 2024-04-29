@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import TopMenu from "@/components/TopMenu";
 import ClientSessionProvider from "@/providers/ClientSessionProvider";
-import {ThemeProvider} from "next-themes"
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ClientSessionProvider>
           <ThemeProvider attribute="class">
-            <TopMenu/>
+            <TopMenu />
             {children}
           </ThemeProvider>
         </ClientSessionProvider>
