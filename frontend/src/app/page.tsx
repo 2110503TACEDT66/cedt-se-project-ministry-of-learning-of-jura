@@ -2,11 +2,16 @@ import RestaurantsWithTag from "@/components/RestaurantsWithTag";
 import WelcomeBackDialog from "@/components/WelcomeBackDialog";
 import useServerSession from "@/hooks/useServerSession";
 import AddIcon from "@mui/icons-material/Add"
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import Link from "next/link";
 
 export default async function Home() {
   const session = await useServerSession();
+  const {data:canRedeem} = await fetch(process.env.BACKEND_URL+"/api/v1/redeem",{
+    method: "GET",
+    headers:{
+      Authorization: `Bearer ${session?.token}`
+    }
+  }).then(res=>res.json())
   return (
     <main className="flex flex-col gap-2">
       {
@@ -17,7 +22,7 @@ export default async function Home() {
         )
       }
       {
-        session?.user.role == "user" && (
+        session?.user.role == "user" && canRedeem && (
           <WelcomeBackDialog/>
         )
       }
