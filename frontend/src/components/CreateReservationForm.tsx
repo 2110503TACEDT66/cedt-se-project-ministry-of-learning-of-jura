@@ -241,7 +241,7 @@ export default function ({
             restaurantsList.length === 1 &&
             discountsList[0] !== undefined &&
             discountsList[0].map((discount, index) => (
-              <MenuItem key={index} value={index}>
+              <MenuItem key={index} value={index} disabled={!discount.isValid}>
                 <p>{discount.name}</p>
                 <p>{discount.points}</p>
               </MenuItem>
