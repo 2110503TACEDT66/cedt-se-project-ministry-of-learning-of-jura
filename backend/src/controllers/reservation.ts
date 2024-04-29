@@ -267,7 +267,7 @@ export async function confirmReservation(req: Request, res: Response, next: Next
       await reserver.save({ session });
       await session.commitTransaction();
       session.endSession();
-      await ReservationModel.findByIdAndDelete(reservation._id);
+      // await ReservationModel.findByIdAndDelete(reservation._id);
       return res.status(200).json({
         success: true,
         data: reservation
