@@ -8,20 +8,20 @@ import { isDocument, isDocumentArray } from "@typegoose/typegoose";
 export default function (populatedUser: User | null) {
   if (populatedUser != undefined && isDocumentArray(populatedUser.reservationHistory)) {
     console.log(JSON.stringify(populatedUser,null,2))
-    let reservationHistory = populatedUser.reservationHistory;
-    let lastReservationIndex = reservationHistory.length - 1;
-    let diffMillisecond = Duration.milliseconds.of(new Date().getTime() - new Date(lastReservation.reservationDate).getTime());
-    const lastestChurnDateVerified = Duration.days.from(diffMillisecond) >= env.CHURN_DURATION 
-    if(lastReservationIndex<0){
-      return lastestChurnDateVerified;
+    const reservationHistory = populatedUser.reservationHistory;
+    if(populatedUser.lastestChurnDate==undefined){
+      return reservationHistory.length!=0;
     }
-    let lastReservation = populatedUser.reservationHistory[lastReservationIndex];
-
-    return lastestChurnDateVerified
-    && (
-      populatedUser.lastestChurnDate == undefined 
-      || populatedUser.lastestChurnDate.getTime() < lastReservation.reservationDate.getTime()
-    )
+    const lastestChurnDuration = Duration.milliseconds.of(new Date().getTime() - populatedUser.lastestChurnDate.getTime());
+    if(reservationHistory.length==0){
+      return false;
+    }
+    const lastReservationIndex = reservationHistory.length - 1;
+    const lastestReservation = reservationHistory[lastReservationIndex];
+    const lastestReservationDuration = Duration.milliseconds.of(new Date().getTime() - lastestReservation.reservationDate.getTime());
+    const lastestChurnDateVerified = Duration.days.from(lastestChurnDuration) < env.CHURN_DURATION
+    const lastestReservationVerified = Duration.days.from(lastestReservationDuration) < env.CHURN_DURATION;
+    return lastestChurnDateVerified && lastestReservationVerified;
   }
   return false;
 }
