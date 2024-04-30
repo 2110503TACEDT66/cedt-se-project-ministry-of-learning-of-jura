@@ -34,7 +34,7 @@ describe("TC1-3", () => {
 
   test("TC1-3-1", async () => {
     let result = await request(app)
-      .get(`/api/v1/restaurants`)
+      .get(`/api/v1/restaurants/${validRestaurantId}/image`)
 
     expect(result.ok).toBe(true);
   })
