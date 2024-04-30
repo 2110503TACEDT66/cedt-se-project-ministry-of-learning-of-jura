@@ -213,27 +213,31 @@ export async function updateReservation(
     });
   }
 }
-export async function deleteReservation(req: Request,res: Response,next: NextFunction){
-  try{
-      const reservation = await ReservationModel.findById(req.params.id);
-      if(!reservation){
-          return res.status(404).json({
-              success:false
-          })
+export async function deleteReservation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const reservation = await ReservationModel.findById(req.params.id);
+    if (!reservation) {
+      return res.status(404).json({
+        success: false
+      })
+    }
+    await reservation.deleteOne();
+    await UserModel.findByIdAndUpdate(req.user!._id, {
+      $inc: {
+        point: POINTS_DEDUCTED_FOR_CANCELLATION,
+        karma: KARMA_DEDUCTED_FOR_CANCELLATION
       }
-      await reservation.deleteOne();
-      await UserModel.findByIdAndUpdate(req.user!._id, { $inc: { point: POINTS_DEDUCTED_FOR_CANCELLATION } })
-      await UserModel.findByIdAndUpdate(req.user!._id, { $inc: { karma: KARMA_DEDUCTED_FOR_CANCELLATION } })
-      return res.status(200).json({
-          success:true,
-          data:{}
-      })
+    })
+    return res.status(200).json({
+      success: true,
+      data: {}
+    })
   }
-  catch(err){
-      console.log(err)
-      res.status(400).json({
-          success:false
-      })
+  catch (err) {
+    console.log(err)
+    res.status(400).json({
+      success: false
+    })
   }
 }
 
