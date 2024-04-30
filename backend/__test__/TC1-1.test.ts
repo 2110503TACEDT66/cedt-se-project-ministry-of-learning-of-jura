@@ -83,6 +83,15 @@ describe("TC1-1", () => {
       .set("Authorization",`Bearer ${token}`)
     expect(result.body.success).toBe(false);
   })
+  
+  test("TC1-1-6",async () => {
+    const result = await request(app)
+      .post("/api/v1/restaurants/6630512239cec65d45debb58/image")
+      .set('Accept', 'application/json')
+      .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
+      .set("Authorization",`Bearer ${token}`)
+    expect(result.body.success).toBe(false);
+  })
 
   afterAll((done)=>{
     cronTask.stop();
