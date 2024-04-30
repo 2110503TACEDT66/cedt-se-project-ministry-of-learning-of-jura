@@ -271,14 +271,18 @@ export default function ({
           value={formik.values.discountIndex ?? ""}
           label={"Discount"}
         >
-          {restaurantsList.length === 1 &&
+          {
+            restaurantsList.length === 1 &&
             discountsList[0] !== undefined &&
-            discountsList[0].map((discount, index) => (
-              <MenuItem key={index} value={index} disabled={!discount.isValid}>
-                <p>{discount.name}</p>
-                <p>{discount.points}</p>
-              </MenuItem>
-            ))}
+            discountsList[0].map((discount, index) => {
+              console.log(discount, "didsjfsodf")
+              let isDisabled = !discount.isValid || discount.points>session.user.point;
+              return < MenuItem key={index} value={index} disabled={isDisabled}>
+              <p>{discount.name}</p>
+              <p>{discount.points}</p>
+            </MenuItem>
+            })
+          }
         </TextField>
 
         <TextField
@@ -323,6 +327,6 @@ export default function ({
           reserve now!
         </Button>
       </form>
-    </div>
+    </div >
   );
 }

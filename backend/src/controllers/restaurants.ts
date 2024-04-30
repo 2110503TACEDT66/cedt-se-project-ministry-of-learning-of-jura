@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from "express";
 import { UserType } from "../models/User";
 import filterKeyAllDepth from "../utils/filterKeyAllDepth";
 import Discount from "../models/Discount";
-import { isDocument } from "@typegoose/typegoose";
+import { isDocument, isDocumentArray } from "@typegoose/typegoose";
 import validUpdateDiscounts from "../utils/validUpdateDiscounts";
 
 //@desc   : Get all restaurants
@@ -39,7 +39,7 @@ export async function getRestaurants(
     } = {
       path: "reservations",
     };
-    if (req.user.role != UserType.RestaurantOwner) {
+    if (req.user.role != UserType.RestaurantOwner ) {
       populateQuery.match = {
         reservorId: req.user._id,
       };
@@ -70,21 +70,20 @@ export async function getRestaurants(
 
   try {
     const total = await RestaurantModel.countDocuments(query);
-    query = query.skip(startIndex).limit(limit);
-
+    query = query.skip(startIndex).limit(limit);  
     let result = await query;
 
-    // Add fields to each restaurant
-    // result = result.map(restaurant => ({
-    //   ...restaurant.toObject(), // Convert the document to a plain JavaScript object
-    //   isOwner: req.user?.isOwner(restaurant),
-    // }));
     let resultWithIsOwner = result.map((restaurant) => {
-      let { restaurantOwner, ...restaurantJson } = restaurant.toJSON();
-
+      let reservations = restaurant.reservations
+      let { restaurantOwner, reservations: _ , ...rest } = restaurant.toJSON();
+      const isOwner = req.user?._id.equals(restaurantOwner);
+      if(req.user?.role==UserType.RestaurantOwner && isDocumentArray(reservations!) && !isOwner){
+        reservations=[];
+      }
       return {
-        ...restaurantJson,
-        isOwner: req.user?.isOwner(restaurant),
+        ...rest,
+        reservations,
+        isOwner: isOwner,
       };
     });
 
@@ -106,6 +105,7 @@ export async function getRestaurants(
     if (startIndex > 0) {
       pagination.prev = { page: page - 1 };
     }
+    console.log(resultWithIsOwner)
 
     res.status(200).json({
       success: true,
@@ -146,7 +146,7 @@ export async function getRestaurant(
       };
       if (
         req.user.role != UserType.RestaurantOwner ||
-        !restaurant.restaurantOwner.equals(req.user._id)
+        !req.user.isOwner(restaurant)
       ) {
         populateQuery.match = {
           reservorId: req.user._id.toString(),

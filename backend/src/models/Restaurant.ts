@@ -101,7 +101,7 @@ export class Restaurant {
     foreignField: "restaurantId",
     justOne: false,
   })
-  public reservations?: Ref<Reservation>;
+  public reservations?: Ref<Reservation>[];
 
   @prop({
     type: [String],
