@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage --runInBand",
     "dev": "nodemon --ignore __test__/  --ignore apiFetcher/ src/server.ts",
     "build": "tsc && npm run gen-swagger",
     "ts:gen-swagger": "ts-node src/swagger.ts",

@@ -364,14 +364,14 @@ export async function uploadRestaurantImage(
         .json({ success: false, message: "Not Authorized" });
     }
     let file = await File.findOne({ filename: restaurant.id });
-    if (file != undefined) {
-      await file.deleteOne();
-      // return res.status(404).json({success:false,message:"restaurant already has image"})
-    }
     if (req.file == undefined) {
       return res
         .status(400)
         .json({ success: false, message: "invalid file attached" });
+    }
+    if (file != undefined) {
+      await file.deleteOne();
+      // return res.status(404).json({success:false,message:"restaurant already has image"})
     }
     let bucket = getGridFsBucket();
     let uploadStream = bucket!.openUploadStream(restaurant.id, {
@@ -380,8 +380,10 @@ export async function uploadRestaurantImage(
       },
     });
     let fileStream = Readable.from(req.file.buffer);
-    fileStream.pipe(uploadStream);
-    res.status(200).json({ success: true });
+    const stream = fileStream.pipe(uploadStream)
+    stream.on("finish",()=>{
+      res.status(200).json({ success: true });
+    })
   } catch (err) {
     res
       .status(400)
@@ -461,7 +463,7 @@ export async function deleteRestaurantImage(
         .json({ success: false, message: "restaurant has no image" });
     }
     let bucket = getGridFsBucket();
-    bucket!.delete(file._id);
+    await bucket!.delete(file._id);
     res.status(200).json({ success: true });
   } catch (err) {
     console.log(err);
@@ -490,11 +492,11 @@ export async function getRestaurantImage(
     }
 
     const bucket = getGridFsBucket();
-    const downloadStream = await bucket!.openDownloadStreamByName(
+    const downloadStream = bucket!.openDownloadStreamByName(
       req.params.id,
     );
     downloadStream.on("error", (err) => {
-      // console.log(err);
+      console.log(err);
       res.status(404).json({
         success: false,
         message: "This restaurant has no images",

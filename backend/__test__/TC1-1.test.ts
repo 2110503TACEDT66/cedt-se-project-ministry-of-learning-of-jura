@@ -8,10 +8,11 @@ import cronTask from "../src/utils/reservationScheduler"
 
 describe("TC1-1", () => {
   let token: string;
+  let restaurantId = "66309e45552b26689dba39b3" //sushi sus
   
   beforeAll(async ()=>{
     const emailAndPass = {
-      email:"restaurantOwner@gmail.com",
+      email:"ARO@gmail.com",
       password:"12345678"
     }
     
@@ -26,7 +27,7 @@ describe("TC1-1", () => {
   
   test("TC1-1-1",async () => {
     const result = await request(app)
-      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .post(`/api/v1/restaurants/${restaurantId}/image`)
       .set('Accept', 'application/json')
       .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
       .set("Authorization",`Bearer ${token}`)
@@ -35,7 +36,7 @@ describe("TC1-1", () => {
 
   test("TC1-1-2",async () => {
     const result = await request(app)
-      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .post(`/api/v1/restaurants/${restaurantId}/image`)
       .set('Accept', 'application/json')
       .attach("image",path.join(__dirname,"../apiFetcher/resource/30mb_image.jpg"))
       .set("Authorization",`Bearer ${token}`)
@@ -44,7 +45,7 @@ describe("TC1-1", () => {
 
   test("TC1-1-3",async () => {
     const result = await request(app)
-      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .post(`/api/v1/restaurants/${restaurantId}/image`)
       .set('Accept', 'application/json')
       .set("Authorization",`Bearer ${token}`)
     expect(result.body.success).toBe(false);
@@ -62,7 +63,7 @@ describe("TC1-1", () => {
       .set('Accept', 'application/json')
     let otherUserToken = loginResult.body.token
     const result = await request(app)
-      .post("/api/v1/restaurants/661d3806aaf6a413b0b076ba/image")
+      .post(`/api/v1/restaurants/${restaurantId}/image`)
       .set('Accept', 'application/json')
       .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
       .set("Authorization",`Bearer ${otherUserToken}`)
@@ -71,7 +72,7 @@ describe("TC1-1", () => {
   
   test("TC1-1-5",async () => {
     const result = await request(app)
-      .post("/api/v1/restaurants/gfgdgdgf/image")
+      .post(`/api/v1/restaurants/gfgdgdgf/image`)
       .set('Accept', 'application/json')
       .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
       .set("Authorization",`Bearer ${token}`)
@@ -80,7 +81,7 @@ describe("TC1-1", () => {
   
   test("TC1-1-6",async () => {
     const result = await request(app)
-      .post("/api/v1/restaurants/6630512239cec65d45debb58/image")
+      .post(`/api/v1/restaurants/6630512239cec65d45debb58/image`)
       .set('Accept', 'application/json')
       .attach("image",path.join(__dirname,"../apiFetcher/resource/steak.jpg"))
       .set("Authorization",`Bearer ${token}`)

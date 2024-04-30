@@ -8,12 +8,12 @@ import cronTask from "../src/utils/reservationScheduler"
 
 describe("TC1-3", () => {
   let token: string;
-  let validRestaurantId = "661d3806aaf6a413b0b076ba";
-  let restaurantWithNoImageId = "66305a129afd8736a43a1ade";
+  let validRestaurantId = "66309e45552b26689dba39b3";
+  let restaurantWithNoImageId = "6630e109bfc36e22961a3530";
   
   beforeAll(async () => {
     const emailAndPass = {
-      email: "restaurantOwner@gmail.com",
+      email: "ARO@gmail.com",
       password: "12345678"
     }
 
@@ -35,7 +35,7 @@ describe("TC1-3", () => {
   test("TC1-3-1", async () => {
     let result = await request(app)
       .get(`/api/v1/restaurants/${validRestaurantId}/image`)
-
+    console.log(result.body)
     expect(result.ok).toBe(true);
   })
 
