@@ -30,7 +30,7 @@ export interface Restaurant {
   closingHours: string;
   reservationPeriods: Period[];
   reserverCapacity: number;
-  reservation: string[];
+  reservations: Reservation[];
   discounts: DiscountWithEdit[];
   tags: string[];
   _id: string;

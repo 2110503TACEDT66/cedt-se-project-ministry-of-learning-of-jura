@@ -19,9 +19,7 @@ export async function getReservations(
       reservorId?: ObjectId;
       restaurantId?: ObjectId;
     } = {};
-    if (req.user!.role != UserType.RestaurantOwner) {
-      filterQuery.reservorId = req.user!._id;
-    }
+    filterQuery.reservorId = req.user!._id;
     if (restaurantId) {
       filterQuery.restaurantId = restaurantId;
     }

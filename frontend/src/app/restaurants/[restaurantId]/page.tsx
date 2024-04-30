@@ -30,27 +30,20 @@ export default async function ({
     reservationId: string;
   };
 }) {
+  const session = await useServerSession();
   const restaurantResponse: RestaurantResponse = await getRestaurant(
     params.restaurantId,
+    session?.token
   ).catch(() => {
     notFound();
   });
-  const session = await useServerSession();
+  console.log(restaurantResponse.data.reservations,"fdsojf")
+  let reservations: Reservation[] | undefined = restaurantResponse.data.reservations;
   const restaurant: Restaurant = restaurantResponse.data;
+
+  console.log(restaurantResponse,"reservations")
   const isRestaurantOwner = session?.user.role == "restaurantOwner";
 
-  let reservations: Reservation[] | undefined;
-  if (session) {
-    const reservationsResponse: ReservationsResponse | undefined =
-      (await getReservations(session?.token, restaurant._id).catch(() => {
-        notFound();
-      })) ?? undefined;
-    reservations = reservationsResponse?.data.filter(
-      (reservation) => reservation.restaurantId === restaurant._id,
-    );
-  } else {
-    reservations = [];
-  }
 
   return (
     <main className=" flex  justify-center">

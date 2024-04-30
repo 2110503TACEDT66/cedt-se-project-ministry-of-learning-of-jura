@@ -39,7 +39,7 @@ export async function getRestaurants(
     } = {
       path: "reservations",
     };
-    if (req.user.role != UserType.RestaurantOwner ) {
+    if (req.user.role != UserType.RestaurantOwner) {
       populateQuery.match = {
         reservorId: req.user._id,
       };
@@ -70,15 +70,15 @@ export async function getRestaurants(
 
   try {
     const total = await RestaurantModel.countDocuments(query);
-    query = query.skip(startIndex).limit(limit);  
+    query = query.skip(startIndex).limit(limit);
     let result = await query;
 
     let resultWithIsOwner = result.map((restaurant) => {
       let reservations = restaurant.reservations
-      let { restaurantOwner, reservations: _ , ...rest } = restaurant.toJSON();
+      let { restaurantOwner, reservations: _, ...rest } = restaurant.toJSON();
       const isOwner = req.user?._id.equals(restaurantOwner);
-      if(req.user?.role==UserType.RestaurantOwner && isDocumentArray(reservations!) && !isOwner){
-        reservations=[];
+      if (req.user?.role == UserType.RestaurantOwner && isDocumentArray(reservations!) && !isOwner) {
+        reservations = [];
       }
       return {
         ...rest,
@@ -105,7 +105,6 @@ export async function getRestaurants(
     if (startIndex > 0) {
       pagination.prev = { page: page - 1 };
     }
-    console.log(resultWithIsOwner)
 
     res.status(200).json({
       success: true,
@@ -135,7 +134,7 @@ export async function getRestaurant(
       return res.status(404).json({ success: false });
     }
     let query = RestaurantModel.findById(req.params.id);
-    if (req.user) {
+    if (req.user != undefined) {
       let populateQuery: {
         path: string;
         match?: {
@@ -156,16 +155,23 @@ export async function getRestaurant(
       query = query.populate(populateQuery);
     }
 
-    const reservationsJson = await query;
-    // console.log(restaurant.restaurantOwner)
-    // restaurant.reservations=reservationsJson.reservations;
-    if (!restaurant) {
-      return res.status(404).json({ success: false, message: "Not found" });
+    const reservationsJson = await query; 
+    if(isDocumentArray(reservationsJson?.reservations)){
+      // const reservations = reservationsJson.reservations
+      const {reservations,...rest} = reservationsJson.toObject({depopulate:false,virtuals:true});
+      
+      const result = {
+        ...rest,
+        reservations
+      }
+      if (!restaurant) {
+          return res.status(404).json({ success: false, message: "Not found" });
+        }
+        res.status(200).json({
+          success: true,
+          data: result,
+        });
     }
-    res.status(200).json({
-      success: true,
-      data: reservationsJson,
-    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, message: "Not valid ID" });
