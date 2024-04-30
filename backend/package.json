@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon --ignore test/ src/server.ts",
+    "dev": "nodemon --ignore __test__/  --ignore apiFetcher/ src/server.ts",
     "build": "tsc && npm run gen-swagger",
     "ts:gen-swagger": "ts-node src/swagger.ts",
     "gen-swagger": "node build/swagger.js",

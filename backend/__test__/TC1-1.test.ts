@@ -6,20 +6,14 @@ import { app } from '../src/app';
 import mongoose from 'mongoose';
 import cronTask from "../src/utils/reservationScheduler"
 
-const url = "http://localhost:6969"
-
 describe("TC1-1", () => {
   let token: string;
-  // let server: any;
-  // let request: any;
-
+  
   beforeAll(async ()=>{
     const emailAndPass = {
       email:"restaurantOwner@gmail.com",
       password:"12345678"
     }
-    // server=app.listen(6970)
-    // request = supertest.agent(server);
     
     let result: any = await request(app)
       .post("/api/v1/auth/login")
