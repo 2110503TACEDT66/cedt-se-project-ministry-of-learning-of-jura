@@ -285,14 +285,6 @@ export async function confirmReservation(
       });
     }
 
-    
-    await UserModel.findByIdAndUpdate(req.user!._id, {
-      $inc: {
-        point: POINTS_GAINED_FOR_RESERVATION,
-        karma: KARMA_GAINED_FOR_RESERVATION
-      }
-    })
-
     reservation.isConfirmed = true;
     reserver.reservationHistory.push(reservation);
     if (reserver.reservationHistory.length > 10) {
@@ -308,6 +300,13 @@ export async function confirmReservation(
       await reserver.save({ session });
       await session.commitTransaction();
       session.endSession();
+      
+      await UserModel.findByIdAndUpdate(reservation.reservorId, {
+        $inc: {
+          point: POINTS_GAINED_FOR_RESERVATION,
+          karma: KARMA_GAINED_FOR_RESERVATION
+        }
+      })
       // await ReservationModel.findByIdAndDelete(reservation._id);
       return res.status(200).json({
         success: true,
