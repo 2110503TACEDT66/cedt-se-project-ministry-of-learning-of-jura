@@ -25,7 +25,7 @@ export default function ({ restaurantId, src, ...rest }: Props) {
       src={imgSrc}
       onError={(e) => {
         e.stopPropagation();
-        // setImgSrc(`/img/pure_logo.jpg`);
+        setImgSrc(`/img/pure_logo.jpg`);
       }}
       priority={true}
     ></Image>
