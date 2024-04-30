@@ -11,8 +11,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Dispatch, SetStateAction, useState } from "react";
 import deleteReservation from "@/utils/deleteReservation";
 import { useRouter } from "next/navigation";
-import { Reservation } from "../../interface";
-
+import { Reservation, User } from "../../interface";
+import getRestaurant from "@/utils/getRestaurant";
 export default function ({
   token,
   reservationId,
@@ -26,7 +26,9 @@ export default function ({
   const router = useRouter();
   async function onDeleteButtonClick() {
     setIsAlerting(false);
-    const response = await deleteReservation(token, reservationId);
+    const deleter = await deleteReservation(token, reservationId);
+    // const response = await getRestaurant(restaurantId);
+    // console.log(response);
     // setReservations()
     router.refresh();
   }
