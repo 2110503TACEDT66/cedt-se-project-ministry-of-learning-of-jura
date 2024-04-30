@@ -10,6 +10,6 @@ const doc = {
 };
 
 const outputFile = "../swagger/output.json";
-const routes = ["../src/server.ts"]; // make it support both js and ts
+const routes = ["../src/app.ts"]; // make it support both js and ts
 
 swaggerAutogen(outputFile, routes, doc);
