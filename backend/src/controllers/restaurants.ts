@@ -155,23 +155,27 @@ export async function getRestaurant(
       query = query.populate(populateQuery);
     }
 
-    const reservationsJson = await query; 
-    if(isDocumentArray(reservationsJson?.reservations)){
+    const reservationsJson = (await query)?.toObject({depopulate: false,virtuals:true});
+    if (isDocumentArray(reservationsJson?.reservations)) {
       // const reservations = reservationsJson.reservations
-      const {reservations,...rest} = reservationsJson.toObject({depopulate:false,virtuals:true});
-      
+      const { reservations, ...rest } = reservationsJson
+
       const result = {
         ...rest,
         reservations
       }
       if (!restaurant) {
-          return res.status(404).json({ success: false, message: "Not found" });
-        }
-        res.status(200).json({
-          success: true,
-          data: result,
-        });
+        return res.status(404).json({ success: false, message: "Not found" });
+      }
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
     }
+    res.status(200).json({
+      success: true,
+      data: reservationsJson,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, message: "Not valid ID" });
@@ -381,7 +385,7 @@ export async function uploadRestaurantImage(
     });
     let fileStream = Readable.from(req.file.buffer);
     const stream = fileStream.pipe(uploadStream)
-    stream.on("finish",()=>{
+    stream.on("finish", () => {
       res.status(200).json({ success: true });
     })
   } catch (err) {

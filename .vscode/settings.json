@@ -1,6 +1,6 @@
 {
     "code-runner.executorMap": {
-        "javascript": "node backend/test/run.js ",
+        "javascript": "node backend/apiFetcher/run.js ",
     },
     "typescript.tsdk": "node_modules\\typescript\\lib"
 }

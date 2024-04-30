@@ -38,6 +38,7 @@ export async function canRedeem(
     throw new Error("Middleware might be broken");
   }
   let populatedUser = await req.user.populate("reservationHistory");
+  console.log(populatedUser,"fdsfssf")
   // let populatedUser = await UserModel.findOne({}).populate("reservationHistory");
   if (redeemable(populatedUser)) {
     return res.status(200).json({ success: true, data: true });
