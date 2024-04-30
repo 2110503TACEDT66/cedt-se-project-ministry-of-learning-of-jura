@@ -24,7 +24,7 @@ describe('Test Point Decrease Correct', () => {
     // cy.wait("@firstPoint" , { timeout : 1000}) ;
     
     
-    cy.get("body > main > div > form > div.MuiAutocomplete-root.MuiAutocomplete-hasClearIcon.css-gieija-MuiAutocomplete-root > div > div").type("no image naja") ;
+    cy.get("body > main > div > form > div.MuiAutocomplete-root.MuiAutocomplete-hasClearIcon.css-gieija-MuiAutocomplete-root > div > div").type("Sushi SUS") ;
     cy.get("body > div").click();
     cy.get("body > main > div > form > div.MuiFormControl-root.MuiTextField-root.css-z3c6am-MuiFormControl-root-MuiTextField-root > div > input").focus().type("04/30/2024") ;
     cy.get("body > main > div > form > div:nth-child(3) > div").click() ;
