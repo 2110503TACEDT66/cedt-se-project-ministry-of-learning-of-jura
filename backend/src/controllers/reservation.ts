@@ -5,7 +5,9 @@ import { UserModel, UserType } from "../models/User";
 import { ObjectId, Document } from "mongoose";
 import {
   KARMA_DEDUCTED_FOR_CANCELLATION,
+  KARMA_GAINED_FOR_RESERVATION,
   POINTS_DEDUCTED_FOR_CANCELLATION,
+  POINTS_GAINED_FOR_RESERVATION,
 } from "../config/constants";
 
 export async function getReservations(
@@ -282,6 +284,14 @@ export async function confirmReservation(
         message: "Cannot find user with id " + reservation.reservorId,
       });
     }
+
+    
+    await UserModel.findByIdAndUpdate(req.user!._id, {
+      $inc: {
+        point: POINTS_GAINED_FOR_RESERVATION,
+        karma: KARMA_GAINED_FOR_RESERVATION
+      }
+    })
 
     reservation.isConfirmed = true;
     reserver.reservationHistory.push(reservation);
