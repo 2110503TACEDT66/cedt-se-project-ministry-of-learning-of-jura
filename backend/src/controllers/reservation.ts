@@ -108,6 +108,7 @@ export async function addReservation(
       ReservationModel.countDocuments({
         restaurantId,
         reservationPeriod,
+        isConfirmed: false
       }),
       RestaurantModel.findOne({ _id: restaurantId }),
     ]);
